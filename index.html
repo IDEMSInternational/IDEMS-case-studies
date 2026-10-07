@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STACK in Africa Personas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f3ee;
+  --surface: #ffffff;
+  --surface-2: #f1ede6;
+  --text: #1d1b18;
+  --muted: #6b655c;
+  --line: #e2dcd2;
+  --accent: #1f5f8b;
+  --shadow: 0 1px 2px rgba(30,25,15,.06), 0 6px 20px rgba(30,25,15,.06);
+  --g-students: #c2410c;
+  --g-teaching: #1f6f8b;
+  --g-support: #6d28d9;
+  --g-leadership: #9f1239;
+  --g-funders: #a16207;
+  --g-research: #15803d;
+  --tvet: #0f766e;
+  --commercial: #334155;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161513; --surface: #1f1e1b; --surface-2: #2a2824; --text: #eeeae3; --muted: #a39d93;
+    --line: #36332e; --accent: #7cb8e0; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+    --g-students: #fb923c; --g-teaching: #5ab4d6; --g-support: #a78bfa; --g-leadership: #fb7185;
+    --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161513; --surface: #1f1e1b; --surface-2: #2a2824; --text: #eeeae3; --muted: #a39d93;
+  --line: #36332e; --accent: #7cb8e0; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  --g-students: #fb923c; --g-teaching: #5ab4d6; --g-support: #a78bfa; --g-leadership: #fb7185;
+  --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+header.top { padding: 40px 0 20px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+h1 { font-family: Fraunces, Georgia, serif; font-weight: 650; font-size: clamp(30px, 5vw, 46px); line-height: 1.1; margin: 6px 0 12px; }
+.lede { max-width: 760px; color: var(--muted); font-size: 16px; margin: 0; }
+.note {
+  margin-top: 16px; max-width: 760px; font-size: 13px; color: var(--muted);
+  border-left: 3px solid var(--accent); padding: 6px 12px; background: var(--surface);
+}
+.controls {
+  position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(6px); padding: 12px 0; border-bottom: 1px solid var(--line); margin-bottom: 20px;
+}
+.controls .wrap { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip {
+  border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px;
+  padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--muted)); }
+.chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.chip .n { opacity: .6; font-size: 12px; }
+.search {
+  margin-left: auto; min-width: 0; flex: 1 1 180px; max-width: 260px; border: 1px solid var(--line); background: var(--surface);
+  color: var(--text); border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 13px;
+}
+.theme-btn { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; width: 34px; height: 34px; cursor: pointer; font-size: 15px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; padding-bottom: 40px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+  box-shadow: var(--shadow); display: flex; flex-direction: column; cursor: pointer; text-align: left;
+  padding: 0; font: inherit; color: inherit; transition: transform .15s ease, box-shadow .15s ease;
+}
+.card:hover, .card:focus-visible { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(30,25,15,.12); outline: none; }
+.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.card .ph { position: relative; aspect-ratio: 4/3; background: var(--surface-2); overflow: hidden; }
+.card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.num {
+  position: absolute; top: 10px; left: 10px; background: var(--surface); color: var(--text); border-radius: 999px;
+  font-size: 12px; font-weight: 600; padding: 2px 9px; box-shadow: var(--shadow);
+}
+.newtag {
+  position: absolute; top: 10px; right: 10px; background: var(--text); color: var(--bg);
+  border-radius: 999px; font-size: 11px; font-weight: 600; padding: 2px 8px; letter-spacing: .03em;
+}
+.card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; border-top: 4px solid var(--c); }
+.name { font-family: Fraunces, Georgia, serif; font-size: 20px; font-weight: 650; line-height: 1.2; margin: 0; }
+.tagline { font-style: italic; color: var(--muted); font-size: 14px; margin: 0; }
+.meta { font-size: 12.5px; color: var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.tag { font-size: 11.5px; font-weight: 600; color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); border-radius: 999px; padding: 1px 8px; }
+.card blockquote { margin: 6px 0 0; font-size: 13.5px; color: var(--text); opacity: .9; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.empty { color: var(--muted); padding: 40px 0; text-align: center; display: none; }
+
+/* Profile dialog */
+dialog {
+  border: none; padding: 0; width: min(1000px, calc(100vw - 24px)); max-height: calc(100vh - 24px);
+  border-radius: 16px; background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+dialog::backdrop { background: rgba(15,12,8,.55); }
+.pf { display: grid; grid-template-columns: 340px 1fr; }
+.pf-side { background: var(--surface-2); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.pf-side img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; display: block; }
+.pf-quote {
+  margin: 0; background: color-mix(in srgb, var(--c) 14%, var(--surface)); border-left: 4px solid var(--c);
+  padding: 14px 16px; border-radius: 8px; font-family: Fraunces, Georgia, serif; font-style: italic; font-size: 16px; line-height: 1.45;
+}
+.pf-main { padding: 22px 26px 26px; overflow: auto; }
+.pf-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.pf-head h2 { font-family: Fraunces, Georgia, serif; font-size: 28px; margin: 0; line-height: 1.15; }
+.pf-head .tagline { font-size: 16px; }
+.close { margin-left: auto; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; width: 36px; height: 36px; font-size: 18px; cursor: pointer; flex: none; }
+.sections { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 28px; }
+.sec h3 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin: 14px 0 6px; color: var(--c); }
+.sec ul { margin: 0; padding-left: 18px; }
+.sec li { margin: 3px 0; font-size: 14px; }
+.grounded { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); margin-top: 18px; padding-top: 10px; }
+details.prompt { font-size: 12.5px; color: var(--muted); }
+details.prompt summary { cursor: pointer; font-weight: 600; color: var(--text); }
+details.prompt p { margin: 8px 0 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-family: ui-monospace, Consolas, monospace; font-size: 12px; line-height: 1.5; }
+.credit { font-size: 11.5px; color: var(--muted); }
+.credit a { color: inherit; }
+.nav { display: flex; gap: 8px; margin-top: 18px; }
+.nav button { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+
+footer { border-top: 1px solid var(--line); padding: 28px 0 60px; color: var(--muted); font-size: 13px; }
+footer h2 { font-family: Fraunces, Georgia, serif; color: var(--text); font-size: 20px; margin: 0 0 8px; }
+footer ol { padding-left: 20px; columns: 2 380px; column-gap: 32px; }
+footer li { margin: 4px 0; break-inside: avoid; }
+footer a { color: var(--accent); }
+
+@media (max-width: 760px) {
+  .pf { grid-template-columns: 1fr; }
+  .pf-side img { aspect-ratio: 4/3; }
+  .sections { grid-template-columns: 1fr; }
+  .pf-main { padding: 18px 16px 22px; }
+  .search { max-width: none; margin-left: 0; flex-basis: 100%; }
+}
+@media print {
+  .controls, .theme-btn { display: none; }
+  .card { break-inside: avoid; box-shadow: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">IDEMS · STACK in Africa and beyond · Draft for internal review</div>
+    <h1>Who STACK in Africa is for</h1>
+    <p class="lede"><span id="count">31</span> fictional personas built from IDEMS’ STACK case studies (2019–2026) and the Maseno student-engagement study (Juma et al., 2022). They cover the students who use STACK, the people who teach and support it, and the people who decide whether it lasts. A second set reflects the commercial contracts that grew out of the African work, with a highly selective US university and a public university in Italy. Select a card to read the full profile.</p>
+    <p class="note"><strong>Preview only.</strong> Names, details and quotes are fictional composites. The photos are Creative Commons placeholders from Wikimedia Commons showing real, unrelated people. Before publication, replace them with generated or consented images; each profile includes an image prompt for this.</p>
+  </div>
+</header>
+
+<nav class="controls" aria-label="Filter personas">
+  <div class="wrap" id="filters"></div>
+</nav>
+
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty">No personas match that filter.</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Sources</h2>
+    <p>Grounding: STACK case studies at stack-assessment.org (Maseno 2019; Maseno workshop 2022; INNODEMS internship 2023; Bahir Dar workshop 2023; African STACK Conferences 2023, 2024, 2025; the INNODEMS model 2025; International Meeting Nairobi 2026), and Juma, Ayere, Oyengo &amp; Osang (2022), “Evaluating Engagement and Learning Based on a Student Categorization using STACK…”, iJET 17(23). Format adapted from IDEMS’ PLH Digital parenting personas (2020).</p>
+    <h2 style="margin-top:22px">Photo credits</h2>
+    <p>All photos via Wikimedia Commons, mostly from the Wiki Loves Africa “African people at work” collection; licences as listed. Images were cropped for display.</p>
+    <ol id="credits"></ol>
+  </div>
+</footer>
+
+<dialog id="dlg" aria-labelledby="dlg-title"></dialog>
+
+<script>
+const GROUPS = {
+  students:   { label: "Students", color: "var(--g-students)" },
+  teaching:   { label: "Teaching staff", color: "var(--g-teaching)" },
+  support:    { label: "Technical support", color: "var(--g-support)" },
+  leadership: { label: "Institutional leaders", color: "var(--g-leadership)" },
+  funders:    { label: "Funders & networks", color: "var(--g-funders)" },
+  research:   { label: "Research & evidence", color: "var(--g-research)" },
+};
+
+const PERSONAS = [
+{
+  id: "p01", isNew: false, group: "teaching", tvet: false, pos: "45% 35%",
+  name: "Samuel Okello", tagline: "the Overwhelmed Lecturer", where: "Uganda", age: 46,
+  quote: "I have nine hundred students in Calculus and I mark every script myself. I know they need practice and feedback every week, but I am one man. There has to be a better way.",
+  background: ["46 years old; married with three children", "Mathematics lecturer for 14 years", "Teaches four courses a semester, including a compulsory first-year service course of 800–1,200 students", "Has no teaching assistants; gives at most two paper tests per course because that is all he can mark", "Has heard colleagues talk about STACK at a regional workshop but has never logged in"],
+  looking: ["A way to give weekly practice and feedback without weekly marking", "Ready-made, good-quality questions for the courses he already teaches", "Someone nearby to call when something breaks the night before a deadline", "Proof that it works for students like his, not just in Europe"],
+  hopes: ["Students who actually understand calculus rather than cram it", "Evenings and weekends back with his family", "Time to finish the research paper he started three years ago"],
+  worries: ["That a new system will be one more job on top of everything else", "Students without phones or data being left behind", "Being blamed if online quizzes go wrong in front of 900 students", "Cheating he cannot see"],
+  day: ["Up at 5.30 am; marks scripts before breakfast", "Lectures back-to-back in a hall where the back rows cannot hear him", "Queue of students at his office door during lunch", "Evening: more marking, then WhatsApp messages from class representatives", "Uses a laptop and an Android phone; home internet is patchy"],
+  grounded: "Large service courses (500–1,200 students) and lecturers teaching four or more courses without support (Maseno 2019; Juma et al. 2022).",
+  prompt: "Documentary-style photo of a Ugandan man in his mid-40s, mathematics lecturer, short greying hair, button-up shirt, standing at the front of a very large crowded university lecture hall with a stack of paper scripts under his arm, tired but determined expression, natural window light, realistic, candid, 35mm.",
+},
+{
+  id: "p02", isNew: false, group: "students", tvet: false, pos: "55% 30%",
+  name: "Amina Hassan", tagline: "the First-Year Engineering Student", where: "Tanzania", age: 19,
+  quote: "I like that I can practise as many times as I need and see straight away where I went wrong. But my bundle finishes before the week does, and typing maths on this small screen takes forever.",
+  background: ["19 years old; first in her family at university", "First-year engineering student taking compulsory mathematics", "Does all her coursework on a mid-range smartphone; shares a laptop with three roommates", "Buys mobile data weekly; campus Wi-Fi is slow at peak times", "Strong in school maths but shaken by the jump to university level"],
+  looking: ["Practice she can do on her phone, in short sessions, offline where possible", "Feedback that shows the steps, not just right or wrong", "Help with typing expressions: brackets, powers, “*”", "Deadlines that allow for days without data"],
+  hopes: ["Pass first-year maths well enough to stay in engineering", "Understand concepts rather than memorise procedures", "Make her family proud and get a good job"],
+  worries: ["Losing marks because of syntax, not maths", "Running out of data on a test day", "Falling behind and being too shy to ask the lecturer", "Exam anxiety"],
+  day: ["Up at 6 am; quiz practice on the bus while her bundle lasts", "Lectures and labs until 4 pm", "Studies in the library where Wi-Fi is strongest", "Does mastery quizzes late at night when the network is quieter"],
+  grounded: "Most students use personal smartphones with purchased data (Maseno 2019); difficulty entering maths on phones (Nairobi 2026).",
+  prompt: "Natural photo of a 19-year-old Tanzanian woman engineering student, braided hair, casual top, sitting on campus steps concentrating on a maths problem on her smartphone, notebook with equations on her lap, soft afternoon light, realistic, candid.",
+},
+{
+  id: "p03", isNew: false, group: "teaching", tvet: false, pos: "35% 35%",
+  name: "Tesfaye Alemu", tagline: "the Enthusiastic New Lecturer", where: "Ethiopia", age: 31,
+  quote: "At the workshop I wrote my first randomised question and it worked. I was so excited I did not sleep! Now I am back home, the Wi-Fi is down and I have no one to ask.",
+  background: ["31 years old; single", "Mathematics lecturer for three years; finished his MSc recently", "Attended a five-day STACK workshop and authored his first questions there", "Comfortable with computers but has never written LaTeX or Maxima before", "Teaches the compulsory Basic Mathematics course that every first-year student takes"],
+  looking: ["A mentor he can message when a question will not behave", "Templates and examples he can adapt quickly", "A community of other new authors so he is not the only one in his department", "Recognition that authoring questions is real academic work"],
+  hopes: ["Build a full STACK course for his students", "Present his work at the next African STACK Conference", "Start a PhD in mathematics education"],
+  worries: ["That his questions have bugs students will find before he does", "Colleagues seeing STACK as a distraction", "Losing momentum once the workshop excitement fades", "Unreliable internet and power"],
+  day: ["Morning lectures to first-year groups", "Afternoons preparing materials and invigilating", "Evenings on the STACK question bank, testing his questions on his phone", "Checks the African STACK community chat before bed"],
+  grounded: "Workshop participants found authoring exciting but “time-consuming, requires a little ICT experience” (Maseno 2022, Bahir Dar 2023).",
+  prompt: "Realistic photo of a 31-year-old Ethiopian man, mathematics lecturer, short hair, smart casual shirt, sitting at a desk in a modest university office smiling at a laptop showing a maths question with formulas, notebook full of equations beside him, natural light.",
+},
+{
+  id: "p04", isNew: false, group: "teaching", tvet: false, pos: "40% 30%",
+  name: "Dr. Rehema Salim", tagline: "the STACK Champion", where: "Tanzania", age: 44,
+  quote: "I’ve seen my students’ results change. The hard part isn’t the technology any more, it’s bringing my colleagues along and keeping it going when I’m not in the room.",
+  background: ["44 years old; married with two teenagers", "Senior lecturer in mathematics; has used STACK in her courses for six years", "Moved her department’s continuous assessment for three large courses (1,000+ students each) onto STACK", "Trains colleagues informally and presents at the African STACK Conference", "Sits on the African STACK Community leadership team"],
+  looking: ["Time and recognition from her university for mentoring others", "A clear training path she can point new colleagues to", "Ways to share and reuse questions with other universities", "Data she can show management"],
+  hopes: ["See STACK used across her whole department, not just in her own courses", "Build a regional network of mentors", "Publish on what has worked locally"],
+  worries: ["Burnout: she is the person everyone calls", "Progress stopping if she moves or is promoted", "Uneven use across parallel groups making students’ experiences unfair", "Funding for servers and support"],
+  day: ["Up at 5 am for prayers; prepares children for school", "Lectures in the morning; afternoon meetings", "Answers colleagues’ STACK questions on WhatsApp throughout the day", "Reviews analytics to see which topics students struggle with"],
+  grounded: "Long-term adopters at Dar es Salaam, MMUST and Maseno; the Community Leadership Team set up in 2023; uneven uptake across groups (Nairobi 2026).",
+  prompt: "Warm realistic portrait of a confident Tanzanian woman in her mid-40s wearing a patterned hijab, senior mathematics lecturer, seated at an office desk with a laptop open to a quiz analytics dashboard, colleague leaning in to look, natural light, candid.",
+},
+{
+  id: "p05", isNew: false, group: "support", tvet: false, pos: "45% 40%",
+  name: "Daniel Mensah", tagline: "the Local Technical Intern", where: "Ghana", age: 24,
+  quote: "Six months ago I didn’t know what Maxima was. Now lecturers call me to fix their quizzes and I’ve written questions that thousands of students use. I just hope there’s a job at the end of it.",
+  background: ["24 years old; single", "Recent mathematics graduate", "One of the first interns at a new local STACK hub organisation", "Authors and reviews questions, sets up Moodle courses and supports lecturers", "Learning LaTeX, HTML and JavaScript as he goes; mentored remotely by experienced staff"],
+  looking: ["Structured mentoring and code review", "A recognised certificate or career pathway", "Peers in other countries to learn from", "A reliable laptop and internet"],
+  hopes: ["Become a STACK trainer and lead his own team", "Do a Master’s in mathematics education or data science", "Help build the hub into a lasting organisation"],
+  worries: ["Short-term contracts and no clear next step", "Being out of his depth when a lecturer’s course breaks before an exam", "Juggling requests from several universities at once", "Remote training that does not fit local realities"],
+  day: ["Weekly team meeting online with mentors", "Morning: authors and peer-reviews questions", "Afternoon: on site at a university helping a lecturer set up a course", "Evening: tutorials on Maxima; helps students locked out of Moodle"],
+  grounded: "INNODEMS internship 2023 (four interns grew to 14 staff by 2025); GHAIDEMS volunteering to host 2027 (Nairobi 2026).",
+  prompt: "Realistic photo of a 24-year-old Ghanaian man, recent graduate, short hair, black t-shirt, smiling while working on a laptop at a shared office desk with code and maths on screen, other workstations in background, bright natural light.",
+},
+{
+  id: "p06", isNew: false, group: "leadership", tvet: false, pos: "70% 22%",
+  name: "Dr. Hayat Seid", tagline: "the Head of Department", where: "Ethiopia", age: 52,
+  quote: "Every first-year student in this university takes Basic Mathematics. STACK looks promising, but I have seen many projects come and go. I need it to work for 6,000 students, and after the funding ends.",
+  background: ["52 years old; married with four children", "Head of a mathematics department with 30+ staff", "Responsible for a compulsory course taken by every first-year student", "Has had to deliver remedial courses and exit-exam preparation at short notice under national policy", "Signed her department up to a cross-university teaching team"],
+  looking: ["Clear evidence that STACK improves results in her context", "A realistic plan for staffing, servers and support", "Shared materials she can adopt instead of building from scratch", "Formal agreements that protect her department’s ownership"],
+  hopes: ["A consistent, high-quality Basic Mathematics course across all sections", "Staff workload that is manageable", "A department known nationally for good teaching"],
+  worries: ["Pilots that depend on one enthusiastic person", "National policy changes arriving with weeks’ notice", "Political instability disrupting teaching", "Server capacity at exam time"],
+  day: ["Early meetings with the dean and faculty", "Timetabling and staffing crises before lunch", "Reviews exam papers and course reports", "Evenings reading Ministry circulars and emails at home"],
+  grounded: "Bahir Dar 2023 (remedial courses, exit exams, a redesigned course for up to 1,500 students); MoU and collaborative teaching team (2025).",
+  prompt: "Realistic photo of an Ethiopian woman in her early 50s wearing a light headscarf, head of a university mathematics department, seated at an office desk reviewing a printed course report with a laptop open, shelves of files behind, calm and authoritative, natural light.",
+},
+{
+  id: "p07", isNew: false, group: "support", tvet: false, pos: "50% 40%",
+  name: "Joseph Kamau", tagline: "the ICT / LMS Administrator", where: "Kenya", age: 38,
+  quote: "When a thousand students open a quiz at 11.55 pm, it’s my phone that rings. I want STACK to succeed, but I need to know what is coming, not hear about it at midnight.",
+  background: ["38 years old; married with two children", "Runs the university’s Moodle and other systems with a team of three", "Supports every faculty, not just mathematics", "Has upgraded Moodle and seen plugins break afterwards", "Has a limited budget for servers and bandwidth"],
+  looking: ["Assessment calendars from lecturers in advance", "Clear technical requirements and a contact at the STACK hub", "Help with load testing and plugin upgrades", "Recognition from academics for the support his team provides"],
+  hopes: ["Stable, secure systems that people trust", "A proper budget and a bigger team", "Being treated as a partner, not a help desk"],
+  worries: ["Peak load during test weeks", "Being blamed when something fails", "Security and data protection", "Too many systems and too few people"],
+  day: ["Checks overnight server alerts at 6.30 am", "Morning: helpdesk tickets and account issues", "Afternoon: meetings with faculties about new systems", "Often back online late at night during exam periods"],
+  grounded: "Universities without Moodle hosted by IDEMS; plugin issues after upgrades (Maseno 2022); server capacity constraints (2025).",
+  prompt: "Realistic photo of a 38-year-old Kenyan man, university IT systems administrator, wearing a dark blazer over a shirt, standing in a server room beside racks with blinking lights, holding a phone, slightly tired but focused, cool lighting.",
+},
+{
+  id: "p08", isNew: false, group: "leadership", tvet: false, pos: "55% 45%",
+  name: "Prof. Njeri Wambui", tagline: "the University Leader", where: "Kenya", age: 57,
+  quote: "I want our students to have the best possible start. But every project asks for money and promises results. Show me that STACK fits our strategy and will still be here in five years.",
+  background: ["57 years old; married; grandmother of one", "Deputy Vice-Chancellor (Academic Affairs)", "Responsible for teaching quality, e-learning strategy and accreditation", "Has spoken publicly in support of STACK after a conference on her campus", "Faces a tight budget and pressure from government and accreditors"],
+  looking: ["A concise case: impact, cost and risks", "Evidence from comparable universities", "A path to institution-wide adoption, not a single-department pilot", "Partnerships that raise the university’s profile"],
+  hopes: ["Better pass rates in first-year mathematics", "A reputation for innovation in teaching", "Graduates who can compete regionally and internationally"],
+  worries: ["Investing in something that collapses when external support ends", "Academic integrity in online assessment", "Unequal student access to devices and data", "Staff resistance to change"],
+  day: ["Senate, committee and board meetings for most of the day", "Signs off budgets and partnership agreements", "Opens conferences and workshops", "Reads reports at home in the evening"],
+  grounded: "Vice-Chancellors publicly backing STACK (Maseno 2022, MMUST 2023); the need for institutional commitment (2024, 2026).",
+  prompt: "Professional realistic portrait of a Kenyan woman in her late 50s, deputy vice-chancellor, elegant blouse and short natural hair, seated at a large office desk signing documents, flowers and files on the desk, warm confident smile, bright office light.",
+},
+{
+  id: "p09", isNew: false, group: "research", tvet: false, pos: "40% 30%",
+  name: "Dr. Fatima Diallo", tagline: "the Education Researcher", where: "Senegal", age: 36,
+  quote: "Studies from Europe tell us little about a class of 900 students on phones. I want to know what really works here, and why some students who score well online still fail the exam.",
+  background: ["36 years old; married with one child", "Lecturer and researcher in mathematics education", "Interested in learning analytics and formative assessment", "Works in French; most STACK materials and literature are in English", "Collaborates with colleagues in Kenya and Europe"],
+  looking: ["Access to anonymised quiz and exam data", "Research partners and co-authors in the STACK community", "Funding for interviews and focus groups, not just log data", "Materials and training in French"],
+  hopes: ["Publish evidence that shapes practice in African universities", "Lead a multi-country study", "Bring STACK to Francophone universities"],
+  worries: ["Moodle logs that do not show real time on task", "Ethics and data protection", "Research that never reaches lecturers’ practice", "Balancing teaching load with research time"],
+  day: ["Morning lectures", "Afternoon analysing data and writing", "Online calls with collaborators across time zones", "Evenings reading literature after her child is asleep"],
+  grounded: "Juma et al. (2022) mixed-methods study; Moodle duration data unreliable; expansion to Francophone Africa (2025).",
+  prompt: "Realistic photo of a Senegalese woman in her mid-30s, education researcher, long braids, colourful print dress, sitting at a cluttered desk with a laptop showing scatter plots and printed papers, looking up with a thoughtful smile, natural daylight.",
+},
+{
+  id: "p10", isNew: false, group: "funders", tvet: false, pos: "35% 40%",
+  name: "Ruth Achieng", tagline: "the Programme Officer", where: "Kenya (regional office of an international foundation)", age: 33,
+  quote: "I believe in this work, but I have to defend it to my board. I need a clear theory of change, numbers I can trust, and proof that local institutions own it.",
+  background: ["33 years old; single", "Programme officer for higher-education grants in East Africa", "Manages a portfolio of 12 grants; reports to a head office abroad", "Former secondary maths teacher", "Visits grantees two or three times a year"],
+  looking: ["Clear, measurable outcomes and realistic timelines", "Evidence of scale and sustainability beyond the grant", "Stories of students and lecturers she can share", "Strong partners with local leadership"],
+  hopes: ["Fund work that changes how a whole region teaches mathematics", "Build local capacity rather than dependency", "Be promoted to lead the education portfolio"],
+  worries: ["Projects that stop when funding stops", "Weak monitoring and evaluation", "Over-promising in proposals", "Shifting priorities at head office"],
+  day: ["Morning video calls with head office", "Reviews reports and budgets", "Field visit or grantee meeting in the afternoon", "Writes board papers in the evening"],
+  grounded: "Funding and sustainability as recurring challenges (INNODEMS 2025); conferences run on <$10k budgets (2022, 2023).",
+  prompt: "Realistic photo of a Kenyan woman in her early 30s, grants programme officer, hair neatly braided back, navy blouse, writing notes at a desk beside a laptop in a modern office, focused expression, soft natural light.",
+},
+{
+  id: "p11", isNew: false, group: "funders", tvet: false, pos: "75% 45%",
+  name: "Charles Mwakasege", tagline: "the Philanthropist", where: "Tanzania", age: 63,
+  quote: "Mathematics took me from a village school to running a business. I want to give that chance to others. But I want to see the people I’m backing and know my money did something real.",
+  background: ["63 years old; married with four grown children", "Founded a successful finance and logistics business", "Funds scholarships through a family foundation", "Not an academic; trusts people more than proposals", "Recently heard a student speak about STACK at an event"],
+  looking: ["Inspiring, concrete stories of impact", "Small, visible investments that can grow", "Trustworthy local leaders", "Opportunities to visit and meet students"],
+  hopes: ["More young people from poor backgrounds succeeding in STEM", "A legacy in his country’s universities", "His children continuing the foundation"],
+  worries: ["Money disappearing into overheads", "Projects that depend on foreigners", "Not understanding the technology well enough to judge it"],
+  day: ["Still goes to the office most mornings", "Meetings with business partners", "Afternoons on foundation work and community events", "Evenings with family"],
+  grounded: "Diverse, often small funders behind conferences and hubs (2022–2026); emphasis on local ownership.",
+  prompt: "Realistic photo of a Tanzanian man in his early 60s, successful businessman and philanthropist, grey suit and tie, seated at a desk shaking hands with a young university student, office setting, warm and dignified, natural light.",
+},
+{
+  id: "p12", isNew: false, group: "funders", tvet: false, pos: "50% 30%",
+  name: "Dr. Ibrahim El-Tayeb", tagline: "the Regional Education Leader", where: "Sudan (works across the region)", age: 61,
+  quote: "Universities in Somalia and South Sudan are rebuilding with very little. STACK and open textbooks could help them skip steps. The question is how to adapt it to each country, not copy it.",
+  background: ["61 years old; married with five children", "Former professor of mathematics; now leads a regional mathematics network", "Works with ministries, mathematical societies and universities", "Has lived through conflict and displacement of his own institution", "Champions open educational resources"],
+  looking: ["Models that work with weak infrastructure, e.g. PreTeXt textbooks without Moodle", "Partnerships with ministries and funders", "Peer support between established and new universities", "Training that can be cascaded locally"],
+  hopes: ["STACK and open books adopted in conflict-affected countries", "A strong African mathematics community", "National policy that values formative assessment"],
+  worries: ["Infrastructure and security in fragile regions", "Initiatives that only reach a few elite universities", "Coordination across many stakeholders"],
+  day: ["Calls with ministry officials and university leaders", "Writes policy briefs and grant proposals", "Travels often for regional meetings", "Mentors younger academics in the evenings"],
+  grounded: "Support to University of Juba and Somali National University; PreTeXt as an alternative where an LMS is limited; policy engagement (2025).",
+  prompt: "Realistic portrait of a Sudanese man in his early 60s, grey hair and moustache, striped shirt, leaning on a railing outdoors with a city behind, warm and wise expression, golden-hour light.",
+},
+{
+  id: "p13", isNew: true, group: "students", tvet: false, pos: "55% 55%",
+  name: "Brian Wafula", tagline: "the Student Who “Books” a Clever Classmate", where: "Kenya", age: 22,
+  quote: "Everyone does it. I pay a friend a little to do my quizzes because I have no time. Then I sat the exam and the questions looked familiar, but I couldn’t write anything. I was only cheating myself.",
+  background: ["22 years old; third-year education student taking a compulsory maths unit", "Works evenings and weekends at a relative’s shop to pay fees", "Pays a strong classmate to do his weekly STACK quizzes", "His quiz scores are good but his exam scores are very low", "Doesn’t see this as cheating; it feels like normal “help”"],
+  looking: ["A way to keep up with the quizzes alongside his job", "Flexible deadlines", "Practice that feels worth his time", "To pass and graduate"],
+  hopes: ["Graduate and become a secondary school teacher", "Support his younger siblings through school"],
+  worries: ["Failing the course and paying to repeat it", "Being caught", "Disappointing his family", "Not actually understanding the maths he will one day teach"],
+  day: ["Morning lectures, often late after a night shift", "Afternoons at the shop", "Sends money to a classmate by mobile money when quizzes open", "Crams the night before the exam"],
+  grounded: "Juma et al. (2022) group A: high quiz scores, failed exam; 17/20 interviewees and 31/32 focus-group participants described paying peers; typically one attempt per quiz.",
+  prompt: "Realistic candid photo of a 22-year-old Kenyan man, university student, green polo shirt, sitting under a shaded shelter outdoors looking at his phone with a conflicted expression, natural light, documentary style.",
+},
+{
+  id: "p14", isNew: true, group: "students", tvet: false, pos: "40% 35%",
+  name: "Mercy Akinyi", tagline: "the Data-Starved Student", where: "Kenya", age: 20,
+  quote: "My bundle finished, so I ran to the Wi-Fi area, and the Wi-Fi was also down. Then it started raining and there is no shelter there. That week I just left the quiz.",
+  background: ["20 years old; second-year actuarial science student", "From a rural family; lives in a shared hostel off campus", "Has a cheap Android phone with a cracked screen; no laptop", "Can afford about one data bundle a week", "Motivated and capable, but often misses test-quiz deadlines"],
+  looking: ["Quizzes that use little data or work offline", "Longer windows for test quizzes", "Reliable, sheltered Wi-Fi spots on campus", "Lecturers who understand access problems"],
+  hopes: ["Graduate with good grades and become an actuary", "Buy a laptop", "Help her family financially"],
+  worries: ["Losing marks for reasons that have nothing to do with maths", "Her phone breaking", "Being seen as lazy", "Weekends when campus Wi-Fi is off"],
+  day: ["Walks 30 minutes to campus", "Lectures in the morning; waits at the Wi-Fi spot at lunch", "Downloads notes when the signal is good", "Studies with friends who have laptops in the evening"],
+  grounded: "Juma et al. (2022): 15/20 interviewees cited devices and data; about 20% of students affected; Wi-Fi areas without shelter.",
+  prompt: "Realistic candid photo of a 20-year-old Kenyan woman university student standing outdoors on a campus path holding an old smartphone up searching for signal, cloudy sky threatening rain, another student nearby also on a phone, documentary style.",
+},
+{
+  id: "p15", isNew: true, group: "students", tvet: false, pos: "45% 40%",
+  name: "Dawit Bekele", tagline: "the Quiet Reviser", where: "Ethiopia", age: 21,
+  quote: "My weekly test scores were bad, because the deadline always caught me without data. But before the exam I went back to every mastery quiz and practised until I understood. That is how I passed.",
+  background: ["21 years old; third-year mathematics student", "Lives in a dormitory with five others; shares one tablet", "Often misses weekly test-quiz deadlines", "Uses the mastery quizzes, with feedback, as his main revision tool", "Quiet in class; rarely asks lecturers questions"],
+  looking: ["Mastery quizzes that stay open all semester", "Worked solutions he can study offline", "Revision quizzes before exams", "A study group"],
+  hopes: ["Graduate and teach mathematics at a secondary school", "Pass the national exit exam", "Maybe study for a Master’s abroad"],
+  worries: ["Low continuous-assessment marks pulling his grade down", "Power cuts in the dormitory", "The national exit exam"],
+  day: ["Morning classes", "Afternoon in the library", "Evening revising on the shared tablet with earphones in", "Late-night practice when others are asleep"],
+  grounded: "Juma et al. (2022) group C: below-average quiz scores but passed by revising with mastery quizzes; Ethiopian exit exams (2023).",
+  prompt: "Realistic photo of a 21-year-old Ethiopian male student in a dormitory room, earphones in, working through maths problems on a tablet propped on a desk, bunk bed behind, focused, soft evening light.",
+},
+{
+  id: "p16", isNew: true, group: "students", tvet: false, pos: "55% 45%",
+  name: "Neema Mollel", tagline: "the Persistent Struggler", where: "Tanzania", age: 23,
+  quote: "I try the mastery quiz again and again, hoping the next version will show me how to do it. Sometimes the feedback jumps over the step I don’t understand. I’m not a fast learner, but I don’t give up.",
+  background: ["23 years old; second-year BEd (mathematics) student", "Weak secondary-school maths background; got in through a bridging programme", "Makes many attempts on each quiz, sometimes 5–10", "Often marked wrong for answers she believes are right (input format)", "Embarrassed to ask questions in a class of 700"],
+  looking: ["Feedback that shows every step", "Easier warm-up questions before harder ones", "Clear help on how to type answers", "Someone to explain in Swahili when she is stuck"],
+  hopes: ["Pass and become a primary or secondary maths teacher", "Prove to herself she can do mathematics", "Be the teacher she never had"],
+  worries: ["Her exam score not matching her effort", "Being labelled as weak", "Running out of time"],
+  day: ["Lectures in the morning", "Works through mastery quizzes in a quiet corner of the hostel", "Asks a friend for help after supper", "Revises from her own handwritten notes"],
+  grounded: "Juma et al. (2022) group D: many attempts but low exam scores; about 20% said feedback lacked steps; the quote “I’m not a fast learner”.",
+  prompt: "Realistic photo of a 23-year-old Tanzanian woman student with short locs, sitting by a window working through a maths problem on paper with her phone beside her, determined expression, natural window light.",
+},
+{
+  id: "p17", isNew: true, group: "students", tvet: false, pos: "50% 30%",
+  name: "Ivan Ssekandi", tagline: "the Minimum-Effort Student", where: "Uganda", age: 20,
+  quote: "I get 70% on the mastery quiz so the test opens, then I stop. Maths is not my thing. I just need the marks to move forward.",
+  background: ["20 years old; first-year statistics student (it was not his first choice)", "Sociable, popular, active in student politics and football", "Does exactly enough to unlock each test quiz", "Rarely reads feedback", "Not struggling with access; struggling with interest"],
+  looking: ["Something that shows why this maths matters to him", "Short, game-like practice", "Recognition when he does well", "Friends to study with"],
+  hopes: ["Transfer to a business degree", "Start his own company", "Have a good time at university"],
+  worries: ["Retakes eating his holidays", "Disappointing his parents, who pay his fees", "Being bored"],
+  day: ["Wakes late; skips early lectures", "Football training in the afternoon", "Does quizzes on his phone minutes before they close", "Evenings with friends"],
+  grounded: "Juma et al. (2022): low motivation and disinterest in mathematics (“just did the quizzes to get the minimum score”).",
+  prompt: "Realistic photo of a 20-year-old Ugandan young man, friendly grin, t-shirt, backpack over one shoulder, standing among green banana leaves on the edge of a campus, holding a phone casually, natural light.",
+},
+{
+  id: "p18", isNew: true, group: "students", tvet: false, pos: "85% 40%",
+  name: "Abena Owusu", tagline: "the Maths-Anxious Business Student", where: "Ghana", age: 19,
+  quote: "I chose business because I thought I could avoid maths. Now I have Quantitative Methods with 1,000 people and my heart races every time a quiz opens.",
+  background: ["19 years old; first-year business administration student", "Took a compulsory mathematics service course she did not expect", "Was told at school that she was “not a maths person”", "Diligent, organised and hard-working in every other subject", "Has a laptop and good data, but avoids opening the quizzes"],
+  looking: ["Low-stakes practice where mistakes are private", "Encouraging feedback", "Examples connected to business and money", "Reassurance that she can improve"],
+  hopes: ["Pass without fear", "Start a fashion business", "Feel confident with numbers"],
+  worries: ["Timed tests", "Failing in front of her friends", "Losing her scholarship"],
+  day: ["Lectures and group work", "Leaves the maths quiz until the last moment", "Studies in the library with headphones", "Calls her mother in the evening"],
+  grounded: "Large service courses for non-maths programmes (Juma et al. 2022); mathematics anxiety as a theme (Kiratu keynote, 2024).",
+  prompt: "Realistic photo of a 19-year-old Ghanaian woman business student with braids and glasses, sitting at a library desk with one hand on her forehead, looking anxiously at a laptop showing a maths quiz, bookshelves behind, natural light.",
+},
+{
+  id: "p19", isNew: true, group: "students", tvet: false, pos: "35% 50%",
+  name: "Grace Nangolo", tagline: "the High Achiever", where: "Namibia", age: 21,
+  quote: "I finish the quizzes on the first day and then I want something harder. Proofs, challenges, anything. And yes, classmates ask me to do their quizzes for them. I say no, but it’s not easy.",
+  background: ["21 years old; third-year mathematics and statistics student", "Top of her class; tutors younger students", "Often finishes the weekly quizzes in one attempt", "Is regularly offered money to do other students’ quizzes", "Wants to do postgraduate study"],
+  looking: ["Extension and challenge questions, including proofs", "Chances to author questions or tutor", "Recommendations and research opportunities", "Contact with the wider STACK community"],
+  hopes: ["A scholarship for a Master’s in applied mathematics", "Become a lecturer", "Show girls in her community that maths is for them"],
+  worries: ["Boredom and being held back", "Pressure from classmates", "Lack of funding for further study"],
+  day: ["Lectures; then tutoring sessions", "Works ahead on next week’s material", "Helps her younger brother with homework", "Reads about AI and maths online"],
+  grounded: "The 5-quiz model with extension quizzes and STACK proof questions (2024); the peers who do others’ quizzes (Juma et al. 2022); student authors (Dar es Salaam).",
+  prompt: "Realistic photo of a 21-year-old Namibian woman mathematics student in a yellow top, smiling as she writes a proof on a whiteboard, bright classroom, confident, natural light.",
+},
+{
+  id: "p20", isNew: true, group: "students", tvet: true, pos: "45% 35%",
+  name: "Peter Kiprono", tagline: "the TVET Electrical Trainee", where: "Kenya", age: 19,
+  quote: "I came to college to wire buildings, not to do algebra. But when the tutor showed me that the formula tells me which cable to use, I started to listen.",
+  background: ["19 years old; first-year Diploma in Electrical Engineering at a technical training institute", "Practical learner; best in the workshop, weakest in the classroom", "Entry maths grade was low", "Uses a basic Android phone; college computer lab is often booked", "Helps his uncle on wiring jobs at weekends"],
+  looking: ["Maths linked directly to his trade", "Short practice on his phone", "Clear feedback in simple English", "Hands-on rather than theory-heavy learning"],
+  hopes: ["Pass national exams and get licensed", "Start his own electrical contracting business", "Maybe continue to a degree later"],
+  worries: ["Failing the maths unit and repeating the year", "The cost of fees and data", "Exams that test theory he will never use"],
+  day: ["Workshop practicals in the morning", "Theory and maths classes in the afternoon", "Evening revision with classmates", "Weekend jobs with his uncle"],
+  grounded: "TVET integration (2024); training of TVET tutors (INNODEMS 2025); multi-level integration including polytechnics and TVETs (2025).",
+  prompt: "Realistic photo of a 19-year-old Kenyan male technical college trainee in a black t-shirt working with tools in a bright electrical workshop with benches and equipment behind, concentrating, natural light.",
+},
+{
+  id: "p21", isNew: true, group: "students", tvet: true, pos: "25% 50%",
+  name: "Clarisse Mbarga", tagline: "the Returning TVET Learner", where: "Cameroon", age: 33,
+  quote: "I left school at 17 and fixed cars for ten years. Now I want the certificate. The engines are easy; the maths I left behind is the hard part, and it is all in English online.",
+  background: ["33 years old; married with two children", "Experienced mechanic returning to formal training in automotive engineering", "Studies part-time while working at a garage", "Francophone; most online maths resources she finds are in English", "Uses her phone and the garage’s laptop"],
+  looking: ["Refresher maths she can do in short evening sessions", "Materials in French", "Flexible deadlines that fit work and family", "Practical examples: ratios, torque, fuel consumption"],
+  hopes: ["Earn a recognised qualification", "Open her own garage and train other women", "Be a role model for her daughters"],
+  worries: ["Not having time", "Being older than her classmates", "Feeling foolish about forgotten school maths", "Fees"],
+  day: ["Garage from 7.30 am", "Classes three afternoons a week", "Cooks and helps children with homework", "Studies after 9 pm on her phone"],
+  grounded: "TVET expansion (2024–2025); Francophone Africa and Cameroon’s interest (2025, 2026).",
+  prompt: "Realistic photo of a 33-year-old Cameroonian woman mechanic in grey work overalls and glasses, smiling while using a laptop on a workbench in a busy garage with a car on a lift behind, natural light.",
+},
+{
+  id: "p22", isNew: true, group: "teaching", tvet: true, pos: "40% 25%",
+  name: "Esther Wanjiku", tagline: "the TVET Tutor", where: "Kenya", age: 29,
+  quote: "I teach engineering maths to 200 trainees with one whiteboard and no marker some days. I was sceptical at the workshop, but if STACK can mark their practice, I can spend my time in the workshop with them.",
+  background: ["29 years old; single", "Tutor in mechanical and electrical engineering at a technical training institute", "Teaches engineering mathematics and workshop practice", "Attended a STACK training for TVET tutors", "Has never used Moodle; college ICT support is minimal"],
+  looking: ["Question banks matched to the TVET curriculum, not university courses", "Training that respects her time", "Simple set-up, or hosting by a partner", "Evidence that it helps practical learners"],
+  hopes: ["Better pass rates in national exams", "Promotion to head of department", "A degree in technical education"],
+  worries: ["Trainees without smartphones", "Extra workload with no extra pay", "Materials designed for universities, not TVET", "Losing contact with support after training"],
+  day: ["Workshop supervision in the morning", "Maths classes after lunch", "Marks practical logbooks in the staffroom", "Evening classes twice a week"],
+  grounded: "TVET tutor training (INNODEMS 2025); TVET participation from 2024; materials needing adaptation to context.",
+  prompt: "Realistic photo of a 29-year-old Kenyan woman technical college tutor in a green work coat demonstrating equipment in an engineering workshop, hair tied back, focused, natural light.",
+},
+{
+  id: "p23", isNew: true, group: "teaching", tvet: false, pos: "60% 20%",
+  name: "Dr. Yusuf Mohamed", tagline: "the Reluctant Lecturer", where: "Kenya", age: 58,
+  quote: "I have taught this course on the blackboard for 25 years and my students pass. My colleague’s group uses STACK; mine does not. If it is so good, why do their exam results not match their quiz marks?",
+  background: ["58 years old; married with grown children", "Senior lecturer; teaches one of several parallel groups of a large course", "Prefers chalk, paper tests and his own notes", "Not against technology, but has seen several initiatives disappear", "Respected by colleagues; his opinion carries weight in the department"],
+  looking: ["Evidence that convinces him, from his own students", "Help that does not require him to learn programming", "Assurance about cheating and integrity", "Respect for his experience"],
+  hopes: ["Retire knowing his students learned properly", "Keep high standards in the department", "See younger colleagues succeed"],
+  worries: ["Students cheating on online quizzes", "Technology replacing real teaching", "Being made to look outdated", "Extra work close to retirement"],
+  day: ["Arrives early and prepares notes by hand", "Lectures with chalk and board", "Marks scripts at his desk", "Mentors junior staff over tea"],
+  grounded: "Uneven STACK adoption between parallel groups at MMUST; gaps between continuous assessment and exam results (Nairobi 2026); resistance to new methods (2024).",
+  prompt: "Realistic photo of a Kenyan man in his late 50s, senior mathematics lecturer in a white kanzu and kofia, writing equations on a whiteboard in a modest classroom with students seated at wooden desks, natural light.",
+},
+{
+  id: "p24", isNew: true, context: "commercial", group: "students", tvet: false, pos: "30% 30%",
+  name: "Marcus Alvarez", tagline: "the High-Flying Undergraduate", where: "USA", age: 19,
+  quote: "I don’t mind hard questions. What I mind is submitting and not knowing if I’m right until next week, or losing points because a computer didn’t like how I wrote my answer. Give me instant feedback and a way to appeal, and I’m in.",
+  background: ["19 years old; second-year physics major at a highly selective university", "Top of his high-school class; used to getting things right first time", "Takes a required applied-maths course (differential equations) alongside heavy lab and problem-set loads", "Laptop, fast campus internet; time is his scarce resource, not access", "Sceptical of automated grading until he trusts it"],
+  looking: ["Immediate feedback and the chance to retry (adaptive mode)", "Questions that test understanding, not tedious algebra", "A fair, quick way to request a regrade", "Questions sized to fit around his other problem sets"],
+  hopes: ["Go to graduate school in theoretical physics", "Master the maths properly rather than just survive it", "A research internship next summer"],
+  worries: ["Losing points to input syntax or a badly written question", "Questions that take far too long for what they teach", "Grades affecting graduate applications", "Burnout"],
+  day: ["Morning lectures and labs", "Afternoon research group meeting", "Problem sets with friends until late evening", "Does the weekly STACK quiz before starting the written problem set, to warm up"],
+  grounded: "Case study of a STACK introduction at a highly selective US university (2025): frustration with deferred feedback, 86% rated adaptive mode “very useful”, a regrade request system, early questions felt too time-consuming.",
+  prompt: "Realistic photo of a 19-year-old American male undergraduate with shoulder-length dark hair, t-shirt, working on a laptop at a table in a modern university study space, confident and focused, natural light.",
+},
+{
+  id: "p25", isNew: true, context: "commercial", group: "students", tvet: false, pos: "45% 35%",
+  name: "Mei Lin Chen", tagline: "the PhD Student from Another Field", where: "USA", age: 26,
+  quote: "I’m a first-year PhD student in environmental science and I haven’t solved a differential equation in five years. The practice quizzes were a lifeline, as long as I could fit them between lab shifts.",
+  background: ["26 years old; first-year PhD student in environmental science and engineering", "Took the applied-maths course because her programme requires it", "Strong researcher; maths skills rusty after years of fieldwork", "Juggles lab work, a teaching assistantship and coursework", "Sits alongside undergraduates who seem much faster than her"],
+  looking: ["A refresher quiz at the start of the course", "Ungraded practice with worked feedback", "Applied examples linked to real models", "Flexible timing around lab work"],
+  hopes: ["Use PDE models confidently in her thesis", "Pass the course without it eating her research time", "Publish her first paper this year"],
+  worries: ["Feeling behind and exposed in a class of undergraduates", "Time pressure", "Gaps in pre-requisite knowledge"],
+  day: ["Lab from 8 am", "Teaches a lab section in the afternoon", "Works through STACK practice quizzes in the evening", "Reads papers on the train home"],
+  grounded: "US case study (2025): mixed class of undergraduates and PhD students from many disciplines with varied preparation; pre-course and ungraded practice quizzes.",
+  prompt: "Realistic photo of a 26-year-old East Asian American woman PhD student in a yellow sweatshirt working at a lab bench with notes and a laptop, focused, bright university lab, natural light.",
+},
+{
+  id: "p26", isNew: true, context: "commercial", group: "students", tvet: false, pos: "45% 40%",
+  name: "Giulia Moretti", tagline: "the Biology Student in a Stats Service Course", where: "Italy", age: 20,
+  quote: "I study biology because I love living things, not formulas. But when the statistics quizzes used real data from experiments like ours, I finally understood why I need this.",
+  background: ["20 years old; second-year biology student", "Takes a compulsory statistics course taught by the mathematics department", "Good at memorising; less confident with abstract reasoning", "Studies in Italian; much statistics software and help online is in English", "Commutes by train from a nearby town"],
+  looking: ["Statistics questions set in biology contexts", "Step-by-step feedback in Italian", "Practice she can do on the train", "Confidence for the oral and written exams"],
+  hopes: ["Do a Master’s in molecular biology", "Analyse her own data in her thesis without help", "Work in a research lab"],
+  worries: ["Failing statistics and delaying graduation", "Oral exams", "Not seeing the point of the maths"],
+  day: ["Morning train to campus", "Lectures and lab practicals", "Studies with classmates in the library", "Does STACK practice on the train home"],
+  grounded: "IDEMS’ work with an Italian university began with statistics questions for biology students (service teaching).",
+  prompt: "Realistic photo of a 20-year-old Italian woman biology student with long light-brown hair in a pink jumper, looking through a microscope in a university biology lab, natural light.",
+},
+{
+  id: "p27", isNew: true, context: "commercial", group: "students", tvet: false, pos: "60% 40%",
+  name: "Luca Ferrara", tagline: "the Mixed-Ability Linear Algebra Student", where: "Italy", age: 19,
+  quote: "Some people in my course did linear algebra at school; I did not. With paper exercises I never knew if I was right. Now at least the computer tells me, but sometimes I still don’t understand why.",
+  background: ["19 years old; first-year engineering student", "Came from a technical high school with less abstract maths", "Works weekends in his family’s bar", "Linear algebra class has a very wide range of ability", "Prefers working on paper, then typing answers in"],
+  looking: ["Feedback that explains why, not just whether", "Easier questions to build up before the hard ones", "Many randomised versions to practise on", "Clear guidance on entering matrices and vectors"],
+  hopes: ["Pass linear algebra on the first try", "Become a mechanical engineer", "Not spend his summer retaking exams"],
+  worries: ["Falling behind classmates who already know the material", "The written exam", "Time lost to work commitments"],
+  day: ["Lectures in the morning", "Exercise sessions in the afternoon", "Works on STACK exercises at a library desk with paper beside him", "Weekends in the family bar"],
+  grounded: "IDEMS’ wider contract with an Italian university to improve its STACK questions, especially for linear algebra, with a wider range of student ability.",
+  prompt: "Realistic photo of a 19-year-old Italian male student with dark hair, black t-shirt, writing linear algebra working on paper beside an open textbook and a laptop at a library carrel, focused, natural light.",
+},
+{
+  id: "p28", isNew: true, context: "commercial", group: "teaching", tvet: false, pos: "55% 35%",
+  name: "Dr. Daniel Brooks", tagline: "the Instructor Redesigning on a Deadline", where: "USA", age: 37,
+  quote: "We had to squeeze three terms of content into two and redesign the course at the same time. I could write the questions in LaTeX; I needed people who could make them work in STACK, fast and right.",
+  background: ["37 years old; married with a young child", "Assistant professor of applied mathematics", "Leads a large required course taken by students from many departments", "Strong teacher and researcher; no time to learn STACK authoring himself", "Works with a head TA, several TAs and an external partner (IDEMS) that converts and reviews questions"],
+  looking: ["Reliable conversion of his LaTeX questions into STACK", "Quick review cycles and fixes during the term", "Analytics showing which questions confuse students", "Integration with the university’s own LMS"],
+  hopes: ["A course students rate highly", "Better learning outcomes without more grading", "Tenure"],
+  worries: ["Errors in auto-graded questions undermining trust", "Technical integration not ready in time", "Student complaints in course evaluations", "His research time disappearing"],
+  day: ["Lectures and research meetings", "Weekly check-in with TAs about anonymous student feedback", "Reviews converted questions in the evening", "Writes grant proposals at weekends"],
+  grounded: "US case study (2025): course redesigned under time pressure; instructors authored in LaTeX, partners converted to STACK; anonymous surveys and response analysis used to adjust during the term; contract later extended to Calculus 1 and Linear Algebra.",
+  prompt: "Realistic photo of an American man in his late 30s, assistant professor, beard and glasses, plaid shirt, explaining an equation at a whiteboard to a small group, bright classroom, natural light.",
+},
+{
+  id: "p29", isNew: true, context: "commercial", group: "teaching", tvet: false, pos: "50% 60%",
+  name: "Priya Raman", tagline: "the Head Teaching Assistant", where: "USA", age: 27,
+  quote: "Every regrade request lands with me. Half are input problems, a few are real bugs, and some are students testing the system. If I can sort them fast and show we listen, the complaints stop.",
+  background: ["27 years old; fourth-year PhD student in applied mathematics", "Head TA for a large required course", "Coordinates a team of TAs and handles student regrade requests", "Reads the anonymous feedback after every quiz and reports to the instructor", "Comfortable with code; picked up STACK quickly"],
+  looking: ["A clear regrade workflow", "A direct line to the people who maintain the questions", "Dashboards showing common wrong answers", "Recognition of the extra workload"],
+  hopes: ["Finish her PhD on time", "A faculty position where she can design courses like this", "Build skills in educational technology"],
+  worries: ["Being the buffer between frustrated students and the system", "Time taken from research", "Bugs in questions near deadlines"],
+  day: ["Research in the morning", "Office hours in the afternoon", "Triages regrade requests and feedback each evening", "Weekly TA meeting"],
+  grounded: "US case study (2025): regrade request activity, anonymous feedback surveys with each quiz, response-analysis dashboard; trust built through quick responses.",
+  prompt: "Realistic photo of a 27-year-old South Asian American woman PhD student, head teaching assistant, holding office hours at a round table with undergraduates and laptops in a glass-walled study room, friendly and engaged, natural light.",
+},
+{
+  id: "p30", isNew: true, context: "commercial", group: "teaching", tvet: false, pos: "50% 25%",
+  name: "Prof. Paolo Benedetti", tagline: "the Lecturer Who Built His Own Questions", where: "Italy", age: 55,
+  quote: "We started by asking IDEMS for statistics questions for our biologists. Then I learned to write my own. Now we have hundreds, and some are not as good as they should be. I want them checked, improved and more of my exercises turned into STACK.",
+  background: ["55 years old; married with two university-age children", "Associate professor of mathematics", "Teaches linear algebra to engineers and statistics to biology students", "Learned STACK by working alongside IDEMS, then authored many questions independently", "Has built a large question bank in Italian of uneven quality"],
+  looking: ["Expert review of his existing questions: feedback, randomisation, robustness", "Help “stackifying” his remaining paper exercises", "Consistent style and quality across the bank", "Guidance on good practice he can pass on to colleagues"],
+  hopes: ["A complete, high-quality question bank for his courses", "Colleagues adopting it too", "Shared materials with other Italian universities"],
+  worries: ["Students finding bugs in his questions", "Maintaining the bank as STACK and Moodle evolve", "Budget for continued external support"],
+  day: ["Lectures in the morning", "Office hours and exams", "Writes or edits STACK questions in the afternoon", "Reviews IDEMS’ suggested improvements"],
+  grounded: "IDEMS’ Italian contract: started with statistics questions for biology students; staff then developed questions independently and with IDEMS; current work improves their questions (especially linear algebra) and converts more material.",
+  prompt: "Realistic photo of an Italian man in his mid-50s, mathematics professor, grey curly hair and glasses, leather jacket and scarf, speaking with a microphone in a historic university hall, animated, warm light.",
+},
+{
+  id: "p31", isNew: true, context: "commercial", group: "support", tvet: false, pos: "40% 35%",
+  name: "Halima Bello", tagline: "the IDEMS Question Author", where: "Nigeria (works remotely for IDEMS)", age: 30,
+  quote: "In the morning I convert a US instructor’s LaTeX into STACK; in the afternoon I review Italian linear algebra questions with a translator open. Paying clients have hard deadlines, but I don’t want the African work to fall behind.",
+  background: ["30 years old; married with one child", "Mathematics graduate with an MSc; IDEMS STACK author and reviewer", "Works remotely across time zones from Lagos to California", "Converts, tests and improves questions for commercial clients", "Also contributes to open question banks for African universities"],
+  looking: ["Clear specifications and sample answers from clients", "Fast feedback loops with instructors", "Shared templates and testing tools", "Time protected for community work"],
+  hopes: ["Lead the authoring team", "Help commercial income sustain the African work", "Present at the next STACK international meeting"],
+  worries: ["Errors slipping through under deadline pressure", "Language and curriculum differences (Italian, US conventions)", "Late-night calls across time zones", "Commercial work crowding out community work"],
+  day: ["Early: client questions due for the US course", "Midday: review meeting with the team", "Afternoon: Italian question improvements", "Evening: open question-bank work, after her child is asleep"],
+  grounded: "IDEMS staff deliver both commercial contracts (question conversion, review and improvement) alongside support for the African STACK community.",
+  prompt: "Realistic photo of a 30-year-old Nigerian woman wearing a hijab, mathematics content author, working on a laptop at a desk with a second screen showing equations, home office, focused, natural light.",
+},
+];
+
+const CREDITS = {"p01": ["A Lecturer.jpg", "Achodanick", "https://commons.wikimedia.org/wiki/File:A_Lecturer.jpg"], "p02": ["Women on a phone meeting.jpg", "Nebiyu.s", "https://commons.wikimedia.org/wiki/File:Women_on_a_phone_meeting.jpg"], "p03": ["Kenya Office Work.jpg", "Moritz Poll", "https://commons.wikimedia.org/wiki/File:Kenya_Office_Work.jpg"], "p04": ["Pink power.jpg", "Sarah.Engin", "https://commons.wikimedia.org/wiki/File:Pink_power.jpg"], "p05": ["Software Developer at work 03.jpg", "Daudi mukiibi", "https://commons.wikimedia.org/wiki/File:Software_Developer_at_work_03.jpg"], "p06": ["MYXJ 20171027160326 fast African woman at work.jpg", "Peace Eneja", "https://commons.wikimedia.org/wiki/File:MYXJ_20171027160326_fast_African_woman_at_work.jpg"], "p07": ["Working at night in server room.jpg", "Tsinkala", "https://commons.wikimedia.org/wiki/File:Working_at_night_in_server_room.jpg"], "p08": ["A businesswoman signing contracts.jpg", "Melchisedek ABAKA", "https://commons.wikimedia.org/wiki/File:A_businesswoman_signing_contracts.jpg"], "p09": ["Assistante de direction.jpg", "Aristidek5maya", "https://commons.wikimedia.org/wiki/File:Assistante_de_direction.jpg"], "p10": ["Young & Dedicated Accountant at Work.jpg", "Mweufika", "https://commons.wikimedia.org/wiki/File:Young_%26_Dedicated_Accountant_at_Work.jpg"], "p11": ["Family bank.jpg", "Berbeture", "https://commons.wikimedia.org/wiki/File:Family_bank.jpg"], "p12": ["Portrait of uncle Abdalla.jpg", "Ibrahimpic", "https://commons.wikimedia.org/wiki/File:Portrait_of_uncle_Abdalla.jpg"], "p13": ["Young man taking a break in his banana plantation in Ivory Coast.jpg", "Elder-ak", "https://commons.wikimedia.org/wiki/File:Young_man_taking_a_break_in_his_banana_plantation_in_Ivory_Coast.jpg"], "p14": ["Students on WIFI.jpg", "Sarenda", "https://commons.wikimedia.org/wiki/File:Students_on_WIFI.jpg"], "p15": ["African student studying at dormitory from tablet computer,.jpg", "Tinsae Belay", "https://commons.wikimedia.org/wiki/File:African_student_studying_at_dormitory_from_tablet_computer,.jpg"], "p16": ["Young Teacher Preparing For Lesson.jpg", "Fahariya", "https://commons.wikimedia.org/wiki/File:Young_Teacher_Preparing_For_Lesson.jpg"], "p17": ["A farmer;s brother.jpg", "Rotimisonde", "https://commons.wikimedia.org/wiki/File:A_farmer;s_brother.jpg"], "p18": ["Worker studying.jpg", "Appreciating Beauty", "https://commons.wikimedia.org/wiki/File:Worker_studying.jpg"], "p19": ["A young student doing exercises on a whiteboard.jpg", "Melchisedek ABAKA", "https://commons.wikimedia.org/wiki/File:A_young_student_doing_exercises_on_a_whiteboard.jpg"], "p20": ["Electrical work.jpg", "Trssuretm", "https://commons.wikimedia.org/wiki/File:Electrical_work.jpg"], "p21": ["Femme mecanicienne26.jpg", "Photokadaffi", "https://commons.wikimedia.org/wiki/File:Femme_mecanicienne26.jpg"], "p22": ["Lady Eng 1.jpg", "MildredOndusi", "https://commons.wikimedia.org/wiki/File:Lady_Eng_1.jpg"], "p23": ["A lecturer.jpg", "Johnexx", "https://commons.wikimedia.org/wiki/File:A_lecturer.jpg"], "p24": ["Coffee Center Lab 2017 (38198074606).jpg", "UC Davis College of Engineering", "https://commons.wikimedia.org/wiki/File:Coffee_Center_Lab_2017_(38198074606).jpg", "CC BY 2.0"], "p25": ["Coffee Center Lab 2017 (37542125374).jpg", "UC Davis College of Engineering", "https://commons.wikimedia.org/wiki/File:Coffee_Center_Lab_2017_(37542125374).jpg", "CC BY 2.0"], "p26": ["Студент биолог.jpg", "Иоанна Чернова", "https://commons.wikimedia.org/wiki/File:%D0%A1%D1%82%D1%83%D0%B4%D0%B5%D0%BD%D1%82_%D0%B1%D0%B8%D0%BE%D0%BB%D0%BE%D0%B3.jpg", "CC BY 4.0"], "p27": ["Studying.jpg", "Gnarlycraig", "https://commons.wikimedia.org/wiki/File:Studying.jpg", "Public domain"], "p28": ["636268202514872783-Teaching-Fellows-001.webp", "BlaintoGreen", "https://commons.wikimedia.org/wiki/File:636268202514872783-Teaching-Fellows-001.webp", "CC BY-SA 4.0"], "p29": ["Office hour- SAS Science and Technology Class wiki Project 2021.jpg", "Flower of truth", "https://commons.wikimedia.org/wiki/File:Office_hour-_SAS_Science_and_Technology_Class_wiki_Project_2021.jpg", "CC BY-SA 4.0"], "p30": ["Coronavirus, all'Università di Pavia l'incontro per la comunità e la cittadinanza - 49533148918.jpg", "unipavia", "https://commons.wikimedia.org/wiki/File:Coronavirus,_all%27Universit%C3%A0_di_Pavia_l%27incontro_per_la_comunit%C3%A0_e_la_cittadinanza_-_49533148918.jpg", "CC BY 2.0"], "p31": ["WLA 2017 Workshop - 25th November 2017 16.jpg", "Jamie Tubers", "https://commons.wikimedia.org/wiki/File:WLA_2017_Workshop_-_25th_November_2017_16.jpg", "CC BY-SA 4.0"]};
+const lic = c => c[3] || "CC BY-SA 4.0";
+const FEMALE = new Set(["p02","p04","p06","p08","p09","p10","p14","p16","p18","p19","p21","p22","p25","p26","p29","p31"]);
+const CONTEXTS = { africa: "Africa", commercial: "Commercial partners" };
+PERSONAS.forEach(p => { p.context = p.context || "africa"; });
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const grid = document.getElementById("grid");
+const dlg = document.getElementById("dlg");
+let filter = "all";
+let query = "";
+let visible = [];
+
+function tagsHTML(p) {
+  let t = `<span class="tag" style="--c:${GROUPS[p.group].color}">${GROUPS[p.group].label}</span>`;
+  if (p.tvet) t += `<span class="tag" style="--c:var(--tvet)">TVET</span>`;
+  if (p.context === "commercial") t += `<span class="tag" style="--c:var(--commercial)">Commercial partner</span>`;
+  return t;
+}
+
+function render() {
+  const q = query.trim().toLowerCase();
+  visible = PERSONAS.filter(p => {
+    const inFilter = filter === "all" || (filter === "tvet" ? p.tvet : filter === "new" ? p.isNew : filter in CONTEXTS ? p.context === filter : p.group === filter);
+    const hay = [p.name, p.tagline, p.where, p.quote, ...p.background, ...p.looking, ...p.hopes, ...p.worries].join(" ").toLowerCase();
+    return inFilter && (!q || hay.includes(q));
+  });
+  grid.innerHTML = visible.map(p => {
+    const n = PERSONAS.indexOf(p) + 1;
+    return `<button class="card" style="--c:${GROUPS[p.group].color}" data-id="${p.id}" aria-label="Open profile: ${esc(p.name)}, ${esc(p.tagline)}">
+      <div class="ph"><img src="images/${p.id}.jpg" alt="" loading="lazy" style="object-position:${p.pos}"><span class="num">${n}</span>${p.isNew ? '<span class="newtag">NEW</span>' : ""}</div>
+      <div class="body">
+        <h2 class="name">${esc(p.name)}</h2>
+        <p class="tagline">${esc(p.tagline)}</p>
+        <div class="meta">${p.age} · ${esc(p.where)}</div>
+        <div class="tags">${tagsHTML(p)}</div>
+        <blockquote>“${esc(p.quote)}”</blockquote>
+      </div>
+    </button>`;
+  }).join("");
+  document.getElementById("empty").style.display = visible.length ? "none" : "block";
+}
+
+function list(items) { return `<ul>${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>`; }
+
+function open(id) {
+  const p = PERSONAS.find(x => x.id === id);
+  const c = CREDITS[p.id];
+  const i = visible.findIndex(x => x.id === id);
+  dlg.style.setProperty("--c", GROUPS[p.group].color);
+  dlg.innerHTML = `<div class="pf">
+    <aside class="pf-side">
+      <img src="images/${p.id}.jpg" alt="Placeholder photo for ${esc(p.name)}" style="object-position:${p.pos}">
+      <blockquote class="pf-quote">“${esc(p.quote)}”</blockquote>
+      <details class="prompt"><summary>Image-generation prompt</summary><p>${esc(p.prompt)}</p></details>
+      <div class="credit">Placeholder photo: <a href="${c[2]}" target="_blank" rel="noopener">${esc(c[0])}</a> by ${esc(c[1])}, ${lic(c)}, via Wikimedia Commons (cropped).</div>
+    </aside>
+    <section class="pf-main">
+      <div class="pf-head">
+        <div>
+          <h2 id="dlg-title">${esc(p.name)}</h2>
+          <p class="tagline">${esc(p.tagline)}</p>
+          <div class="tags" style="margin-top:8px">${tagsHTML(p)}${p.isNew ? '<span class="tag" style="--c:var(--text)">New persona</span>' : ""}</div>
+        </div>
+        <button class="close" aria-label="Close" data-close>×</button>
+      </div>
+      <div class="sections">
+        <div class="sec"><h3>Background</h3>${list(p.background)}</div>
+        <div class="sec"><h3>What ${FEMALE.has(p.id) ? "she’s" : "he’s"} looking for</h3>${list(p.looking)}</div>
+        <div class="sec"><h3>Hopes &amp; dreams</h3>${list(p.hopes)}</div>
+        <div class="sec"><h3>Worries &amp; fears</h3>${list(p.worries)}</div>
+        <div class="sec" style="grid-column:1/-1"><h3>A day in the life of ${esc(p.name.replace(/^(Dr\.|Prof\.)\s*/, "").split(" ")[0])}</h3>${list(p.day)}</div>
+      </div>
+      <p class="grounded"><strong>Grounded in:</strong> ${esc(p.grounded)}</p>
+      <div class="nav">
+        <button data-step="-1" ${i <= 0 ? "disabled" : ""}>← Previous</button>
+        <button data-step="1" ${i >= visible.length - 1 ? "disabled" : ""}>Next →</button>
+      </div>
+    </section>
+  </div>`;
+  dlg.dataset.id = id;
+  if (!dlg.open) dlg.showModal();
+  dlg.querySelector(".pf-main").scrollTop = 0;
+}
+
+grid.addEventListener("click", e => {
+  const card = e.target.closest(".card");
+  if (card) open(card.dataset.id);
+});
+dlg.addEventListener("click", e => {
+  if (e.target === dlg || e.target.closest("[data-close]")) return dlg.close();
+  const step = e.target.closest("[data-step]");
+  if (step && !step.disabled) {
+    const i = visible.findIndex(x => x.id === dlg.dataset.id) + Number(step.dataset.step);
+    if (visible[i]) open(visible[i].id);
+  }
+});
+document.addEventListener("keydown", e => {
+  if (!dlg.open || e.target.closest("summary")) return;
+  const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+  if (!d) return;
+  const i = visible.findIndex(x => x.id === dlg.dataset.id) + d;
+  if (visible[i]) open(visible[i].id);
+});
+
+// Filters
+const counts = { all: PERSONAS.length, new: PERSONAS.filter(p => p.isNew).length, tvet: PERSONAS.filter(p => p.tvet).length };
+for (const g in GROUPS) counts[g] = PERSONAS.filter(p => p.group === g).length;
+for (const k in CONTEXTS) counts[k] = PERSONAS.filter(p => p.context === k).length;
+document.getElementById("count").textContent = PERSONAS.length;
+const filterDefs = [["all", "All", "var(--muted)"], ["africa", "Africa", "var(--g-students)"], ["commercial", "Commercial partners", "var(--commercial)"], ...Object.entries(GROUPS).map(([k, v]) => [k, v.label, v.color]), ["tvet", "TVET", "var(--tvet)"], ["new", "New personas", "var(--text)"]];
+const fwrap = document.getElementById("filters");
+fwrap.innerHTML = filterDefs.map(([k, l, c]) =>
+  `<button class="chip" data-f="${k}" aria-pressed="${k === "all"}" style="--c:${c}"><span class="dot"></span>${l} <span class="n">${counts[k]}</span></button>`
+).join("") + `<input class="search" type="search" placeholder="Search personas…" aria-label="Search personas"><button class="theme-btn" aria-label="Toggle dark mode" title="Toggle theme">◐</button>`;
+fwrap.addEventListener("click", e => {
+  const b = e.target.closest("[data-f]");
+  if (b) {
+    filter = b.dataset.f;
+    fwrap.querySelectorAll("[data-f]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    render();
+  }
+  if (e.target.closest(".theme-btn")) {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("persona-theme", root.dataset.theme); } catch (_) {}
+  }
+});
+fwrap.querySelector(".search").addEventListener("input", e => { query = e.target.value; render(); });
+try { const t = localStorage.getItem("persona-theme"); if (t) document.documentElement.dataset.theme = t; } catch (_) {}
+
+document.getElementById("credits").innerHTML = PERSONAS.map((p, i) => {
+  const c = CREDITS[p.id];
+  return `<li>${esc(p.name)}: <a href="${c[2]}" target="_blank" rel="noopener">${esc(c[0])}</a> by ${esc(c[1])}, ${lic(c)}</li>`;
+}).join("");
+
+render();
+if (location.hash && PERSONAS.some(p => p.id === location.hash.slice(1))) open(location.hash.slice(1));
+</script>
+</body>
+</html>
