@@ -27,20 +27,21 @@
   --commercial: #334155;
   --g-content: #b45309;
   --textbooks: #0369a1;
+  --ai: #7e22ce;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #161513; --surface: #1f1e1b; --surface-2: #2a2824; --text: #eeeae3; --muted: #a39d93;
     --line: #36332e; --accent: #7cb8e0; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
     --g-students: #fb923c; --g-teaching: #5ab4d6; --g-support: #a78bfa; --g-leadership: #fb7185;
-    --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1; --g-content: #fbbf24; --textbooks: #38bdf8;
+    --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1; --g-content: #fbbf24; --textbooks: #38bdf8; --ai: #c084fc;
   }
 }
 :root[data-theme="dark"] {
   --bg: #161513; --surface: #1f1e1b; --surface-2: #2a2824; --text: #eeeae3; --muted: #a39d93;
   --line: #36332e; --accent: #7cb8e0; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
   --g-students: #fb923c; --g-teaching: #5ab4d6; --g-support: #a78bfa; --g-leadership: #fb7185;
-  --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1; --g-content: #fbbf24; --textbooks: #38bdf8;
+  --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1; --g-content: #fbbf24; --textbooks: #38bdf8; --ai: #c084fc;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -156,7 +157,7 @@ footer a { color: var(--accent); }
   <div class="wrap">
     <div class="eyebrow">IDEMS · STACK in Africa and beyond · Draft for internal review</div>
     <h1>Who STACK and open textbooks are for</h1>
-    <p class="lede"><span id="count">51</span> fictional personas in three sets. <strong>STACK in Africa</strong> draws on IDEMS’ STACK case studies (2019–2026) and the Maseno student-engagement study (Juma et al., 2022). <strong>Commercial partners</strong> covers the contracts that grew out of the African work, with a highly selective US university and a public university in Italy. <strong>Open textbooks</strong> covers interactive PreTeXt books with STACK questions: Kenya’s Grade 7–10 books, Ethiopia’s Basic Maths, emerging work in Somalia, South Sudan and Ghana, and interest from lecturers in the US and UK. Select a card to read the full profile.</p>
+    <p class="lede"><span id="count">61</span> fictional personas in four sets. <strong>STACK in Africa</strong> draws on IDEMS’ STACK case studies (2019–2026) and the Maseno student-engagement study (Juma et al., 2022). <strong>Commercial partners</strong> covers the contracts that grew out of the African work, with a highly selective US university and a public university in Italy. <strong>Open textbooks</strong> covers interactive PreTeXt books with STACK questions: Kenya’s Grade 7–10 books, Ethiopia’s Basic Maths, emerging work in Somalia, South Sudan and Ghana, and interest from lecturers in the US and UK. <strong>AI authoring</strong> covers the people who use, and are affected by, IDEMS’ AI tools for writing STACK questions, from a single chatbot to a multi-agent system. Select a card to read the full profile.</p>
     <p class="note"><strong>Preview only.</strong> Names, details and quotes are fictional composites. The photos are Creative Commons placeholders from Wikimedia Commons showing real, unrelated people. Before publication, replace them with generated or consented images; each profile includes an image prompt for this.</p>
   </div>
 </header>
@@ -173,7 +174,7 @@ footer a { color: var(--accent); }
 <footer>
   <div class="wrap">
     <h2>Sources</h2>
-    <p>Grounding: STACK case studies at stack-assessment.org (Maseno 2019; Maseno workshop 2022; INNODEMS internship 2023; Bahir Dar workshop 2023; African STACK Conferences 2023, 2024, 2025; the INNODEMS model 2025; PreTeXt integration 2025; International Meeting Nairobi 2026; a US university case study 2025), Grade 10 digital textbook pilot interviews and a school visit report (Kenya, 2026), project information from IDEMS staff, and Juma, Ayere, Oyengo &amp; Osang (2022), “Evaluating Engagement and Learning Based on a Student Categorization using STACK…”, iJET 17(23). Format adapted from IDEMS’ PLH Digital parenting personas (2020).</p>
+    <p>Grounding: STACK case studies at stack-assessment.org (Maseno 2019; Maseno workshop 2022; INNODEMS internship 2023; Bahir Dar workshop 2023; African STACK Conferences 2023, 2024, 2025; the INNODEMS model 2025; PreTeXt integration 2025; International Meeting Nairobi 2026; a US university case study 2025), Grade 10 digital textbook pilot interviews and a school visit report (Kenya, 2026), project information from IDEMS staff, a draft case study on AI agents for STACK authoring (2026) and IDEMS podcast episodes on AI, STACK and textbooks, and Juma, Ayere, Oyengo &amp; Osang (2022), “Evaluating Engagement and Learning Based on a Student Categorization using STACK…”, iJET 17(23). Format adapted from IDEMS’ PLH Digital parenting personas (2020).</p>
     <h2 style="margin-top:22px">Photo credits</h2>
     <p>All photos via Wikimedia Commons, mostly from the Wiki Loves Africa “African people at work” collection; licences as listed. Images were cropped for display.</p>
     <ol id="credits"></ol>
@@ -806,13 +807,134 @@ const PERSONAS = [
   grounded: "User input (2026): a UK lecturer considering adapting a published linear algebra book into an interactive PreTeXt book.",
   prompt: "Realistic photo of a British woman in her mid-50s, senior lecturer, short curly blonde hair, dark blazer, at a desk with an open book and laptop, bright office.",
 },
+{
+  id: "p52", isNew: true, context: "ai", group: "content", tvet: false, pos: "60% 35%",
+  name: "Dr. Owen Price", tagline: "the Expert Who Drives the Agents", where: "UK", age: 41,
+  quote: "I give the coding assistant the repository, the rules and the tools, and it builds a chapter’s worth of questions overnight. It goes off track sometimes, but I know STACK well enough to catch it.",
+  background: ["41 years old; married with two children", "Mathematics lecturer and long-standing STACK author", "Uses a general coding assistant (like Claude Code) in a question-bank repository", "Lets the agents work freely and corrects them when they go wrong", "Has years of STACK expertise; the coding itself is now almost trivial to him"],
+  looking: ["A well-structured repository: cheat-sheets, authoring rules, validation tools", "Fast validation through the STACK API", "Bank-wide tasks: trackers, reports, consistency checks", "Colleagues to share tools and lessons with"],
+  hopes: ["Whole textbooks with high-quality interactive assessment", "Show the community what experts plus agents can do", "Spend his time on pedagogy, not syntax"],
+  worries: ["Subtle errors that pass validation but teach the wrong thing", "Dependence on one commercial provider", "Others using the same tools without the expertise to catch mistakes"],
+  day: ["Morning: reviews what the agents produced overnight", "Lectures and meetings", "Afternoon: writes new rules after spotting a recurring mistake", "Evening: sets the next batch running"],
+  grounded: "AI authoring case study (2026): second system = repository used through a coding assistant; podcasts on “AI for experts”; work with supervised agents on school textbooks (SMP case study).",
+  prompt: "Realistic photo of a British man in his early 40s with glasses and a checked shirt, at a desk with two monitors showing code and maths, plants on the desk, modern university office, natural light.",
+},
+{
+  id: "p53", isNew: true, context: "ai", group: "support", tvet: false, pos: "55% 35%",
+  name: "Claire Dubois", tagline: "the IDEMS Author on Client Deadlines", where: "France (works remotely for IDEMS)", age: 38,
+  quote: "I’m a former secondary teacher writing PDE questions I couldn’t solve myself. The lecturer writes the spec, the Planner and I turn it into a plan, the Author builds it, and I check every branch before it merges.",
+  background: ["38 years old; partner, one child", "Former secondary maths teacher; now a STACK author at IDEMS", "Works on paid contracts for universities in the US and Italy", "Uses the multi-agent interface daily: plan, preview, edit by hand, merge", "Not a subject specialist in most of what she authors"],
+  looking: ["Clear specifications and worked solutions from lecturers", "Question tests she can trust", "Previews of every variant", "A record of decisions in issues, so others can pick up her work"],
+  hopes: ["Cover her salary through contracts so impact work can continue", "Bring the same quality to African partners’ question banks", "Lead a small authoring team"],
+  worries: ["AI-written question tests that pass for the wrong reasons", "Tolerances and edge cases she can’t judge without the expert", "Deadlines squeezing quality"],
+  day: ["Morning: picks up an issue, reviews the Planner’s draft plan", "Late morning: previews variants, edits feedback by hand", "Afternoon: call with the lecturer about tolerances", "Merges approved branches before logging off"],
+  grounded: "AI authoring case study (2026): Planner–Retriever–Author cycle, hand editor and preview, issues and branches; podcasts: authoring outside one’s specialism with close lecturer collaboration; contracts covering salaries.",
+  prompt: "Realistic photo of a French woman in her late 30s, blonde hair tied up, t-shirt, working at a home-office desk with two screens showing a chat and a maths question preview, natural light.",
+},
+{
+  id: "p54", isNew: true, context: "ai", group: "teaching", tvet: false, pos: "40% 40%",
+  name: "Chiara Fontana", tagline: "the Busy Teacher Who Wants to Start", where: "Italy", age: 39,
+  quote: "I love the idea: practice with feedback for every student. But I have a full-time job and three children. If I have to learn HTML, Maxima and feedback trees first, I’ll never begin.",
+  background: ["39 years old; married with three children", "Secondary school mathematics teacher, highly motivated", "Uses textbook exercises; gives page numbers for homework", "Was introduced to STACK by a friend and was overwhelmed by the learning curve", "Asks about assessing students’ written proofs"],
+  looking: ["A tool that serves her rather than one she must learn", "Assessment for the textbook she already uses", "Questions she can trust without checking every line of code", "A community of teachers who share and improve questions"],
+  hopes: ["Give every student feedback, not just the ones who ask", "Contribute to open question banks", "Become a mentor for other teachers"],
+  worries: ["Time she doesn’t have", "Looking foolish with technology", "AI making mistakes she can’t spot"],
+  day: ["Teaches five classes", "Marks homework at the kitchen table", "Children’s activities in the evening", "Half an hour of her own time after 10 pm, at best"],
+  grounded: "Podcast (2026): a teacher friend with a full-time job and three children; vision that within months she could have assessment for her textbook authored with her input central, and in a year contribute to open banks.",
+  prompt: "Realistic photo of an Italian woman in her late 30s, long dark hair, at a home desk late in the evening with a laptop, a maths textbook and a cup of tea, focused, warm lamp light.",
+},
+{
+  id: "p55", isNew: true, context: "ai", group: "teaching", tvet: false, pos: "60% 30%",
+  name: "Dr. Lucy Njoroge", tagline: "the Lecturer Becoming an Author", where: "Kenya", age: 34,
+  quote: "I never had time to learn STACK properly. With the planner I describe what I want my students to practise, check the plan, and watch it appear in the preview. I’m learning STACK by doing it.",
+  background: ["34 years old; married, one child", "Lecturer in mathematics teaching large first-year courses", "Attended a STACK workshop but never authored alone", "Uses the multi-agent interface with an API key paid by a project", "Wants her questions in the open banks used across Kenya"],
+  looking: ["Guidance that teaches her STACK as she works", "Questions that work in Moodle and in PreTeXt books", "Low running costs", "Review from experienced authors before questions go live"],
+  hopes: ["Author all the quizzes for her own courses", "Train colleagues", "Publish on AI-supported authoring in Africa"],
+  worries: ["Paying for model use from a small budget", "Unreliable internet in long sessions", "Being blamed for errors the AI made"],
+  day: ["Morning lectures to 800 students", "Afternoon: one question with the Planner", "Evening: reviews preview variants on her laptop"],
+  grounded: "Podcasts (2026): “AI that builds expertise”, enabling many more authors; INNODEMS capacity bottleneck (2025); cost around $1 per new question (case study).",
+  prompt: "Realistic photo of a Kenyan woman in her mid-30s, mathematics lecturer, wearing headphones and a pink blouse, working at a laptop by a window in a university office, natural light.",
+},
+{
+  id: "p56", isNew: true, context: "ai", group: "content", tvet: false, pos: "65% 30%",
+  name: "Emma Hartley", tagline: "the Textbook Converter Who Talks to the Robots", where: "UK", age: 29,
+  quote: "I’ve converted dozens of open textbooks to PreTeXt. Now the agents cross-reference a chapter with our question bank and tell me what fits. I agree or disagree with the robots, and the good ones go in.",
+  background: ["29 years old; single", "Data scientist and statistics educator", "Converts published open textbooks to PreTeXt", "Uses the multi-agent system to match textbook exercises to open STACK questions", "Hands near-matches to colleagues to adapt"],
+  looking: ["Good matching across textbooks and banks", "Ways to manage textbook and question variants", "Interactive graphs (JSXGraph) inside books", "More skills-based questions using real data"],
+  hopes: ["A library of open textbooks with embedded assessment", "Rescue classic statistics resources", "Lecturers mixing chapters to build their own books"],
+  worries: ["Conceptual questions reduced to simple multiple choice", "Tolerances for estimation questions", "Too many textbooks, too few authors"],
+  day: ["Converts a chapter to PreTeXt", "Runs a cross-referencing pass", "Reviews the agents’ comments and makes decisions", "Discusses tolerances with a colleague"],
+  grounded: "Podcasts (2026): AI cross-referencing of a PreTeXt textbook with an open statistics bank (~40 questions selected, half close matches); textbook and question variants; assessment specialists across textbooks.",
+  prompt: "Realistic photo of a British woman in her late 20s with long curly dark hair, smiling with a coffee at a laptop in a bright home office, natural light.",
+},
+{
+  id: "p57", isNew: true, context: "ai", group: "teaching", tvet: false, pos: "40% 40%",
+  name: "Dr. Samuel Adeyemi", tagline: "the Subject Expert Who Writes the Spec", where: "Nigeria", age: 46,
+  quote: "I know what a good estimate of a standard deviation looks like. I don’t know Maxima. If I write a clear plan and approve it, the authors and agents can do the rest, but only I can say what counts as close enough.",
+  background: ["46 years old; married with four children", "Senior lecturer in statistics", "Collaborates with remote authors who build questions from his specifications", "Reviews plans with fixed fields: goal, randomisation, answer tests, feedback", "Values estimation and interpretation over formulas"],
+  looking: ["Plans he can read and approve quickly", "Previews of every random variant", "Questions in his own context and examples", "Open licences so his work reaches others"],
+  hopes: ["Statistics students who can interpret, not just compute", "Questions shared across West Africa", "Recognition for assessment work in promotion"],
+  worries: ["Tolerances set wrongly by non-specialists or AI", "Randomisation creating variants of very different difficulty", "Time to review"],
+  day: ["Lectures and supervision", "Reviews three question plans", "Answers authors’ questions by email", "Research in the evening"],
+  grounded: "Case study (2026): plan fields; podcasts on lecturer-defined specifications, estimation tolerances, variant difficulty and localisation of textbooks in West Africa.",
+  prompt: "Realistic photo of a Nigerian man in his mid-40s, statistics lecturer, checked shirt, reviewing a document on a desktop computer in a bright office, natural light.",
+},
+{
+  id: "p58", isNew: true, context: "ai", group: "support", tvet: false, pos: "50% 30%",
+  name: "Dr. Fiona MacLeod", tagline: "the In-House STACK Professional", where: "UK (Scotland)", age: 44,
+  quote: "Writing STACK questions is my job. AI could double what I produce, or it could convince my department they don’t need me. I want to use it on my own terms.",
+  background: ["44 years old; married", "Employed by a university to STACKify courses", "Member of the STACK professionals network", "Owns a large private question bank synchronised with Moodle", "Has tried general chatbots; got hallucinated syntax"],
+  looking: ["Git-based banks that sync with Moodle as new versions", "Tools that respect her institution’s licensing rules", "Reliable question tests", "Evidence of quality, not just speed"],
+  hopes: ["Spend time on feedback design, not boilerplate", "Lead AI-supported authoring in her university", "Collaborate with external specialists where her team lacks expertise"],
+  worries: ["Job security", "Data and IP leaving the institution", "Quality drifting as volume rises"],
+  day: ["Meetings with lecturers about next term", "Authoring and reviewing questions", "Trials the agent interface on a copy of the bank", "Answers student issue reports"],
+  grounded: "Podcasts: STACK professionals network inside institutions; IDEMS complementing in-house authors; gitsync-managed banks (case study); fears about AI and jobs.",
+  prompt: "Realistic photo of a Scottish woman in her mid-40s with long blonde hair, standing at a desk working on a laptop in a home office, thoughtful, warm light.",
+},
+{
+  id: "p59", isNew: true, context: "ai", group: "support", tvet: false, pos: "40% 35%",
+  name: "Yaw Darko", tagline: "the Hub Tech Lead Wanting the Tool", where: "Ghana", age: 31,
+  quote: "We want to run the system for our universities, but every question costs a dollar of API calls and the best models are foreign and expensive. Show me a path to cheaper models and our own git server.",
+  background: ["31 years old; married", "Technical lead at a new local STACK hub", "Computer science graduate; manages Moodle servers", "Supports lecturers in several universities with small budgets", "Interested in open models and self-hosting (e.g. Forgejo)"],
+  looking: ["Model choice per agent, including cheaper and open models", "Self-hosted question banks", "Clear setup documentation", "Costs he can predict and budget"],
+  hopes: ["An African-run authoring service", "Local small language models doing most of the work", "Jobs for graduate interns"],
+  worries: ["API costs in foreign currency", "Connectivity and reliability", "Lock-in to one provider"],
+  day: ["Server maintenance", "Training interns", "Tests different models on the same question", "Budget calls with university partners"],
+  grounded: "Case study (2026): model agnosticism, roughly Sonnet-level models needed, Forgejo planned, offer to others; podcasts on small language models and responsible AI in low-resource settings; GHAIDEMS (2026).",
+  prompt: "Realistic photo of a Ghanaian man in his early 30s in a striped polo shirt, sitting at a laptop in an open-plan tech office, looking at the camera, natural light.",
+},
+{
+  id: "p60", isNew: true, context: "ai", group: "students", tvet: false, pos: "35% 40%",
+  name: "Abdikarim Yusuf", tagline: "the Student Who Finally Gets Feedback", where: "Somalia", age: 21,
+  quote: "Last term the quiz just said ‘incorrect’. This term, when I make the same mistake, it tells me which step went wrong. I don’t know who changed it. I only know it helps.",
+  background: ["21 years old; second-year mathematics student", "Uses STACK quizzes and an interactive textbook on his phone", "Doesn’t know or care how the questions are made", "Many questions in his course were recently reviewed with AI support", "Studies in a third language"],
+  looking: ["Feedback on every wrong answer", "Partial credit for nearly-right proofs", "Questions that work on a phone", "Fair marking"],
+  hopes: ["Become a mathematics teacher", "Help rebuild his country’s schools"],
+  worries: ["Marks lost without explanation", "Data costs", "Questions that are wrong"],
+  day: ["Lectures in the morning", "Quiz practice in the library", "Group study in the evening"],
+  grounded: "Case study (2026): 51 mark-losing branches without feedback now carry messages; proof questions moved to partial credit; support for Somali National University (2025).",
+  prompt: "Realistic photo of a Somali male university student in his early 20s in a light shirt, sitting thoughtfully in a lecture room with other students, natural light.",
+},
+{
+  id: "p61", isNew: true, context: "ai", group: "funders", tvet: false, pos: "50% 50%",
+  name: "Jonas Weber", tagline: "the Funder Asking About Responsible AI", where: "Germany", age: 48,
+  quote: "Everyone pitches me AI for education. I want the ones that make teachers more capable, not replace them, and that have a plan for cost and energy beyond next year’s models.",
+  background: ["48 years old; married with two children", "Programme manager at a European foundation funding digital education", "Former teacher and edtech researcher", "Reviews dozens of AI proposals a year", "Interested in open-source and low-resource contexts"],
+  looking: ["Human-in-the-loop design", "Evidence of quality, not just speed", "Open licences and open models", "Plans for sustainability and lower environmental impact"],
+  hopes: ["AI that widens participation in creating educational content", "Fund work that scales in Africa and Europe", "A credible alternative to commercial platforms"],
+  worries: ["Hype over substance", "Dependence on big providers", "Entry-level jobs disappearing"],
+  day: ["Proposal reviews", "Calls with grantees", "Conference panels on AI in education", "Writes strategy papers"],
+  grounded: "Podcasts (2025–2026): responsible AI, small language models, jobs of the future, AI that enhances rather than replaces human work.",
+  prompt: "Realistic photo of a German man in his late 40s working on a laptop and writing notes at a coffee table at home, natural light.",
+},
 ];
 
 const CREDITS = {"p01": ["A Lecturer.jpg", "Achodanick", "https://commons.wikimedia.org/wiki/File:A_Lecturer.jpg"], "p02": ["Women on a phone meeting.jpg", "Nebiyu.s", "https://commons.wikimedia.org/wiki/File:Women_on_a_phone_meeting.jpg"], "p03": ["Kenya Office Work.jpg", "Moritz Poll", "https://commons.wikimedia.org/wiki/File:Kenya_Office_Work.jpg"], "p04": ["Pink power.jpg", "Sarah.Engin", "https://commons.wikimedia.org/wiki/File:Pink_power.jpg"], "p05": ["Software Developer at work 03.jpg", "Daudi mukiibi", "https://commons.wikimedia.org/wiki/File:Software_Developer_at_work_03.jpg"], "p06": ["MYXJ 20171027160326 fast African woman at work.jpg", "Peace Eneja", "https://commons.wikimedia.org/wiki/File:MYXJ_20171027160326_fast_African_woman_at_work.jpg"], "p07": ["Working at night in server room.jpg", "Tsinkala", "https://commons.wikimedia.org/wiki/File:Working_at_night_in_server_room.jpg"], "p08": ["A businesswoman signing contracts.jpg", "Melchisedek ABAKA", "https://commons.wikimedia.org/wiki/File:A_businesswoman_signing_contracts.jpg"], "p09": ["Assistante de direction.jpg", "Aristidek5maya", "https://commons.wikimedia.org/wiki/File:Assistante_de_direction.jpg"], "p10": ["Young & Dedicated Accountant at Work.jpg", "Mweufika", "https://commons.wikimedia.org/wiki/File:Young_%26_Dedicated_Accountant_at_Work.jpg"], "p11": ["Family bank.jpg", "Berbeture", "https://commons.wikimedia.org/wiki/File:Family_bank.jpg"], "p12": ["Portrait of uncle Abdalla.jpg", "Ibrahimpic", "https://commons.wikimedia.org/wiki/File:Portrait_of_uncle_Abdalla.jpg"], "p13": ["Young man taking a break in his banana plantation in Ivory Coast.jpg", "Elder-ak", "https://commons.wikimedia.org/wiki/File:Young_man_taking_a_break_in_his_banana_plantation_in_Ivory_Coast.jpg"], "p14": ["Students on WIFI.jpg", "Sarenda", "https://commons.wikimedia.org/wiki/File:Students_on_WIFI.jpg"], "p15": ["African student studying at dormitory from tablet computer,.jpg", "Tinsae Belay", "https://commons.wikimedia.org/wiki/File:African_student_studying_at_dormitory_from_tablet_computer,.jpg"], "p16": ["Young Teacher Preparing For Lesson.jpg", "Fahariya", "https://commons.wikimedia.org/wiki/File:Young_Teacher_Preparing_For_Lesson.jpg"], "p17": ["A farmer;s brother.jpg", "Rotimisonde", "https://commons.wikimedia.org/wiki/File:A_farmer;s_brother.jpg"], "p18": ["Worker studying.jpg", "Appreciating Beauty", "https://commons.wikimedia.org/wiki/File:Worker_studying.jpg"], "p19": ["A young student doing exercises on a whiteboard.jpg", "Melchisedek ABAKA", "https://commons.wikimedia.org/wiki/File:A_young_student_doing_exercises_on_a_whiteboard.jpg"], "p20": ["Electrical work.jpg", "Trssuretm", "https://commons.wikimedia.org/wiki/File:Electrical_work.jpg"], "p21": ["Femme mecanicienne26.jpg", "Photokadaffi", "https://commons.wikimedia.org/wiki/File:Femme_mecanicienne26.jpg"], "p22": ["Lady Eng 1.jpg", "MildredOndusi", "https://commons.wikimedia.org/wiki/File:Lady_Eng_1.jpg"], "p23": ["A lecturer.jpg", "Johnexx", "https://commons.wikimedia.org/wiki/File:A_lecturer.jpg"], "p24": ["Coffee Center Lab 2017 (38198074606).jpg", "UC Davis College of Engineering", "https://commons.wikimedia.org/wiki/File:Coffee_Center_Lab_2017_(38198074606).jpg", "CC BY 2.0"], "p25": ["Coffee Center Lab 2017 (37542125374).jpg", "UC Davis College of Engineering", "https://commons.wikimedia.org/wiki/File:Coffee_Center_Lab_2017_(37542125374).jpg", "CC BY 2.0"], "p26": ["Студент биолог.jpg", "Иоанна Чернова", "https://commons.wikimedia.org/wiki/File:%D0%A1%D1%82%D1%83%D0%B4%D0%B5%D0%BD%D1%82_%D0%B1%D0%B8%D0%BE%D0%BB%D0%BE%D0%B3.jpg", "CC BY 4.0"], "p27": ["Studying.jpg", "Gnarlycraig", "https://commons.wikimedia.org/wiki/File:Studying.jpg", "Public domain"], "p28": ["636268202514872783-Teaching-Fellows-001.webp", "BlaintoGreen", "https://commons.wikimedia.org/wiki/File:636268202514872783-Teaching-Fellows-001.webp", "CC BY-SA 4.0"], "p29": ["Office hour- SAS Science and Technology Class wiki Project 2021.jpg", "Flower of truth", "https://commons.wikimedia.org/wiki/File:Office_hour-_SAS_Science_and_Technology_Class_wiki_Project_2021.jpg", "CC BY-SA 4.0"], "p30": ["Coronavirus, all'Università di Pavia l'incontro per la comunità e la cittadinanza - 49533148918.jpg", "unipavia", "https://commons.wikimedia.org/wiki/File:Coronavirus,_all%27Universit%C3%A0_di_Pavia_l%27incontro_per_la_comunit%C3%A0_e_la_cittadinanza_-_49533148918.jpg", "CC BY 2.0"], "p31": ["WLA 2017 Workshop - 25th November 2017 16.jpg", "Jamie Tubers", "https://commons.wikimedia.org/wiki/File:WLA_2017_Workshop_-_25th_November_2017_16.jpg", "CC BY-SA 4.0"]};
 Object.assign(CREDITS, {"p32": ["Teacher Helping students to use Kiwix.jpg", "Abdulai Ibrahim", "https://commons.wikimedia.org/wiki/File:Teacher_Helping_students_to_use_Kiwix.jpg", "CC BY-SA 4.0"], "p33": ["Guiding Students on how to use kiwix.jpg", "Abdulai Ibrahim", "https://commons.wikimedia.org/wiki/File:Guiding_Students_on_how_to_use_kiwix.jpg", "CC BY-SA 4.0"], "p34": ["Reading Wikipedia in the Classroom Training at Dagbani Wikimedians User Group 13.jpg", "Awinebotima", "https://commons.wikimedia.org/wiki/File:Reading_Wikipedia_in_the_Classroom_Training_at_Dagbani_Wikimedians_User_Group_13.jpg", "CC BY-SA 4.0"], "p35": ["Students practicing on how to use kiwix.jpg", "Abdulai Ibrahim", "https://commons.wikimedia.org/wiki/File:Students_practicing_on_how_to_use_kiwix.jpg", "CC BY-SA 4.0"], "p36": ["Ghanaian Senior High School students in class 02.jpg", "BAGANIAH", "https://commons.wikimedia.org/wiki/File:Ghanaian_Senior_High_School_students_in_class_02.jpg", "CC BY-SA 4.0"], "p37": ["Pope John Senior High School and Minor Seminary students receive their WASSCE upon Graduation.jpg", "Joel Kwesi Sam", "https://commons.wikimedia.org/wiki/File:Pope_John_Senior_High_School_and_Minor_Seminary_students_receive_their_WASSCE_upon_Graduation.jpg", "CC BY-SA 3.0"], "p38": ["Reading Wikipedia in the Classroom Training at Dagbani Wikimedians User Group 11.jpg", "Awinebotima", "https://commons.wikimedia.org/wiki/File:Reading_Wikipedia_in_the_Classroom_Training_at_Dagbani_Wikimedians_User_Group_11.jpg", "CC BY-SA 4.0"], "p39": ["Helping students to launch the kiwix.jpg", "Abdulai Ibrahim", "https://commons.wikimedia.org/wiki/File:Helping_students_to_launch_the_kiwix.jpg", "CC BY-SA 4.0"], "p40": ["Somali Youth Learners Initiative Teacher Training (22567579282).jpg", "USAID in Africa", "https://commons.wikimedia.org/wiki/File:Somali_Youth_Learners_Initiative_Teacher_Training_(22567579282).jpg", "Public domain"], "p41": ["Students at Addis Ababa University - Addis Ababa - Ethiopia (8667490197).jpg", "Adam Jones from Kelowna, BC, Canada", "https://commons.wikimedia.org/wiki/File:Students_at_Addis_Ababa_University_-_Addis_Ababa_-_Ethiopia_(8667490197).jpg", "CC BY-SA 2.0"], "p42": ["2014 10 23 Somali National University Re-opens (15428342489).jpg", "AMISOM Public Information", "https://commons.wikimedia.org/wiki/File:2014_10_23_Somali_National_University_Re-opens_(15428342489).jpg", "CC0"], "p43": ["Somali Youth Learners Initiative Teacher Training (22394311769).jpg", "USAID in Africa", "https://commons.wikimedia.org/wiki/File:Somali_Youth_Learners_Initiative_Teacher_Training_(22394311769).jpg", "Public domain"], "p44": ["Réunion Intelligentsia 2.jpg", "Alex Ndongmo", "https://commons.wikimedia.org/wiki/File:R%C3%A9union_Intelligentsia_2.jpg", "CC BY-SA 4.0"], "p45": ["Reading Wikipedia in the Classroom Training at Dagbani Wikimedians User Group 09.jpg", "Awinebotima", "https://commons.wikimedia.org/wiki/File:Reading_Wikipedia_in_the_Classroom_Training_at_Dagbani_Wikimedians_User_Group_09.jpg", "CC BY-SA 4.0"], "p46": ["Ghanaian Senior High School students in class 01.jpg", "BAGANIAH", "https://commons.wikimedia.org/wiki/File:Ghanaian_Senior_High_School_students_in_class_01.jpg", "CC BY-SA 4.0"], "p47": ["Imprimeur sur plexiglas.jpg", "Oumaima kh", "https://commons.wikimedia.org/wiki/File:Imprimeur_sur_plexiglas.jpg", "CC BY-SA 4.0"], "p48": ["Reading Wikipedia in the Classroom Training at Dagbani Wikimedians User Group 10.jpg", "Awinebotima", "https://commons.wikimedia.org/wiki/File:Reading_Wikipedia_in_the_Classroom_Training_at_Dagbani_Wikimedians_User_Group_10.jpg", "CC BY-SA 4.0"], "p49": ["Woman sits at a desk with a laptop and writes notes.jpg", "Shixart1985", "https://commons.wikimedia.org/wiki/File:Woman_sits_at_a_desk_with_a_laptop_and_writes_notes.jpg", "CC BY 2.0"], "p50": ["Professional woman working on a laptop while enjoying coffee in a modern office setting.jpg", "Shixart1985", "https://commons.wikimedia.org/wiki/File:Professional_woman_working_on_a_laptop_while_enjoying_coffee_in_a_modern_office_setting.jpg", "CC BY 2.0"], "p51": ["Professional woman working at desk with laptop and documents in bright office setting.jpg", "Shixart1985", "https://commons.wikimedia.org/wiki/File:Professional_woman_working_at_desk_with_laptop_and_documents_in_bright_office_setting.jpg", "CC BY 2.0"]});
+Object.assign(CREDITS, {"p52": ["Video Producer in Cape Town.jpg", "Don Leitch", "https://commons.wikimedia.org/wiki/File:Video_Producer_in_Cape_Town.jpg", "CC BY-SA 4.0"], "p53": ["Partner Staff (52388904223).jpg", "Joshua Tree National Park", "https://commons.wikimedia.org/wiki/File:Partner_Staff_(52388904223).jpg", "Public domain"], "p54": ["Woman sitting at a desk working on a laptop while holding a cup.jpg", "Shixart1985", "https://commons.wikimedia.org/wiki/File:Woman_sitting_at_a_desk_working_on_a_laptop_while_holding_a_cup.jpg", "CC BY 2.0"], "p55": ["Software developer at work 01.jpg", "daudi_mukiibi", "https://commons.wikimedia.org/wiki/File:Software_developer_at_work_01.jpg", "CC BY-SA 4.0"], "p56": ["Woman enjoying coffee while working on laptop in cozy indoor space during daytime.jpg", "Shixart1985", "https://commons.wikimedia.org/wiki/File:Woman_enjoying_coffee_while_working_on_laptop_in_cozy_indoor_space_during_daytime.jpg", "CC BY 2.0"], "p57": ["African software developer at work, Nigeria.jpg", "Jedchela", "https://commons.wikimedia.org/wiki/File:African_software_developer_at_work,_Nigeria.jpg", "CC BY-SA 4.0"], "p58": ["Woman working on laptop at home office.jpg", "Shixart1985", "https://commons.wikimedia.org/wiki/File:Woman_working_on_laptop_at_home_office.jpg", "CC BY 2.0"], "p59": ["Software Developer at Work.jpg", "Tsinkala", "https://commons.wikimedia.org/wiki/File:Software_Developer_at_Work.jpg", "CC BY-SA 4.0"], "p60": ["2014 10 23 Somali National University Re-opens (15428978307).jpg", "AMISOM Public Information", "https://commons.wikimedia.org/wiki/File:2014_10_23_Somali_National_University_Re-opens_(15428978307).jpg", "CC0"], "p61": ["Man working from home on a coffee table making notes.jpg", "Microbiz Mag", "https://commons.wikimedia.org/wiki/File:Man_working_from_home_on_a_coffee_table_making_notes.jpg", "CC BY 2.0"]});
 const lic = c => c[3] || "CC BY-SA 4.0";
-const FEMALE = new Set(["p02","p04","p06","p08","p09","p10","p14","p16","p18","p19","p21","p22","p25","p26","p29","p31","p42","p46","p49","p50","p51"]);
-const CONTEXTS = { africa: "STACK in Africa", commercial: "Commercial partners", textbooks: "Open textbooks" };
+const FEMALE = new Set(["p02","p04","p06","p08","p09","p10","p14","p16","p18","p19","p21","p22","p25","p26","p29","p31","p42","p46","p49","p50","p51","p53","p54","p55","p56","p58"]);
+const CONTEXTS = { africa: "STACK in Africa", commercial: "Commercial partners", textbooks: "Open textbooks", ai: "AI authoring" };
 PERSONAS.forEach(p => { p.context = p.context || "africa"; });
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -827,6 +949,7 @@ function tagsHTML(p) {
   if (p.tvet) t += `<span class="tag" style="--c:var(--tvet)">TVET</span>`;
   if (p.context === "commercial") t += `<span class="tag" style="--c:var(--commercial)">Commercial partner</span>`;
   if (p.context === "textbooks") t += `<span class="tag" style="--c:var(--textbooks)">Open textbooks</span>`;
+  if (p.context === "ai") t += `<span class="tag" style="--c:var(--ai)">AI authoring</span>`;
   return t;
 }
 
@@ -920,7 +1043,7 @@ const counts = { all: PERSONAS.length, new: PERSONAS.filter(p => p.isNew).length
 for (const g in GROUPS) counts[g] = PERSONAS.filter(p => p.group === g).length;
 for (const k in CONTEXTS) counts[k] = PERSONAS.filter(p => p.context === k).length;
 document.getElementById("count").textContent = PERSONAS.length;
-const filterDefs = [["all", "All", "var(--muted)"], ["africa", "STACK in Africa", "var(--g-students)"], ["commercial", "Commercial partners", "var(--commercial)"], ["textbooks", "Open textbooks", "var(--textbooks)"], ...Object.entries(GROUPS).map(([k, v]) => [k, v.label, v.color]), ["tvet", "TVET", "var(--tvet)"], ["new", "New personas", "var(--text)"]];
+const filterDefs = [["all", "All", "var(--muted)"], ["africa", "STACK in Africa", "var(--g-students)"], ["commercial", "Commercial partners", "var(--commercial)"], ["textbooks", "Open textbooks", "var(--textbooks)"], ["ai", "AI authoring", "var(--ai)"], ...Object.entries(GROUPS).map(([k, v]) => [k, v.label, v.color]), ["tvet", "TVET", "var(--tvet)"], ["new", "New personas", "var(--text)"]];
 const fwrap = document.getElementById("filters");
 fwrap.innerHTML = filterDefs.map(([k, l, c]) =>
   `<button class="chip" data-f="${k}" aria-pressed="${k === "all"}" style="--c:${c}"><span class="dot"></span>${l} <span class="n">${counts[k]}</span></button>`
