@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STACK and Textbooks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="case.css">
+</head>
+<body>
+<nav class="topnav"><div class="in">
+  <span class="brand">IDEMS · STACK journey</span>
+  <a href="index.html">Personas</a>
+  <a href="case-1-africa-to-contracts.html">1 · Africa to contracts</a>
+  <a href="case-2-textbooks.html" aria-current="page">2 · STACK and textbooks</a>
+  <a href="case-3-ai-authoring.html">3 · AI authoring</a>
+</div></nav>
+
+<main class="wrap">
+<header class="hero">
+  <div class="eyebrow">Case study 2 of 3 · Draft for internal review</div>
+  <h1>STACK and textbooks: assessment that travels with the book</h1>
+  <p class="standfirst">Quizzes inside a learning management system only reach students who can log in. Putting STACK questions into open, interactive PreTeXt textbooks takes practice with feedback to Ethiopian universities, Kenyan secondary schools and tablets in Ghana, and is starting to interest lecturers in the US and UK.</p>
+  <p class="note">Personas are fictional composites. Select any persona to open the full profile. Schools are not named, and the US partner university is not named.</p>
+</header>
+
+<div class="stats">
+  <div class="stat"><b>50,000+</b><span>Ethiopian undergraduates a year taking the Basic Maths courses now available as interactive books</span></div>
+  <div class="stat"><b>Grades 7–10</b><span>Kenyan competency-based curriculum books written by an intern team</span></div>
+  <div class="stat"><b>73</b><span>Grade 10 learners at one Kenyan model-school demonstration</span></div>
+  <div class="stat"><b>33+</b><span>Open textbooks in IDEMS' PreTeXt library, with around 40 converted</span></div>
+  <div class="stat"><b>~40</b><span>Open statistics questions matched to a single textbook, half of them closely</span></div>
+</div>
+
+<h2>Why textbooks?</h2>
+<p>By 2025 STACK was running in more than 78 university courses across East Africa (<a href="case-1-africa-to-contracts.html">case study 1</a>). Every one of those courses depended on Moodle: a server, someone to maintain it, student accounts and a reliable connection. For many institutions that was the hardest part. At the 2025 African STACK Conference, the University of Namibia described serving 29,000 students across 12 campuses. Somali and South Sudanese universities were rebuilding with almost no infrastructure. Even where Moodle existed, creating accounts was a barrier.</p>
+<p>At the same time, a different idea was growing. At the Bahir Dar workshop in 2023, Ethiopian secondary-textbook authors working for the Ministry asked whether their books could include STACK questions. By 2025 the conference had concluded that "open, interactive PreTeXt digital textbooks with STACK quizzes" were a viable alternative wherever learning management systems were limited. A textbook needs no login. It can be read on a phone, a tablet, a classroom smart TV or as a PDF, and the practice and feedback go wherever the book goes.</p>
+<p>That matters for people like <a href="index.html#p42">Hodan Abdi</a>, an education student in a university that is rebuilding, and for <a href="index.html#p44">Mr. Deng Majok</a>, a Ministry curriculum director with more learners than textbooks.</p>
+<blockquote class="voice">“Our university has no Moodle. An open book with questions I can try on my phone is the first time I get feedback that isn’t from a teacher.”<cite data-p="p42"></cite></blockquote>
+
+<h2>Making STACK work inside a book</h2>
+<p>PreTeXt is an open-source authoring system. Authors write once in structured XML, and the same source produces interactive web pages, PDF, EPUB and even braille. IDEMS developers, working with the PreTeXt developers and STACK contributors, added a new <code>&lt;stack&gt;</code> element. A question exported from Moodle can now sit inside a PreTeXt book. In the web version it is rendered live through the STACK API, so students can answer, get feedback and try new variants. In the PDF a fixed version is printed.</p>
+<p>It was not straightforward. "A question looking fine in Moodle is not a guarantee that it also looks fine in PreTeXt," as the case study put it:</p>
+<ul>
+  <li>Questions that fit in Moodle overflowed the book's layout.</li>
+  <li>Interactive graphs with very large coordinate ranges made pages lag.</li>
+  <li>STACK and PreTeXt used different versions of the maths display library.</li>
+  <li>Some interactive question types cannot become a fixed version for print.</li>
+</ul>
+<p>The book version also does not yet record answers for grading. It is for practice and self-assessment. Ideas for the future include generating a Moodle course directly from the book's source, or connecting books to learning management systems so that students can log in and their marks reach the gradebook.</p>
+<p><a href="index.html#p39">Allan Kiprotich, the Intern Textbook Author</a>, represents the people who did much of this work: Kenyan graduates who learned PreTeXt, STACK and the quirks of both at once.</p>
+<blockquote class="voice">“Grades 7 to 9 we adapted from existing books. Grade 10 we wrote from nothing. Then we cleaned up the Ethiopian Ministry’s Word files equation by equation.”<cite data-p="p39"></cite></blockquote>
+
+<h2>Ethiopia: one book for 50,000 students</h2>
+<p>Ethiopia's harmonised curriculum requires every first-year university student to take Basic Mathematics, in one version for Natural Sciences and one for Social Sciences that share about half their content. That is more than 50,000 students a year. The source was the Ministry's Word files. They were converted automatically to web format, and the Kenyan intern team then fixed the formatting inconsistencies by hand. The Natural Sciences book went into use in September 2025 and the Social Sciences book followed in January 2026. A group of three postgraduate students supports development and piloting, and Ethiopian lecturers reorganised the content into a shared teaching team. The work is formalised in the 2025 Memorandum of Understanding between Bahir Dar University, Wollo University and IDEMS.</p>
+<p>One small design decision has proved important. Every question in the Ethiopian book has its own feedback form, already filled in with the question's identifier. A lecturer who spots a mistake can report it in seconds, and the question can be fixed in Moodle and pushed back into the book. <a href="index.html#p40">Dr. Yonas Tadesse</a> is the lecturer who now sees a correction made the same day. <a href="index.html#p41">Biruk Hailu</a> is the economics student working through compulsory maths on a shared phone, in his third language. <a href="index.html#p06">Dr. Hayat Seid</a> heads the department and has to make it consistent across every section.</p>
+<blockquote class="voice">“Every question has a feedback link that already knows which question I mean. I send a correction in the morning, and it can be fixed by the afternoon. That is new for us.”<cite data-p="p40"></cite></blockquote>
+<div class="personas-label">Personas in this chapter</div>
+<div class="personas">
+  <a class="pcard" data-p="p40"></a><a class="pcard" data-p="p41"></a><a class="pcard" data-p="p06"></a><a class="pcard" data-p="p39"></a>
+</div>
+
+<h2>Kenya: a new curriculum, a new kind of book</h2>
+<p>Kenya's move to a competency-based curriculum opened the door. Supported by US Embassy funding through INNODEMS, an intern team built interactive mathematics books for Grades 7 to 10. Grades 7–9 were adapted from existing textbooks and Grade 10 was written from scratch. Funding stopped and started, but the work continued. In 2026 the Grade 10 book was piloted in secondary schools, and the pilot produced the most detailed picture yet of how teachers and learners actually use an interactive textbook.</p>
+
+<h3>Three teachers, three ways of using the book</h3>
+<p>Interviews with pilot teachers found no single way of using the book. <a href="index.html#p32">Mr. George Wanyama</a> has ten years' experience and an ICT background. He taught himself the book in a week and now mixes it with the coursebook, turning to the e-book where the coursebook is weakest, such as transformations and trigonometry, and moving the sliders while the class reacts. <a href="index.html#p33">Mr. Collins Kibet</a>, five months into his first job, learned it over a weekend with an AI summary. He has to follow the Ministry's lesson plans and feels the book's own plans take away his judgement. <a href="index.html#p34">Mr. Wilson Barasa</a> adopted it because the new coursebooks had not arrived. He follows it page by page ("biblically") because it matches the coursebook and he has come to trust it.</p>
+<blockquote class="voice">“Where the coursebook fails, on rotation, reflection and trigonometry, I open the e-book and move the slider, and the whole class says ‘aaah’. I take the best of both.”<cite data-p="p32"></cite></blockquote>
+<p>Infrastructure decided how far they could go, more than their attitude did. All three described the same limits:</p>
+<ul>
+  <li>One smartboard or projector shared across every class, and sometimes every subject.</li>
+  <li>A book that only opens in the computer lab, so moving the class there eats into a 40-minute lesson.</li>
+  <li>Learners at the back who cannot see a screen only the teacher controls.</li>
+  <li>Power cuts and no internet.</li>
+</ul>
+<p>They also gave specific feedback on the content. They wanted gridded plots, labelled diagrams in trigonometry, a continuous slider for special angles, shorter introductions and measurement sections, fuller worked examples for the laws of logarithms, and short videos. They found the checkpoint questions either too hard or never used them. One teacher had been sending feedback to the developers by WhatsApp until someone showed him the feedback link inside the book. After that it became the way he preferred.</p>
+
+<h3>What learners said</h3>
+<p>Five Grade 10 learners described the e-book as clearer, more visual and more detailed than the "wordy" coursebook. They liked worked solutions they could check their own work against, and seeing more than one method. They also described their reality. The book arrived halfway through the term with no introduction. Their class shared three printed coursebooks. They used the e-book three times a week in the lab, with no access at home, where they only received the questions. They wanted more steps in examples (especially for reflection), a clearer distinction between congruence and similarity, more alternative methods, and a short video on data handling. One pointed out that some exam questions appear in neither book. <a href="index.html#p35">Kevin Omondi</a> brings these voices together.</p>
+<blockquote class="voice">“The e-book is more visual. The coursebook is wordy, and there are only three in our class. If I could open the e-book at home I would check every answer.”<cite data-p="p35"></cite></blockquote>
+
+<h3>A model school</h3>
+<p>A demonstration in July 2026 at a well-equipped girls' secondary school showed the other end of the range. Seventy-three learners and all five maths teachers worked through rotation and congruence, and indices and logarithms, in a computer lab with a projector. Learners solved "stuck questions" at the board while the book gave marks and step-by-step guidance. One teacher pointed out that a logarithm question accepted only one method. The facilitator showed how teachers can send alternative methods through the feedback link. The Deputy Principal proposed the school as a model school, with its maths teachers mentoring other schools, and the school plans to install the book on the smart TVs in its Grade 10 classrooms. <a href="index.html#p36">Mr. Japheth Wekesa, the Master Teacher</a>, <a href="index.html#p37">Mr. Stephen Mutai, the Deputy Principal</a>, and <a href="index.html#p38">Victor Ochieng, the Rollout Facilitator</a>, come from this visit.</p>
+<blockquote class="voice">“If a question accepts only one method, the book teaches them there is only one way to do mathematics.”<cite data-p="p36"></cite></blockquote>
+<div class="personas-label">Personas in this chapter</div>
+<div class="personas">
+  <a class="pcard" data-p="p32"></a><a class="pcard" data-p="p33"></a><a class="pcard" data-p="p34"></a><a class="pcard" data-p="p35"></a><a class="pcard" data-p="p36"></a><a class="pcard" data-p="p37"></a><a class="pcard" data-p="p38"></a>
+</div>
+
+<div class="box">
+  <h3>What teachers and learners asked for</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Request</th><th>Who raised it</th></tr></thead>
+    <tbody>
+      <tr><td>Accept more than one valid solution method</td><td>Teachers at the model school; learners asking for alternative methods</td></tr>
+      <tr><td>Short explanatory videos and animations</td><td>Two pilot teachers, learners and the visit report</td></tr>
+      <tr><td>More steps in worked examples</td><td>Learners (reflection, quadratics)</td></tr>
+      <tr><td>Simpler, clearer checkpoints</td><td>A pilot teacher; checkpoints unused by others</td></tr>
+      <tr><td>Labelled diagrams, gridded plots, continuous sliders</td><td>Pilot teachers</td></tr>
+      <tr><td>Orientation when the book arrives</td><td>Learners (arrived mid-term); teachers who taught themselves</td></tr>
+      <tr><td>Training on the in-book feedback link</td><td>Visit report; a teacher who used WhatsApp until shown it</td></tr>
+      <tr><td>Access beyond the lab: smart TVs, offline copies, home</td><td>Model school; learners</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<h2>Widening horizons</h2>
+<h3>Somalia and South Sudan</h3>
+<p>Universities in Somalia and South Sudan have joined the African STACK conferences, and IDEMS has committed to support the University of Juba and Somali National University. Their students mostly have phones and rarely a working learning management system, and typing maths on a phone is a known difficulty. Through contacts in both countries, conversations with government officials are now under way about deploying interactive textbooks at scale. <a href="index.html#p43">Abdirahman Warsame, the Government Liaison</a>, hears the same two questions every time: will it work on the devices we have, and who will train the teachers?</p>
+<h3>Ghana</h3>
+<p>Ghana has a rare advantage: senior high school students have government-issued tablets. Today those tablets mostly hold the official textbooks as fixed files. IDEMS is working with researchers in Ghana and the UK, with senior members of the Mathematical Association of Ghana who wrote the current official textbooks, with publishers and possibly the Ministry of Education, to turn those books into interactive ones. The personas cover each of these groups: <a href="index.html#p45">Mr. Kwabena Asante</a>, an author of the official books; <a href="index.html#p46">Akosua Boateng</a>, a student who would use the book every night if it could tell her where she went wrong; <a href="index.html#p47">Mr. Emmanuel Tetteh</a>, a publisher who needs a business model; and the research partners <a href="index.html#p48">Dr. Ibrahim Alhassan</a> and <a href="index.html#p49">Dr. Hannah Clarke</a>.</p>
+<blockquote class="voice">“I co-wrote the books every senior high student in Ghana uses. Now every one of them has a tablet. It would be foolish to leave our book as a PDF.”<cite data-p="p45"></cite></blockquote>
+<h3>Beyond Africa</h3>
+<p>Interest is now coming from well-resourced universities too. A lecturer at the US partner university wants to turn years of LaTeX lecture notes and well-liked STACK quizzes into one open PreTeXt book (<a href="index.html#p50">Dr. Rachel Stein</a>). A UK lecturer is considering turning a published, printed Linear Algebra textbook into an interactive online book (<a href="index.html#p51">Dr. Margaret Hughes</a>). What works for an Ethiopian first-year course also works for a lecturer at a leading university.</p>
+<div class="personas-label">Personas in this chapter</div>
+<div class="personas">
+  <a class="pcard" data-p="p42"></a><a class="pcard" data-p="p43"></a><a class="pcard" data-p="p44"></a><a class="pcard" data-p="p45"></a><a class="pcard" data-p="p46"></a><a class="pcard" data-p="p47"></a><a class="pcard" data-p="p48"></a><a class="pcard" data-p="p49"></a><a class="pcard" data-p="p50"></a><a class="pcard" data-p="p51"></a>
+</div>
+
+<h2>An open library with a shared layer of questions</h2>
+<p>While the African books were being built, IDEMS was also building a library of open textbooks converted to PreTeXt. At least 33 are online and around 40 have been converted, mostly in statistics and data science. IDEMS also keeps open STACK question banks with thousands of questions, including more than a hundred in statistics. The obvious next step was to bring the two together.</p>
+<p>In 2026 the team used IDEMS' AI system (<a href="case-3-ai-authoring.html">case study 3</a>) to match an introductory statistics textbook against the open statistics bank. A first pass found questions that matched the textbook's exercises closely. A second found questions that could fit with some changes, and the agents commented on each one, for example noting that a question used grouped data while the chapter did not. The person who converts the textbooks then accepted or rejected each suggestion, and a STACK author improved the selected questions. About 40 questions were chosen, half of them closely matching exercises already in the book. One or two chapters can be fully covered with small adjustments. <a href="index.html#p56">Emma Hartley, the Textbook Converter</a>, represents this way of working.</p>
+<p>The work showed what questions are still missing. Many conceptual questions are simple multiple choice and need randomising, for example by randomising the wording so the correct option changes. Application questions, such as finding percentiles from a stem-and-leaf plot, carry over well. Skills questions, where students take real data and analyse it themselves, rarely matched anything. Estimation questions raised the hardest design problem: how close to the true standard deviation counts as correct? Only a statistics specialist can set that tolerance, which is why <a href="index.html#p57">Dr. Samuel Adeyemi</a>, the lecturer who writes the specification, matters. Many of these questions build on Computer-Assisted Statistics Textbooks (CAST), a pioneering earlier project whose interactive content was lost when Java applets stopped working. JSXGraph, which works in both STACK and PreTeXt, offers a way to rebuild it.</p>
+
+<h3>Assessment as its own role</h3>
+<p>This points to a bigger idea. Many open textbooks cover the same topics in different ways, so the same interactive questions could be used across all of them. At the moment, a textbook author has to write the book and the exercises. Instead, specialists in learning through assessment could contribute across many books, and lecturers could take questions from the library into their own version of a textbook. In US discussions IDEMS has suggested "assessment-focused faculty" to work alongside the "teaching-focused faculty" that many universities now employ for large service courses.</p>
+<p>Taken further, open resources could offer lecturers a joined-up package: a textbook they can adapt, the matching lecture notes, a ready-made course for their learning management system, and mastery quizzes, all of which they can make their own. Commercial publishers offer that experience today, paid for by textbook sales. An open version needs a business model too, perhaps through licences that share income with authors, or services built on open content. That is the question facing <a href="index.html#p47">Mr. Tetteh</a>. Where academic systems are still developing, as in parts of West Africa, adapting an international textbook to the local context could even count towards promotion. That would reward the kind of local authorship that lecturers there say they have been missing.</p>
+
+<div class="box">
+  <h3>What we learned</h3>
+  <ul class="lessons">
+    <li><strong>The book is a way around infrastructure.</strong> Where Moodle is missing or accounts are a barrier, an open book still delivers practice with feedback.</li>
+    <li><strong>One source, many formats, but always test the result.</strong> A question that works in Moodle may still break in the book.</li>
+    <li><strong>Teachers use the book in their own ways.</strong> Some follow it page by page and some mix it with other materials. Both need support, and neither should be prescribed.</li>
+    <li><strong>Infrastructure decides usage more than attitude does.</strong> One smartboard, a lab-only book and power cuts limit even the keenest teacher.</li>
+    <li><strong>Feedback has to be one click away.</strong> The in-book feedback link turned teachers and lecturers into co-authors once they knew it existed.</li>
+    <li><strong>More than one valid method is essential.</strong> Accepting only one method undermines what the curriculum is trying to teach.</li>
+    <li><strong>Questions can be shared across textbooks.</strong> AI-assisted matching shows how much of an existing open bank fits a given book, and what is still missing.</li>
+  </ul>
+</div>
+
+<h2>What comes next</h2>
+<p>The immediate priorities are concrete:</p>
+<ul>
+  <li>Accept more than one method in the Kenyan questions.</li>
+  <li>Add short videos and the requested interactives.</li>
+  <li>Give orientation and feedback-link training to every pilot school.</li>
+  <li>Support installation on classroom smart TVs and offline devices.</li>
+  <li>Carry what has been learned into the Grade 11 and 12 books.</li>
+  <li>Put Ethiopia's Social Sciences book into use and continue reviewing the Natural Sciences one.</li>
+  <li>Turn conversations in Ghana, Somalia and South Sudan into pilots.</li>
+  <li>Develop a way for the books to record marks, so they can be used for assessment as well as practice.</li>
+</ul>
+<p>The bigger challenge is the same one STACK has always faced: there are not enough people who can write good questions. As books multiply, the demand for interactive questions grows faster than any team can author them. That is why the third part of the journey matters.</p>
+
+<div class="next">
+  <a href="case-1-africa-to-contracts.html"><span>Previous case study</span><b>← From Africa to commercial contracts</b></a>
+  <a href="case-3-ai-authoring.html"><span>Next case study</span><b>AI agents for STACK authoring →</b></a>
+</div>
+
+<footer>
+  <strong>Sources</strong>
+  <ul>
+    <li>STACK case studies at stack-assessment.org: Bahir Dar University Workshop 2023; African STACK Conference 2025; PreTeXt integration 2025; Supporting the African STACK Community (INNODEMS) 2025.</li>
+    <li>Grade 10 Digital Mathematics Textbook pilot: teacher interview guide, three teacher interviews and a group interview with five learners (Kenya, 2026); school visit report on a Grade 10 demonstration (July 2026).</li>
+    <li>IDEMS podcast episodes on PreTeXt textbooks, STACK in textbooks and AI cross-referencing of question banks (2026); project information from IDEMS staff.</li>
+  </ul>
+  Personas are fictional. Placeholder photos are credited on the <a href="index.html">personas page</a>.
+</footer>
+</main>
+<script src="personas-mini.js"></script>
+</body>
+</html>
