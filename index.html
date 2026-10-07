@@ -25,20 +25,22 @@
   --g-research: #15803d;
   --tvet: #0f766e;
   --commercial: #334155;
+  --g-content: #b45309;
+  --textbooks: #0369a1;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #161513; --surface: #1f1e1b; --surface-2: #2a2824; --text: #eeeae3; --muted: #a39d93;
     --line: #36332e; --accent: #7cb8e0; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
     --g-students: #fb923c; --g-teaching: #5ab4d6; --g-support: #a78bfa; --g-leadership: #fb7185;
-    --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1;
+    --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1; --g-content: #fbbf24; --textbooks: #38bdf8;
   }
 }
 :root[data-theme="dark"] {
   --bg: #161513; --surface: #1f1e1b; --surface-2: #2a2824; --text: #eeeae3; --muted: #a39d93;
   --line: #36332e; --accent: #7cb8e0; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
   --g-students: #fb923c; --g-teaching: #5ab4d6; --g-support: #a78bfa; --g-leadership: #fb7185;
-  --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1;
+  --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1; --g-content: #fbbf24; --textbooks: #38bdf8;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -153,8 +155,8 @@ footer a { color: var(--accent); }
 <header class="top">
   <div class="wrap">
     <div class="eyebrow">IDEMS · STACK in Africa and beyond · Draft for internal review</div>
-    <h1>Who STACK in Africa is for</h1>
-    <p class="lede"><span id="count">31</span> fictional personas built from IDEMS’ STACK case studies (2019–2026) and the Maseno student-engagement study (Juma et al., 2022). They cover the students who use STACK, the people who teach and support it, and the people who decide whether it lasts. A second set reflects the commercial contracts that grew out of the African work, with a highly selective US university and a public university in Italy. Select a card to read the full profile.</p>
+    <h1>Who STACK and open textbooks are for</h1>
+    <p class="lede"><span id="count">51</span> fictional personas in three sets. <strong>STACK in Africa</strong> draws on IDEMS’ STACK case studies (2019–2026) and the Maseno student-engagement study (Juma et al., 2022). <strong>Commercial partners</strong> covers the contracts that grew out of the African work, with a highly selective US university and a public university in Italy. <strong>Open textbooks</strong> covers interactive PreTeXt books with STACK questions: Kenya’s Grade 7–10 books, Ethiopia’s Basic Maths, emerging work in Somalia, South Sudan and Ghana, and interest from lecturers in the US and UK. Select a card to read the full profile.</p>
     <p class="note"><strong>Preview only.</strong> Names, details and quotes are fictional composites. The photos are Creative Commons placeholders from Wikimedia Commons showing real, unrelated people. Before publication, replace them with generated or consented images; each profile includes an image prompt for this.</p>
   </div>
 </header>
@@ -171,7 +173,7 @@ footer a { color: var(--accent); }
 <footer>
   <div class="wrap">
     <h2>Sources</h2>
-    <p>Grounding: STACK case studies at stack-assessment.org (Maseno 2019; Maseno workshop 2022; INNODEMS internship 2023; Bahir Dar workshop 2023; African STACK Conferences 2023, 2024, 2025; the INNODEMS model 2025; International Meeting Nairobi 2026), and Juma, Ayere, Oyengo &amp; Osang (2022), “Evaluating Engagement and Learning Based on a Student Categorization using STACK…”, iJET 17(23). Format adapted from IDEMS’ PLH Digital parenting personas (2020).</p>
+    <p>Grounding: STACK case studies at stack-assessment.org (Maseno 2019; Maseno workshop 2022; INNODEMS internship 2023; Bahir Dar workshop 2023; African STACK Conferences 2023, 2024, 2025; the INNODEMS model 2025; PreTeXt integration 2025; International Meeting Nairobi 2026; a US university case study 2025), Grade 10 digital textbook pilot interviews and a school visit report (Kenya, 2026), project information from IDEMS staff, and Juma, Ayere, Oyengo &amp; Osang (2022), “Evaluating Engagement and Learning Based on a Student Categorization using STACK…”, iJET 17(23). Format adapted from IDEMS’ PLH Digital parenting personas (2020).</p>
     <h2 style="margin-top:22px">Photo credits</h2>
     <p>All photos via Wikimedia Commons, mostly from the Wiki Loves Africa “African people at work” collection; licences as listed. Images were cropped for display.</p>
     <ol id="credits"></ol>
@@ -188,6 +190,7 @@ const GROUPS = {
   leadership: { label: "Institutional leaders", color: "var(--g-leadership)" },
   funders:    { label: "Funders & networks", color: "var(--g-funders)" },
   research:   { label: "Research & evidence", color: "var(--g-research)" },
+  content:    { label: "Authors & publishers", color: "var(--g-content)" },
 };
 
 const PERSONAS = [
@@ -563,12 +566,253 @@ const PERSONAS = [
   grounded: "IDEMS staff deliver both commercial contracts (question conversion, review and improvement) alongside support for the African STACK community.",
   prompt: "Realistic photo of a 30-year-old Nigerian woman wearing a hijab, mathematics content author, working on a laptop at a desk with a second screen showing equations, home office, focused, natural light.",
 },
+{
+  id: "p32", isNew: true, context: "textbooks", group: "teaching", tvet: false, pos: "40% 30%",
+  name: "Mr. George Wanyama", tagline: "the Confident Mixer of Methods", where: "Kenya", age: 36,
+  quote: "Where the coursebook fails, on rotation, reflection and trigonometry, I open the e-book and move the slider, and the whole class says ‘aaah’. I take the best of both.",
+  background: ["36 years old; married with two children", "Secondary teacher of mathematics, physics and ICT for 10 years", "Has used the Grade 10 digital textbook for one term", "Taught himself with the student version over a week, then brought it into lessons topic by topic", "His ICT background made the book easy to navigate"],
+  looking: ["More interactives: gridded plots, more simulations", "Fuller examples, e.g. all the laws of logarithms", "Shorter introductions with less repetition", "A Grade 11 book that keeps what works"],
+  hopes: ["Learners who see maths, not just memorise it", "Be recognised as a digital-learning lead in his county", "Train other teachers"],
+  worries: ["One smartboard shared by every class", "Concepts the book still explains poorly, like the direction of rotation", "Questions in the book not matching exam style"],
+  day: ["Checks the timetable for his slot in the smartboard room", "Teaches transformations from the e-book, then sets assignments from the coursebook", "Copies e-book questions onto the board for homework", "Sends feedback to the developers on WhatsApp, until he was shown the in-book feedback link"],
+  grounded: "Grade 10 pilot teacher interview (T001): 95/100 confidence; self-taught; mixed methods; sliders and diagrams; one smartboard; checkpoints unused; feedback by WhatsApp.",
+  prompt: "Realistic photo of a Kenyan male secondary maths teacher in his mid-30s, blue shirt, leaning over students working at desktop computers in a school computer lab, natural light.",
+},
+{
+  id: "p33", isNew: true, context: "textbooks", group: "teaching", tvet: false, pos: "45% 35%",
+  name: "Mr. Collins Kibet", tagline: "the Newly Qualified Teacher", where: "Kenya", age: 24,
+  quote: "I learned the book in a weekend, with an AI summary to help. The hard part is getting forty learners to the lab and back before the lesson is over.",
+  background: ["24 years old; single", "Five months into his first job: mathematics, ICT and computer studies", "Has to follow the Ministry lesson plans, so cannot use the book’s own", "The e-book is only available in the computer lab", "Comfortable with technology; less confident on some topics"],
+  looking: ["Precise, clear conclusions on topics like trigonometric special angles", "Labelled diagrams", "Short animations and continuous sliders", "Ways to use the book within 40-minute lessons"],
+  hopes: ["Become an excellent teacher quickly", "Get his learners through the new national assessments", "Further study in educational technology"],
+  worries: ["Losing lesson time moving to the lab", "Learners at the back not seeing the single teacher-operated screen", "Teaching topics he finds unclear himself", "Losing his own judgement to scripted lesson plans"],
+  day: ["Plans from the Ministry lesson plan", "Two lessons a week in the lab with the e-book", "Labels diagrams on screen by hand", "Prepares the next topic on his phone in the evening"],
+  grounded: "Grade 10 pilot teacher interview (T002): 5 months’ experience; self-training + AI summary; avoids special angles; lab-only access; single smartboard; wants videos and continuous sliders.",
+  prompt: "Realistic photo of a 24-year-old Kenyan male teacher in a dark t-shirt leaning over a desktop computer in a school computer lab helping learners, natural light.",
+},
+{
+  id: "p34", isNew: true, context: "textbooks", group: "teaching", tvet: false, pos: "50% 30%",
+  name: "Mr. Wilson Barasa", tagline: "the Teacher Who Follows the Book Step by Step", where: "Kenya", age: 33,
+  quote: "When the new curriculum started, there were no coursebooks yet. The e-book was all we had, so I followed it page by page. Now I trust it, when the power and the projector allow.",
+  background: ["33 years old; married with one child", "Teaches mathematics, chemistry and ICT; 7 years’ experience", "Adopted the e-book because the new curriculum coursebooks arrived late", "Spent two months (December–February) learning it on his own", "Follows the book in order (“biblically”) because it matches the coursebook"],
+  looking: ["Simpler, clearer checkpoint questions", "Videos for angles of elevation and depression", "More shapes and simulations for surface area", "Shorter Measurement sections"],
+  hopes: ["Finish the syllabus on time", "Better results in national assessments", "Reliable equipment for his department"],
+  worries: ["Power cuts and no internet", "One projector shared across classes and subjects", "Setup time eating lessons", "Checkpoints too hard for his learners"],
+  day: ["Books the projector before morning assembly", "Teaches following the book’s sequence", "Extends lessons to cover long subsections", "Reviews the next section at home"],
+  grounded: "Grade 10 pilot teacher interview (T003): follows the e-book “biblically”; curriculum change; shared projector; electricity and internet; checkpoints too difficult.",
+  prompt: "Realistic photo of a Kenyan male teacher in his early 30s in a bright orange shirt speaking in front of a projector screen in a plain classroom, natural light.",
+},
+{
+  id: "p35", isNew: true, context: "textbooks", group: "students", tvet: false, pos: "30% 40%",
+  name: "Kevin Omondi", tagline: "the Grade 10 Learner Sharing Three Coursebooks", where: "Kenya", age: 15,
+  quote: "The e-book is more visual. The coursebook is wordy, and there are only three in our class. If I could open the e-book at home I would check every answer.",
+  background: ["15 years old; Grade 10 in a county secondary school", "Uses the e-book three times a week in the lab, the coursebook twice", "No device or internet at home; the teacher sends only the questions", "The e-book arrived halfway through the term, with no introduction", "Likes checking his own working against worked solutions"],
+  looking: ["More steps in the worked examples, especially reflection", "More exercises and alternative methods", "Short videos for hard topics like statistics", "Exam-style questions"],
+  hopes: ["Choose the STEM pathway in senior school", "Become an engineer", "Top his class in maths"],
+  worries: ["Exam questions that are in neither book", "No access at home", "Topics with long questions and too few steps"],
+  day: ["Morning lessons; maths in the lab on e-book days", "Shares a coursebook in groups of fifteen", "Copies questions to do at home", "Discusses feedback on the book with his class, which the class representative passes to the teacher"],
+  grounded: "Grade 10 student group interview: e-book clearer and more visual; 3 coursebooks per class; internet limits; requests for more steps, alternative methods and videos; feedback via the teacher.",
+  prompt: "Realistic photo of a 15-year-old Kenyan schoolboy in a pink school uniform shirt working at a desktop computer in a crowded school computer lab, natural light.",
+},
+{
+  id: "p36", isNew: true, context: "textbooks", group: "teaching", tvet: false, pos: "50% 25%",
+  name: "Mr. Japheth Wekesa", tagline: "the Master Teacher at a Model School", where: "Kenya", age: 45,
+  quote: "We have the lab, the projector and Smart TVs in every Grade 10 room. Our girls are ready. But if a question accepts only one method, the book teaches them there is only one way to do mathematics.",
+  background: ["45 years old; married with three children", "Head of mathematics at a well-equipped girls’ secondary school", "Leads a team of five maths teachers", "His school has been proposed as a model school for the digital textbook", "Expected to mentor teachers from neighbouring schools"],
+  looking: ["Questions that accept all valid solution methods", "A clear route to send alternative methods back to the authors", "Guidance for installing the book on classroom Smart TVs", "Recognition and time for mentoring other schools"],
+  hopes: ["Show what the book can do when the infrastructure is there", "Become a county trainer", "Help shape the Grade 11 and 12 books"],
+  worries: ["Rigid auto-marking discouraging creative learners", "Mentoring without extra time or pay", "Other schools lacking what his school has"],
+  day: ["Morning lessons using the projector and e-book", "Department meeting on the pilot", "Submits alternative methods through the feedback link", "Hosts visiting teachers some afternoons"],
+  grounded: "School visit report (July 2026): 73 learners and 5 teachers; concern about single-method questions; feedback link demonstrated; model school and master-teacher proposal; Smart TVs.",
+  prompt: "Realistic photo of a Kenyan man in his mid-40s, senior maths teacher in a patterned shirt, explaining with a raised finger to attentive schoolgirls in blue uniforms, bright classroom.",
+},
+{
+  id: "p37", isNew: true, context: "textbooks", group: "leadership", tvet: false, pos: "60% 35%",
+  name: "Mr. Stephen Mutai", tagline: "the Deputy Principal (Academics)", where: "Kenya", age: 50,
+  quote: "We invested in computers before anyone asked us to. Make us the model school, and let our teachers show others how it is done.",
+  background: ["50 years old; married with four children", "Deputy Principal (Academics) at a secondary school", "Oversees timetabling, teacher performance and the move to the new curriculum", "Has invested in a computer lab and classroom Smart TVs", "Sees the digital textbook as a chance to raise the school’s profile"],
+  looking: ["Formal recognition as a model school", "Support with deploying the book on school devices", "Evidence of better results", "Partnerships with universities and NGOs"],
+  hopes: ["The school known county-wide for innovation", "Better national assessment results", "Teachers developing as leaders"],
+  worries: ["Maintenance and replacement of equipment", "Teacher workload", "Pilots that end without support"],
+  day: ["Morning briefing with staff", "Timetabling and parent meetings", "Hosts visitors from partner organisations", "Reviews results data in the evening"],
+  grounded: "School visit report (2026): administration proposed the school as a model institution with master teachers supporting other schools.",
+  prompt: "Realistic photo of a Kenyan man around 50, deputy principal in a grey suit, shaking hands with students in blazers at a school prize-giving, warm light.",
+},
+{
+  id: "p38", isNew: true, context: "textbooks", group: "support", tvet: false, pos: "60% 40%",
+  name: "Victor Ochieng", tagline: "the Textbook Rollout Facilitator", where: "Kenya", age: 29,
+  quote: "Once a teacher sees a learner get step-by-step feedback at the board, the conversation changes. My job is to get that moment into as many schools as possible, and to bring back what goes wrong.",
+  background: ["29 years old; engaged", "Works for the local hub organisation supporting the digital textbooks", "Runs school demonstrations, teacher orientations and pilot interviews", "Mathematics education graduate", "Travels between schools by public transport"],
+  looking: ["Short orientation materials for teachers who start mid-term", "A simple way to log feedback from schools", "Videos and examples to show", "Reliable offline copies for schools without internet"],
+  hopes: ["Every pilot school using the book confidently", "A national rollout", "Postgraduate study in education"],
+  worries: ["Books arriving late with no training", "Schools with no power or devices", "Teachers not using the feedback link", "Funding gaps"],
+  day: ["Early travel to a pilot school", "Demonstration lesson with learners", "Interviews with teachers and learners", "Writes up the visit report in the evening"],
+  grounded: "School visit report and pilot interviews (2026): demonstrations, feedback feature, no orientation when the book arrived mid-term.",
+  prompt: "Realistic photo of a 29-year-old Kenyan man in an orange t-shirt speaking with a microphone to a group of teachers in a training room with a projector, natural light.",
+},
+{
+  id: "p39", isNew: true, context: "textbooks", group: "content", tvet: false, pos: "70% 40%",
+  name: "Allan Kiprotich", tagline: "the Intern Textbook Author", where: "Kenya", age: 23,
+  quote: "Grades 7 to 9 we adapted from existing books. Grade 10 we wrote from nothing. Then we cleaned up the Ethiopian Ministry’s Word files equation by equation. I know PreTeXt better than my own handwriting now.",
+  background: ["23 years old; single", "Mathematics graduate; intern at the local hub", "Writes PreTeXt and STACK content for the Kenyan Grade 7–10 books", "Also fixed the conversion of Ethiopia’s Basic Maths book", "Funding for the team has been interrupted more than once"],
+  looking: ["Clear curriculum specifications", "Feedback from teachers in the classroom", "Mentoring on question design and multiple solution methods", "A stable contract"],
+  hopes: ["Lead a textbook team", "Postgraduate study abroad", "See his chapters used across the country"],
+  worries: ["Funding stopping mid-book", "A question that works in Moodle breaking in the book", "Errors reaching thousands of learners"],
+  day: ["Morning stand-up with the team", "Writes and tests a sub-strand", "Fixes layout bugs from teacher feedback", "Evening learning XSLT and JSXGraph"],
+  grounded: "PreTeXt integration case study (2025): Kenyan intern team, Grades 7–10, Ethiopian conversion via Pandoc and manual clean-up, funding interruptions, layout issues.",
+  prompt: "Realistic photo of a 23-year-old Kenyan man in a dark t-shirt working at a desktop computer in a computer lab, code and maths on the screen, natural light.",
+},
+{
+  id: "p40", isNew: true, context: "textbooks", group: "teaching", tvet: false, pos: "60% 40%",
+  name: "Dr. Yonas Tadesse", tagline: "the Lecturer Reviewing the Ethiopian Book", where: "Ethiopia", age: 42,
+  quote: "Every question has a feedback link that already knows which question I mean. I send a correction in the morning, and it can be fixed by the afternoon. That is new for us.",
+  background: ["42 years old; married with three children", "Mathematics lecturer teaching Basic Mathematics for Natural Sciences", "Part of a cross-university team reviewing the interactive textbook", "Many of his students use only their phones", "Has taught the course from the Ministry’s printed module for years"],
+  looking: ["Quick fixes to errors he reports", "A book aligned exactly to the harmonised curriculum", "Questions that work offline or on poor connections", "Data on how students use it (not yet available)"],
+  hopes: ["A consistent, high-quality course across all universities", "Fewer students failing first-year maths", "Co-authoring the next edition"],
+  worries: ["The book not recording marks for assessment", "Students without data", "Inconsistent use across sections"],
+  day: ["Morning lectures to large first-year groups", "Reviews two sections of the book", "Submits feedback forms", "Team meeting with colleagues from other universities"],
+  grounded: "PreTeXt integration case study (2025): Ethiopian Basic Maths books (Natural Sciences from September 2025, Social Sciences from January 2026), 50,000+ students, auto-filled feedback forms; 2025 conference collaborative teaching team.",
+  prompt: "Realistic photo of an Ethiopian man in his early 40s, mathematics lecturer, light shirt, reviewing printed pages at a table with colleagues, natural light.",
+},
+{
+  id: "p41", isNew: true, context: "textbooks", group: "students", tvet: false, pos: "30% 35%",
+  name: "Biruk Hailu", tagline: "the First-Year Social Sciences Student", where: "Ethiopia", age: 18,
+  quote: "I chose economics, and everyone must take Basic Mathematics. The online book lets me try a question again and again on my phone, as long as I have data.",
+  background: ["18 years old; first-year economics student", "Passed the national exam after a difficult school year", "Takes the compulsory Basic Mathematics for Social Sciences", "Uses a shared smartphone; campus Wi-Fi is unreliable", "Reads the book in English, his third language"],
+  looking: ["Practice that works on a phone", "Simple explanations and examples from economics", "Questions he can try more than once", "Offline or PDF versions"],
+  hopes: ["Pass first-year maths", "Become an economist", "Support his family"],
+  worries: ["Failing a compulsory course", "Data costs", "Language"],
+  day: ["Lectures with hundreds of others", "Library study in the afternoon", "Practises on his phone at night"],
+  grounded: "PreTeXt case study (2025): Social Sciences version from January 2026; harmonised curriculum requires all students to take Basic Mathematics (2025 conference).",
+  prompt: "Realistic photo of an 18-year-old Ethiopian male university student with a backpack, smiling with a friend on a leafy campus, natural light.",
+},
+{
+  id: "p42", isNew: true, context: "textbooks", group: "students", tvet: false, pos: "50% 30%",
+  name: "Hodan Abdi", tagline: "the University Student in a Rebuilding System", where: "Somalia", age: 20,
+  quote: "Our university has no Moodle. An open book with questions I can try on my phone is the first time I get feedback that isn’t from a teacher.",
+  background: ["20 years old; second-year education student", "Wants to be a secondary maths teacher", "Studies at a university rebuilding after years of conflict", "Has a smartphone; typing maths on it is hard", "Learns in Somali, Arabic and English"],
+  looking: ["Interactive books that need no login or LMS", "Easier ways to enter maths on a phone", "Content in languages she understands", "Materials she can later use with her own pupils"],
+  hopes: ["Become a teacher and later a lecturer", "Help rebuild education in her country", "Study for a Master’s abroad"],
+  worries: ["Security and disrupted classes", "Data costs and connectivity", "Not enough lecturers"],
+  day: ["Morning classes", "Studies with friends in the university library", "Practises questions on her phone at home", "Helps younger siblings with homework"],
+  grounded: "Support for Somali National University (2025); difficulties with mathematical input on smartphones (2026); PreTeXt books as an alternative where LMS adoption is limited (2025).",
+  prompt: "Realistic photo of a 20-year-old Somali woman university student in a green hijab sitting in a classroom holding a pink pen and books, attentive, natural light.",
+},
+{
+  id: "p43", isNew: true, context: "textbooks", group: "funders", tvet: false, pos: "45% 35%",
+  name: "Abdirahman Warsame", tagline: "the Government Liaison", where: "Somalia / South Sudan", age: 39,
+  quote: "Officials ask me two questions: will it work on the devices we have, and who will train the teachers? If I can answer both, we can talk about the whole country.",
+  background: ["39 years old; married with four children", "Education consultant and former lecturer", "Works with IDEMS’ partners to bring interactive textbooks to government", "Knows the ministries, the universities and the donors", "Has seen many education projects promise and disappear"],
+  looking: ["A clear offer: content, platform, training and costs", "Examples from Kenya and Ethiopia", "Materials adapted to local curricula and languages", "Commitment beyond a single pilot"],
+  hopes: ["Interactive textbooks deployed at national scale", "Local teams able to maintain them", "A lasting partnership"],
+  worries: ["Political changes stopping the work", "Infrastructure and security", "Dependency on outside funding"],
+  day: ["Meetings with ministry officials", "Calls with IDEMS and partners", "Visits to universities", "Writes concept notes in the evening"],
+  grounded: "User input (2026): contacts in South Sudan and Somalia discussing large-scale deployment of interactive textbooks with government officials; IDEMS support to University of Juba and Somali National University (2025).",
+  prompt: "Realistic photo of a Somali man in his late 30s, education consultant in a pink shirt, taking notes at a meeting table, attentive, natural light.",
+},
+{
+  id: "p44", isNew: true, context: "textbooks", group: "leadership", tvet: false, pos: "60% 35%",
+  name: "Mr. Deng Majok", tagline: "the Ministry Curriculum Director", where: "South Sudan", age: 54,
+  quote: "We have more learners than textbooks and more textbooks than teachers trained to use them. If a digital book can reach a child where a printed one cannot, I am listening.",
+  background: ["54 years old; married with six children", "Director in the Ministry of General Education, responsible for curriculum", "Former secondary mathematics teacher", "Works with donors, NGOs and universities", "Budgets are small and unpredictable"],
+  looking: ["Low-cost, offline-capable materials", "Alignment with the national curriculum", "Teacher training that can be cascaded", "Evidence from similar countries"],
+  hopes: ["Every secondary learner with access to a good maths textbook", "A national digital learning strategy", "Leave a legacy"],
+  worries: ["Electricity and devices in rural schools", "Sustainability after donors leave", "Content not matching exams"],
+  day: ["Ministry meetings", "Meetings with donors and partners", "Reviews curriculum documents", "Occasional field visits to schools"],
+  grounded: "User input (2026): interest from South Sudan and discussions with government officials; IDEMS commitment to support University of Juba (2025).",
+  prompt: "Realistic photo of a South Sudanese man in his mid-50s, ministry official in a smart shirt, in a meeting at a table with a laptop and documents, natural light.",
+},
+{
+  id: "p45", isNew: true, context: "textbooks", group: "content", tvet: false, pos: "60% 35%",
+  name: "Mr. Kwabena Asante", tagline: "the Official Textbook Author", where: "Ghana", age: 58,
+  quote: "I co-wrote the books every senior high student in Ghana uses. Now every one of them has a tablet. It would be foolish to leave our book as a PDF.",
+  background: ["58 years old; married; grandfather of two", "Senior member of the national mathematics association", "Co-author of the current official SHS mathematics textbooks", "Former head of mathematics at a leading senior high school", "Works with researchers in Ghana and the UK"],
+  looking: ["A way to make the official books interactive without rewriting them", "Control over the mathematics and pedagogy", "A good relationship with the publisher", "Ministry approval"],
+  hopes: ["Interactive official textbooks on every student’s tablet", "Better WASSCE maths results", "A legacy for Ghanaian mathematics education"],
+  worries: ["Copyright and publisher agreements", "Quality of automated questions", "Teachers not using the interactivity"],
+  day: ["Association meetings", "Reviews chapters and questions", "Calls with researchers in the UK", "Mentors younger teachers"],
+  grounded: "User input (2026): working with senior members of the Mathematical Association of Ghana, authors of the current official textbooks; all students have tablets.",
+  prompt: "Realistic photo of a Ghanaian man in his late 50s wearing a white kufi cap, working on a laptop with a Ghana flag sticker in a training room, natural light.",
+},
+{
+  id: "p46", isNew: true, context: "textbooks", group: "students", tvet: false, pos: "60% 35%",
+  name: "Akosua Boateng", tagline: "the Senior High Student with a Tablet", where: "Ghana", age: 16,
+  quote: "Everyone got a tablet, but the maths book on it is just the paper book on a screen. If it could tell me where I went wrong, like a teacher, I would use it every night.",
+  background: ["16 years old; SHS 2 student at a boarding school", "Received a government-issued tablet", "The tablet has the official textbooks as static files", "Studies in the dormitory in the evenings when lights allow", "Wants to study nursing"],
+  looking: ["Instant feedback on practice questions", "Worked solutions", "WASSCE-style questions", "Content that works offline"],
+  hopes: ["Good WASSCE grades", "Nursing school", "Make her parents proud"],
+  worries: ["Exams", "Tablet battery and charging in the dormitory", "Falling behind in maths"],
+  day: ["Morning classes", "Prep (study time) in the evening on her tablet", "Group study with friends", "Lights out at 10 pm"],
+  grounded: "User input (2026): Ghanaian SHS students all have access to tablets; plan to get interactive books to them.",
+  prompt: "Realistic photo of a 16-year-old Ghanaian schoolgirl in a light-blue uniform smiling in a classroom with classmates, holding a tablet, natural light.",
+},
+{
+  id: "p47", isNew: true, context: "textbooks", group: "content", tvet: false, pos: "40% 40%",
+  name: "Mr. Emmanuel Tetteh", tagline: "the Educational Publisher", where: "Ghana", age: 47,
+  quote: "Our business is selling books. Open, interactive books are the future, I can see that. Show me a model where we still exist in it.",
+  background: ["47 years old; married with three children", "Managing director of a Ghanaian educational publisher", "Publishes the official SHS mathematics textbooks", "Has invested in digital editions; most revenue is still print", "Negotiates with the Ministry and the Ghana Education Service"],
+  looking: ["A business model for interactive editions", "Clarity on licensing and open content", "Quality and brand protection", "Technical partners"],
+  hopes: ["Lead digital publishing in West Africa", "Government contracts for interactive books", "Keep his staff employed"],
+  worries: ["Open licences undercutting sales", "Piracy", "Technology costs and risk"],
+  day: ["Meetings with authors and the Ministry", "Production and print schedules", "Visits the print shop", "Evening reading about digital publishing"],
+  grounded: "User input (2026): publishers involved in getting interactive books to Ghanaian students.",
+  prompt: "Realistic photo of a Ghanaian man in his late 40s, publisher, light pink shirt and glasses, inspecting printed sheets at a large printing machine, natural light.",
+},
+{
+  id: "p48", isNew: true, context: "textbooks", group: "research", tvet: false, pos: "50% 30%",
+  name: "Dr. Ibrahim Alhassan", tagline: "the Ghanaian Education Researcher", where: "Ghana", age: 41,
+  quote: "The tablets are already in students’ hands. The research question is no longer access, it is use: what makes a student open the maths book at nine at night?",
+  background: ["41 years old; married with two children", "Senior lecturer in mathematics education", "Collaborates with UK researchers on a digital textbook study", "Former SHS mathematics teacher in northern Ghana", "Works closely with the national mathematics association"],
+  looking: ["Usage data from interactive books", "Funding for a pilot and evaluation", "Partnerships with the Ministry and publishers", "Instruments adapted from the Kenyan pilot"],
+  hopes: ["Evidence that shapes national policy", "Publish in leading journals", "Build a research group"],
+  worries: ["Ethics approvals and data protection", "Pilots without control groups", "Political timelines"],
+  day: ["Teaching trainee teachers", "Research meetings with UK partners online", "School visits", "Writes papers at night"],
+  grounded: "User input (2026): working with researchers in Ghana and the UK.",
+  prompt: "Realistic photo of a Ghanaian man in his early 40s, education researcher in an orange t-shirt, glasses on his head, speaking into a microphone at a workshop, natural light.",
+},
+{
+  id: "p49", isNew: true, context: "textbooks", group: "research", tvet: false, pos: "40% 30%",
+  name: "Dr. Hannah Clarke", tagline: "the UK Research Partner", where: "UK", age: 38,
+  quote: "Ghana is doing what most countries only talk about: a tablet for every student. If we get the interactive books right, it is a study the whole world will want to read.",
+  background: ["38 years old; partner, one child", "Lecturer in mathematics education at a UK university", "Researches digital textbooks and formative assessment", "Co-investigator with Ghanaian colleagues", "Has worked with PreTeXt and STACK"],
+  looking: ["A rigorous evaluation design", "Strong local partners and leadership", "Grant funding", "Access to usage data"],
+  hopes: ["A large, funded study", "Equitable research partnership", "Influence policy in both countries"],
+  worries: ["Extractive research relationships", "Funding cycles", "Being too far from the classroom"],
+  day: ["Teaching and supervising", "Calls with Ghana", "Writing grant proposals", "School pick-up at 3.30"],
+  grounded: "User input (2026): researchers in Ghana and the UK collaborating on interactive books for Ghana.",
+  prompt: "Realistic photo of a British woman in her late 30s, academic, curly brown hair, writing notes beside a laptop at a home desk, natural light.",
+},
+{
+  id: "p50", isNew: true, context: "textbooks", group: "content", tvet: false, pos: "55% 30%",
+  name: "Dr. Rachel Stein", tagline: "the Lecturer Turning Notes into a Book", where: "USA", age: 35,
+  quote: "I have 200 pages of lecture notes in LaTeX and STACK quizzes students love. Why not one open book where the notes and the questions live together?",
+  background: ["35 years old; married", "Assistant professor of applied mathematics", "Already uses STACK quizzes in a large course", "Has years of LaTeX lecture notes", "Interested in open educational resources"],
+  looking: ["A smooth path from LaTeX to PreTeXt", "STACK questions embedded in the book", "Help with conversion and design", "An output that works alongside the university LMS"],
+  hopes: ["A published open textbook", "Recognition for teaching innovation", "Students using the book beyond her course"],
+  worries: ["Time it takes away from research", "Technical complexity", "Maintaining the book"],
+  day: ["Research in the morning", "Lectures and office hours", "Edits notes in the evening"],
+  grounded: "User input (2026): a lecturer at the US partner university is interested in turning lecture notes into a PreTeXt book.",
+  prompt: "Realistic photo of an American woman in her mid-30s, assistant professor, hair tied back, white blazer, working on a laptop with coffee in a modern office, natural light.",
+},
+{
+  id: "p51", isNew: true, context: "textbooks", group: "content", tvet: false, pos: "50% 30%",
+  name: "Dr. Margaret Hughes", tagline: "the Lecturer Re-imagining a Classic Textbook", where: "UK", age: 56,
+  quote: "Our linear algebra textbook has served students for twenty years on paper. I want it to answer back: interactive examples, questions with feedback, open to anyone.",
+  background: ["56 years old; married with grown children", "Senior lecturer in mathematics at a UK university", "Co-author of a published linear algebra textbook", "Exploring adapting it into an interactive PreTeXt book with STACK", "Needs to negotiate rights with the publisher"],
+  looking: ["Help converting the book to PreTeXt", "STACK questions matched to each chapter", "Advice on licensing and publisher agreements", "Sustainable hosting"],
+  hopes: ["A free, interactive version used worldwide", "A last major contribution before retirement", "Collaboration with African partners"],
+  worries: ["Copyright", "Cost and effort of conversion", "Losing the quality of the printed edition"],
+  day: ["Teaching linear algebra", "Meetings about the conversion", "Reviews converted chapters"],
+  grounded: "User input (2026): a UK lecturer considering adapting a published linear algebra book into an interactive PreTeXt book.",
+  prompt: "Realistic photo of a British woman in her mid-50s, senior lecturer, short curly blonde hair, dark blazer, at a desk with an open book and laptop, bright office.",
+},
 ];
 
 const CREDITS = {"p01": ["A Lecturer.jpg", "Achodanick", "https://commons.wikimedia.org/wiki/File:A_Lecturer.jpg"], "p02": ["Women on a phone meeting.jpg", "Nebiyu.s", "https://commons.wikimedia.org/wiki/File:Women_on_a_phone_meeting.jpg"], "p03": ["Kenya Office Work.jpg", "Moritz Poll", "https://commons.wikimedia.org/wiki/File:Kenya_Office_Work.jpg"], "p04": ["Pink power.jpg", "Sarah.Engin", "https://commons.wikimedia.org/wiki/File:Pink_power.jpg"], "p05": ["Software Developer at work 03.jpg", "Daudi mukiibi", "https://commons.wikimedia.org/wiki/File:Software_Developer_at_work_03.jpg"], "p06": ["MYXJ 20171027160326 fast African woman at work.jpg", "Peace Eneja", "https://commons.wikimedia.org/wiki/File:MYXJ_20171027160326_fast_African_woman_at_work.jpg"], "p07": ["Working at night in server room.jpg", "Tsinkala", "https://commons.wikimedia.org/wiki/File:Working_at_night_in_server_room.jpg"], "p08": ["A businesswoman signing contracts.jpg", "Melchisedek ABAKA", "https://commons.wikimedia.org/wiki/File:A_businesswoman_signing_contracts.jpg"], "p09": ["Assistante de direction.jpg", "Aristidek5maya", "https://commons.wikimedia.org/wiki/File:Assistante_de_direction.jpg"], "p10": ["Young & Dedicated Accountant at Work.jpg", "Mweufika", "https://commons.wikimedia.org/wiki/File:Young_%26_Dedicated_Accountant_at_Work.jpg"], "p11": ["Family bank.jpg", "Berbeture", "https://commons.wikimedia.org/wiki/File:Family_bank.jpg"], "p12": ["Portrait of uncle Abdalla.jpg", "Ibrahimpic", "https://commons.wikimedia.org/wiki/File:Portrait_of_uncle_Abdalla.jpg"], "p13": ["Young man taking a break in his banana plantation in Ivory Coast.jpg", "Elder-ak", "https://commons.wikimedia.org/wiki/File:Young_man_taking_a_break_in_his_banana_plantation_in_Ivory_Coast.jpg"], "p14": ["Students on WIFI.jpg", "Sarenda", "https://commons.wikimedia.org/wiki/File:Students_on_WIFI.jpg"], "p15": ["African student studying at dormitory from tablet computer,.jpg", "Tinsae Belay", "https://commons.wikimedia.org/wiki/File:African_student_studying_at_dormitory_from_tablet_computer,.jpg"], "p16": ["Young Teacher Preparing For Lesson.jpg", "Fahariya", "https://commons.wikimedia.org/wiki/File:Young_Teacher_Preparing_For_Lesson.jpg"], "p17": ["A farmer;s brother.jpg", "Rotimisonde", "https://commons.wikimedia.org/wiki/File:A_farmer;s_brother.jpg"], "p18": ["Worker studying.jpg", "Appreciating Beauty", "https://commons.wikimedia.org/wiki/File:Worker_studying.jpg"], "p19": ["A young student doing exercises on a whiteboard.jpg", "Melchisedek ABAKA", "https://commons.wikimedia.org/wiki/File:A_young_student_doing_exercises_on_a_whiteboard.jpg"], "p20": ["Electrical work.jpg", "Trssuretm", "https://commons.wikimedia.org/wiki/File:Electrical_work.jpg"], "p21": ["Femme mecanicienne26.jpg", "Photokadaffi", "https://commons.wikimedia.org/wiki/File:Femme_mecanicienne26.jpg"], "p22": ["Lady Eng 1.jpg", "MildredOndusi", "https://commons.wikimedia.org/wiki/File:Lady_Eng_1.jpg"], "p23": ["A lecturer.jpg", "Johnexx", "https://commons.wikimedia.org/wiki/File:A_lecturer.jpg"], "p24": ["Coffee Center Lab 2017 (38198074606).jpg", "UC Davis College of Engineering", "https://commons.wikimedia.org/wiki/File:Coffee_Center_Lab_2017_(38198074606).jpg", "CC BY 2.0"], "p25": ["Coffee Center Lab 2017 (37542125374).jpg", "UC Davis College of Engineering", "https://commons.wikimedia.org/wiki/File:Coffee_Center_Lab_2017_(37542125374).jpg", "CC BY 2.0"], "p26": ["Студент биолог.jpg", "Иоанна Чернова", "https://commons.wikimedia.org/wiki/File:%D0%A1%D1%82%D1%83%D0%B4%D0%B5%D0%BD%D1%82_%D0%B1%D0%B8%D0%BE%D0%BB%D0%BE%D0%B3.jpg", "CC BY 4.0"], "p27": ["Studying.jpg", "Gnarlycraig", "https://commons.wikimedia.org/wiki/File:Studying.jpg", "Public domain"], "p28": ["636268202514872783-Teaching-Fellows-001.webp", "BlaintoGreen", "https://commons.wikimedia.org/wiki/File:636268202514872783-Teaching-Fellows-001.webp", "CC BY-SA 4.0"], "p29": ["Office hour- SAS Science and Technology Class wiki Project 2021.jpg", "Flower of truth", "https://commons.wikimedia.org/wiki/File:Office_hour-_SAS_Science_and_Technology_Class_wiki_Project_2021.jpg", "CC BY-SA 4.0"], "p30": ["Coronavirus, all'Università di Pavia l'incontro per la comunità e la cittadinanza - 49533148918.jpg", "unipavia", "https://commons.wikimedia.org/wiki/File:Coronavirus,_all%27Universit%C3%A0_di_Pavia_l%27incontro_per_la_comunit%C3%A0_e_la_cittadinanza_-_49533148918.jpg", "CC BY 2.0"], "p31": ["WLA 2017 Workshop - 25th November 2017 16.jpg", "Jamie Tubers", "https://commons.wikimedia.org/wiki/File:WLA_2017_Workshop_-_25th_November_2017_16.jpg", "CC BY-SA 4.0"]};
+Object.assign(CREDITS, {"p32": ["Teacher Helping students to use Kiwix.jpg", "Abdulai Ibrahim", "https://commons.wikimedia.org/wiki/File:Teacher_Helping_students_to_use_Kiwix.jpg", "CC BY-SA 4.0"], "p33": ["Guiding Students on how to use kiwix.jpg", "Abdulai Ibrahim", "https://commons.wikimedia.org/wiki/File:Guiding_Students_on_how_to_use_kiwix.jpg", "CC BY-SA 4.0"], "p34": ["Reading Wikipedia in the Classroom Training at Dagbani Wikimedians User Group 13.jpg", "Awinebotima", "https://commons.wikimedia.org/wiki/File:Reading_Wikipedia_in_the_Classroom_Training_at_Dagbani_Wikimedians_User_Group_13.jpg", "CC BY-SA 4.0"], "p35": ["Students practicing on how to use kiwix.jpg", "Abdulai Ibrahim", "https://commons.wikimedia.org/wiki/File:Students_practicing_on_how_to_use_kiwix.jpg", "CC BY-SA 4.0"], "p36": ["Ghanaian Senior High School students in class 02.jpg", "BAGANIAH", "https://commons.wikimedia.org/wiki/File:Ghanaian_Senior_High_School_students_in_class_02.jpg", "CC BY-SA 4.0"], "p37": ["Pope John Senior High School and Minor Seminary students receive their WASSCE upon Graduation.jpg", "Joel Kwesi Sam", "https://commons.wikimedia.org/wiki/File:Pope_John_Senior_High_School_and_Minor_Seminary_students_receive_their_WASSCE_upon_Graduation.jpg", "CC BY-SA 3.0"], "p38": ["Reading Wikipedia in the Classroom Training at Dagbani Wikimedians User Group 11.jpg", "Awinebotima", "https://commons.wikimedia.org/wiki/File:Reading_Wikipedia_in_the_Classroom_Training_at_Dagbani_Wikimedians_User_Group_11.jpg", "CC BY-SA 4.0"], "p39": ["Helping students to launch the kiwix.jpg", "Abdulai Ibrahim", "https://commons.wikimedia.org/wiki/File:Helping_students_to_launch_the_kiwix.jpg", "CC BY-SA 4.0"], "p40": ["Somali Youth Learners Initiative Teacher Training (22567579282).jpg", "USAID in Africa", "https://commons.wikimedia.org/wiki/File:Somali_Youth_Learners_Initiative_Teacher_Training_(22567579282).jpg", "Public domain"], "p41": ["Students at Addis Ababa University - Addis Ababa - Ethiopia (8667490197).jpg", "Adam Jones from Kelowna, BC, Canada", "https://commons.wikimedia.org/wiki/File:Students_at_Addis_Ababa_University_-_Addis_Ababa_-_Ethiopia_(8667490197).jpg", "CC BY-SA 2.0"], "p42": ["2014 10 23 Somali National University Re-opens (15428342489).jpg", "AMISOM Public Information", "https://commons.wikimedia.org/wiki/File:2014_10_23_Somali_National_University_Re-opens_(15428342489).jpg", "CC0"], "p43": ["Somali Youth Learners Initiative Teacher Training (22394311769).jpg", "USAID in Africa", "https://commons.wikimedia.org/wiki/File:Somali_Youth_Learners_Initiative_Teacher_Training_(22394311769).jpg", "Public domain"], "p44": ["Réunion Intelligentsia 2.jpg", "Alex Ndongmo", "https://commons.wikimedia.org/wiki/File:R%C3%A9union_Intelligentsia_2.jpg", "CC BY-SA 4.0"], "p45": ["Reading Wikipedia in the Classroom Training at Dagbani Wikimedians User Group 09.jpg", "Awinebotima", "https://commons.wikimedia.org/wiki/File:Reading_Wikipedia_in_the_Classroom_Training_at_Dagbani_Wikimedians_User_Group_09.jpg", "CC BY-SA 4.0"], "p46": ["Ghanaian Senior High School students in class 01.jpg", "BAGANIAH", "https://commons.wikimedia.org/wiki/File:Ghanaian_Senior_High_School_students_in_class_01.jpg", "CC BY-SA 4.0"], "p47": ["Imprimeur sur plexiglas.jpg", "Oumaima kh", "https://commons.wikimedia.org/wiki/File:Imprimeur_sur_plexiglas.jpg", "CC BY-SA 4.0"], "p48": ["Reading Wikipedia in the Classroom Training at Dagbani Wikimedians User Group 10.jpg", "Awinebotima", "https://commons.wikimedia.org/wiki/File:Reading_Wikipedia_in_the_Classroom_Training_at_Dagbani_Wikimedians_User_Group_10.jpg", "CC BY-SA 4.0"], "p49": ["Woman sits at a desk with a laptop and writes notes.jpg", "Shixart1985", "https://commons.wikimedia.org/wiki/File:Woman_sits_at_a_desk_with_a_laptop_and_writes_notes.jpg", "CC BY 2.0"], "p50": ["Professional woman working on a laptop while enjoying coffee in a modern office setting.jpg", "Shixart1985", "https://commons.wikimedia.org/wiki/File:Professional_woman_working_on_a_laptop_while_enjoying_coffee_in_a_modern_office_setting.jpg", "CC BY 2.0"], "p51": ["Professional woman working at desk with laptop and documents in bright office setting.jpg", "Shixart1985", "https://commons.wikimedia.org/wiki/File:Professional_woman_working_at_desk_with_laptop_and_documents_in_bright_office_setting.jpg", "CC BY 2.0"]});
 const lic = c => c[3] || "CC BY-SA 4.0";
-const FEMALE = new Set(["p02","p04","p06","p08","p09","p10","p14","p16","p18","p19","p21","p22","p25","p26","p29","p31"]);
-const CONTEXTS = { africa: "Africa", commercial: "Commercial partners" };
+const FEMALE = new Set(["p02","p04","p06","p08","p09","p10","p14","p16","p18","p19","p21","p22","p25","p26","p29","p31","p42","p46","p49","p50","p51"]);
+const CONTEXTS = { africa: "STACK in Africa", commercial: "Commercial partners", textbooks: "Open textbooks" };
 PERSONAS.forEach(p => { p.context = p.context || "africa"; });
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -582,6 +826,7 @@ function tagsHTML(p) {
   let t = `<span class="tag" style="--c:${GROUPS[p.group].color}">${GROUPS[p.group].label}</span>`;
   if (p.tvet) t += `<span class="tag" style="--c:var(--tvet)">TVET</span>`;
   if (p.context === "commercial") t += `<span class="tag" style="--c:var(--commercial)">Commercial partner</span>`;
+  if (p.context === "textbooks") t += `<span class="tag" style="--c:var(--textbooks)">Open textbooks</span>`;
   return t;
 }
 
@@ -675,7 +920,7 @@ const counts = { all: PERSONAS.length, new: PERSONAS.filter(p => p.isNew).length
 for (const g in GROUPS) counts[g] = PERSONAS.filter(p => p.group === g).length;
 for (const k in CONTEXTS) counts[k] = PERSONAS.filter(p => p.context === k).length;
 document.getElementById("count").textContent = PERSONAS.length;
-const filterDefs = [["all", "All", "var(--muted)"], ["africa", "Africa", "var(--g-students)"], ["commercial", "Commercial partners", "var(--commercial)"], ...Object.entries(GROUPS).map(([k, v]) => [k, v.label, v.color]), ["tvet", "TVET", "var(--tvet)"], ["new", "New personas", "var(--text)"]];
+const filterDefs = [["all", "All", "var(--muted)"], ["africa", "STACK in Africa", "var(--g-students)"], ["commercial", "Commercial partners", "var(--commercial)"], ["textbooks", "Open textbooks", "var(--textbooks)"], ...Object.entries(GROUPS).map(([k, v]) => [k, v.label, v.color]), ["tvet", "TVET", "var(--tvet)"], ["new", "New personas", "var(--text)"]];
 const fwrap = document.getElementById("filters");
 fwrap.innerHTML = filterDefs.map(([k, l, c]) =>
   `<button class="chip" data-f="${k}" aria-pressed="${k === "all"}" style="--c:${c}"><span class="dot"></span>${l} <span class="n">${counts[k]}</span></button>`
