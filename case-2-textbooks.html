@@ -34,6 +34,18 @@
   <div class="stat"><b>~40</b><span>Open statistics questions matched to a single textbook, half of them closely</span></div>
 </div>
 
+
+<div class="box">
+  <h3>IDEMS' role</h3>
+  <ul>
+    <li><strong>Technology:</strong> IDEMS developers built the STACK–PreTeXt integration with the PreTeXt and STACK communities.</li>
+    <li><strong>Ethiopia:</strong> IDEMS works with Ethiopian universities on the Basic Maths books under the 2025 MoU, and INNODEMS interns did the conversion.</li>
+    <li><strong>Kenya:</strong> IDEMS supports the INNODEMS team writing the Grade 7–10 books and running the school pilots.</li>
+    <li><strong>Library:</strong> IDEMS builds and maintains the open PreTeXt textbook library and the open STACK question banks.</li>
+    <li><strong>New contexts:</strong> IDEMS is the technical partner in the discussions in Ghana, Somalia and South Sudan.</li>
+  </ul>
+</div>
+
 <h2>Why textbooks?</h2>
 <p>By 2025 STACK was running in more than 78 university courses across East Africa (<a href="case-1-africa-to-contracts.html">case study 1</a>). Every one of those courses depended on Moodle: a server, someone to maintain it, student accounts and a reliable connection. For many institutions that was the hardest part. At the 2025 African STACK Conference, the University of Namibia described serving 29,000 students across 12 campuses. Somali and South Sudanese universities were rebuilding with almost no infrastructure. Even where Moodle existed, creating accounts was a barrier.</p>
 <p>At the same time, a different idea was growing. At the Bahir Dar workshop in 2023, Ethiopian secondary-textbook authors working for the Ministry asked whether their books could include STACK questions. By 2025 the conference had concluded that "open, interactive PreTeXt digital textbooks with STACK quizzes" were a viable alternative wherever learning management systems were limited. A textbook needs no login. It can be read on a phone, a tablet, a classroom smart TV or as a PDF, and the practice and feedback go wherever the book goes.</p>
@@ -41,7 +53,7 @@
 <blockquote class="voice">“Our university has no Moodle. An open book with questions I can try on my phone is the first time I get feedback that isn’t from a teacher.”<cite data-p="p42"></cite></blockquote>
 
 <h2>Making STACK work inside a book</h2>
-<p>PreTeXt is an open-source authoring system. Authors write once in structured XML, and the same source produces interactive web pages, PDF, EPUB and even braille. IDEMS developers, working with the PreTeXt developers and STACK contributors, added a new <code>&lt;stack&gt;</code> element. A question exported from Moodle can now sit inside a PreTeXt book. In the web version it is rendered live through the STACK API, so students can answer, get feedback and try new variants. In the PDF a fixed version is printed.</p>
+<p>PreTeXt is an open-source authoring system. Authors write once in structured XML, and the same source produces interactive web pages, PDF, EPUB and even braille. IDEMS developers, working with the PreTeXt developers and STACK contributors, designed and built a new <code>&lt;stack&gt;</code> element. A question exported from Moodle can now sit inside a PreTeXt book. In the web version it is rendered live through the STACK API, so students can answer, get feedback and try new variants. In the PDF a fixed version is printed.</p>
 <p>It was not straightforward. "A question looking fine in Moodle is not a guarantee that it also looks fine in PreTeXt," as the case study put it:</p>
 <ul>
   <li>Questions that fit in Moodle overflowed the book's layout.</li>
