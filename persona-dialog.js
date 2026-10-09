@@ -59,6 +59,7 @@
           <div class="sec"><h3>What ${FEMALE.has(p.id) ? "she’s" : "he’s"} looking for</h3>${list(p.looking)}</div>
           <div class="sec"><h3>Hopes &amp; dreams</h3>${list(p.hopes)}</div>
           <div class="sec"><h3>Worries &amp; fears</h3>${list(p.worries)}</div>
+        <div class="sec wide"><h3>Their data and expertise</h3>${list(p.data)}</div>
           <div class="sec wide"><h3>A day in the life of ${esc(firstName(p))}</h3>${list(p.day)}</div>
         </div>
         <p class="grounded"><strong>Grounded in:</strong> ${esc(p.grounded)}</p>
