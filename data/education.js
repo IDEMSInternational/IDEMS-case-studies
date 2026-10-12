@@ -1,14 +1,4 @@
 // Education personas (STACK). Load after data/catalogue.js.
-Object.assign(GROUPS, {
-  students: { label: "Students", color: "var(--g-students)" },
-  teaching: { label: "Teaching staff", color: "var(--g-teaching)" },
-  support: { label: "Technical support", color: "var(--g-support)" },
-  leadership: { label: "Institutional leaders", color: "var(--g-leadership)" },
-  funders: { label: "Funders & networks", color: "var(--g-funders)" },
-  research: { label: "Research & evidence", color: "var(--g-research)" },
-  content: { label: "Authors & publishers", color: "var(--g-content)" },
-});
-
 Object.assign(SETS, {
   africa: { label: "STACK in Africa", category: "education", color: "var(--s-africa)" },
   commercial: { label: "Commercial partners", category: "education", color: "var(--s-commercial)" },
@@ -19,7 +9,7 @@ Object.assign(SETS, {
 PERSONAS.push(
 {
   id: "samuel-okello", category: "education", set: "africa", cases: ["africa-to-contracts","ai-authoring"],
-  group: "teaching", tags: [], pronoun: "he", pos: "45% 35%",
+  pronoun: "he", pos: "45% 35%",
   name: "Samuel Okello", tagline: "the Overwhelmed Lecturer", where: "Uganda", age: 46,
   quote: "I have nine hundred students in Calculus and I mark every script myself. I know they need practice and feedback every week, but I am one man. There has to be a better way.",
   background: ["46 years old; married with three children","Mathematics lecturer for 14 years","Teaches four courses a semester, including a compulsory first-year service course of 800–1,200 students","Has no teaching assistants; gives at most two paper tests per course because that is all he can mark","Has heard colleagues talk about STACK at a regional workshop but has never logged in"],
@@ -34,7 +24,7 @@ PERSONAS.push(
 },
 {
   id: "amina-hassan", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "she", pos: "55% 30%",
+  pronoun: "she", pos: "55% 30%",
   name: "Amina Hassan", tagline: "the First-Year Engineering Student", where: "Tanzania", age: 19,
   quote: "I like that I can practise as many times as I need and see straight away where I went wrong. But my bundle finishes before the week does, and typing maths on this small screen takes forever.",
   background: ["19 years old; first in her family at university","First-year engineering student taking compulsory mathematics","Does all her coursework on a mid-range smartphone; shares a laptop with three roommates","Buys mobile data weekly; campus Wi-Fi is slow at peak times","Strong in school maths but shaken by the jump to university level"],
@@ -49,7 +39,7 @@ PERSONAS.push(
 },
 {
   id: "tesfaye-alemu", category: "education", set: "africa", cases: ["africa-to-contracts","ai-authoring"],
-  group: "teaching", tags: [], pronoun: "he", pos: "35% 35%",
+  pronoun: "he", pos: "35% 35%",
   name: "Tesfaye Alemu", tagline: "the Enthusiastic New Lecturer", where: "Ethiopia", age: 31,
   quote: "At the workshop I wrote my first randomised question and it worked. I was so excited I did not sleep! Now I am back home, the Wi-Fi is down and I have no one to ask.",
   background: ["31 years old; single","Mathematics lecturer for three years; finished his MSc recently","Attended a five-day STACK workshop and authored his first questions there","Comfortable with computers but has never written LaTeX or Maxima before","Teaches the compulsory Basic Mathematics course that every first-year student takes"],
@@ -64,7 +54,7 @@ PERSONAS.push(
 },
 {
   id: "rehema-salim", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "teaching", tags: [], pronoun: "she", pos: "40% 30%",
+  pronoun: "she", pos: "40% 30%",
   name: "Dr. Rehema Salim", tagline: "the STACK Champion", where: "Tanzania", age: 44,
   quote: "I’ve seen my students’ results change. The hard part isn’t the technology any more, it’s bringing my colleagues along and keeping it going when I’m not in the room.",
   background: ["44 years old; married with two teenagers","Senior lecturer in mathematics; has used STACK in her courses for six years","Moved her department’s continuous assessment for three large courses (1,000+ students each) onto STACK","Trains colleagues informally and presents at the African STACK Conference","Sits on the African STACK Community leadership team"],
@@ -79,7 +69,7 @@ PERSONAS.push(
 },
 {
   id: "daniel-mensah", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "support", tags: [], pronoun: "he", pos: "45% 40%",
+  pronoun: "he", pos: "45% 40%",
   name: "Daniel Mensah", tagline: "the Local Technical Intern", where: "Ghana", age: 24,
   quote: "Six months ago I didn’t know what Maxima was. Now lecturers call me to fix their quizzes and I’ve written questions that thousands of students use. I just hope there’s a job at the end of it.",
   background: ["24 years old; single","Recent mathematics graduate","One of the first interns at a new local STACK hub organisation","Authors and reviews questions, sets up Moodle courses and supports lecturers","Learning LaTeX, HTML and JavaScript as he goes; mentored remotely by experienced staff"],
@@ -94,7 +84,7 @@ PERSONAS.push(
 },
 {
   id: "hayat-seid", category: "education", set: "africa", cases: ["africa-to-contracts","textbooks"],
-  group: "leadership", tags: [], pronoun: "she", pos: "70% 22%",
+  pronoun: "she", pos: "70% 22%",
   name: "Dr. Hayat Seid", tagline: "the Head of Department", where: "Ethiopia", age: 52,
   quote: "Every first-year student in this university takes Basic Mathematics. STACK looks promising, but I have seen many projects come and go. I need it to work for 6,000 students, and after the funding ends.",
   background: ["52 years old; married with four children","Head of a mathematics department with 30+ staff","Responsible for a compulsory course taken by every first-year student","Has had to deliver remedial courses and exit-exam preparation at short notice under national policy","Signed her department up to a cross-university teaching team"],
@@ -109,7 +99,7 @@ PERSONAS.push(
 },
 {
   id: "joseph-kamau", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "support", tags: [], pronoun: "he", pos: "50% 40%",
+  pronoun: "he", pos: "50% 40%",
   name: "Joseph Kamau", tagline: "the ICT / LMS Administrator", where: "Kenya", age: 38,
   quote: "When a thousand students open a quiz at 11.55 pm, it’s my phone that rings. I want STACK to succeed, but I need to know what is coming, not hear about it at midnight.",
   background: ["38 years old; married with two children","Runs the university’s Moodle and other systems with a team of three","Supports every faculty, not just mathematics","Has upgraded Moodle and seen plugins break afterwards","Has a limited budget for servers and bandwidth"],
@@ -124,7 +114,7 @@ PERSONAS.push(
 },
 {
   id: "njeri-wambui", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "leadership", tags: [], pronoun: "she", pos: "55% 45%",
+  pronoun: "she", pos: "55% 45%",
   name: "Prof. Njeri Wambui", tagline: "the University Leader", where: "Kenya", age: 57,
   quote: "I want our students to have the best possible start. But every project asks for money and promises results. Show me that STACK fits our strategy and will still be here in five years.",
   background: ["57 years old; married; grandmother of one","Deputy Vice-Chancellor (Academic Affairs)","Responsible for teaching quality, e-learning strategy and accreditation","Has spoken publicly in support of STACK after a conference on her campus","Faces a tight budget and pressure from government and accreditors"],
@@ -139,7 +129,7 @@ PERSONAS.push(
 },
 {
   id: "fatima-diallo", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "research", tags: [], pronoun: "she", pos: "40% 30%",
+  pronoun: "she", pos: "40% 30%",
   name: "Dr. Fatima Diallo", tagline: "the Education Researcher", where: "Senegal", age: 36,
   quote: "Studies from Europe tell us little about a class of 900 students on phones. I want to know what really works here, and why some students who score well online still fail the exam.",
   background: ["36 years old; married with one child","Lecturer and researcher in mathematics education","Interested in learning analytics and formative assessment","Works in French; most STACK materials and literature are in English","Collaborates with colleagues in Kenya and Europe"],
@@ -154,7 +144,7 @@ PERSONAS.push(
 },
 {
   id: "ruth-achieng", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "funders", tags: [], pronoun: "she", pos: "35% 40%",
+  pronoun: "she", pos: "35% 40%",
   name: "Ruth Achieng", tagline: "the Programme Officer", where: "Kenya (regional office of an international foundation)", age: 33,
   quote: "I believe in this work, but I have to defend it to my board. I need a clear theory of change, numbers I can trust, and proof that local institutions own it.",
   background: ["33 years old; single","Programme officer for higher-education grants in East Africa","Manages a portfolio of 12 grants; reports to a head office abroad","Former secondary maths teacher","Visits grantees two or three times a year"],
@@ -169,7 +159,7 @@ PERSONAS.push(
 },
 {
   id: "charles-mwakasege", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "funders", tags: [], pronoun: "he", pos: "75% 45%",
+  pronoun: "he", pos: "75% 45%",
   name: "Charles Mwakasege", tagline: "the Philanthropist", where: "Tanzania", age: 63,
   quote: "Mathematics took me from a village school to running a business. I want to give that chance to others. But I want to see the people I’m backing and know my money did something real.",
   background: ["63 years old; married with four grown children","Founded a successful finance and logistics business","Funds scholarships through a family foundation","Not an academic; trusts people more than proposals","Recently heard a student speak about STACK at an event"],
@@ -184,7 +174,7 @@ PERSONAS.push(
 },
 {
   id: "ibrahim-el-tayeb", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "funders", tags: [], pronoun: "he", pos: "50% 30%",
+  pronoun: "he", pos: "50% 30%",
   name: "Dr. Ibrahim El-Tayeb", tagline: "the Regional Education Leader", where: "Sudan (works across the region)", age: 61,
   quote: "Universities in Somalia and South Sudan are rebuilding with very little. STACK and open textbooks could help them skip steps. The question is how to adapt it to each country, not copy it.",
   background: ["61 years old; married with five children","Former professor of mathematics; now leads a regional mathematics network","Works with ministries, mathematical societies and universities","Has lived through conflict and displacement of his own institution","Champions open educational resources"],
@@ -199,7 +189,7 @@ PERSONAS.push(
 },
 {
   id: "brian-wafula", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "he", pos: "55% 55%",
+  pronoun: "he", pos: "55% 55%",
   name: "Brian Wafula", tagline: "the Student Who “Books” a Clever Classmate", where: "Kenya", age: 22,
   quote: "Everyone does it. I pay a friend a little to do my quizzes because I have no time. Then I sat the exam and the questions looked familiar, but I couldn’t write anything. I was only cheating myself.",
   background: ["22 years old; third-year education student taking a compulsory maths unit","Works evenings and weekends at a relative’s shop to pay fees","Pays a strong classmate to do his weekly STACK quizzes","His quiz scores are good but his exam scores are very low","Doesn’t see this as cheating; it feels like normal “help”"],
@@ -214,7 +204,7 @@ PERSONAS.push(
 },
 {
   id: "mercy-akinyi", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "she", pos: "40% 35%",
+  pronoun: "she", pos: "40% 35%",
   name: "Mercy Akinyi", tagline: "the Data-Starved Student", where: "Kenya", age: 20,
   quote: "My bundle finished, so I ran to the Wi-Fi area, and the Wi-Fi was also down. Then it started raining and there is no shelter there. That week I just left the quiz.",
   background: ["20 years old; second-year actuarial science student","From a rural family; lives in a shared hostel off campus","Has a cheap Android phone with a cracked screen; no laptop","Can afford about one data bundle a week","Motivated and capable, but often misses test-quiz deadlines"],
@@ -229,7 +219,7 @@ PERSONAS.push(
 },
 {
   id: "dawit-bekele", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "he", pos: "45% 40%",
+  pronoun: "he", pos: "45% 40%",
   name: "Dawit Bekele", tagline: "the Quiet Reviser", where: "Ethiopia", age: 21,
   quote: "My weekly test scores were bad, because the deadline always caught me without data. But before the exam I went back to every mastery quiz and practised until I understood. That is how I passed.",
   background: ["21 years old; third-year mathematics student","Lives in a dormitory with five others; shares one tablet","Often misses weekly test-quiz deadlines","Uses the mastery quizzes, with feedback, as his main revision tool","Quiet in class; rarely asks lecturers questions"],
@@ -244,7 +234,7 @@ PERSONAS.push(
 },
 {
   id: "neema-mollel", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "she", pos: "55% 45%",
+  pronoun: "she", pos: "55% 45%",
   name: "Neema Mollel", tagline: "the Persistent Struggler", where: "Tanzania", age: 23,
   quote: "I try the mastery quiz again and again, hoping the next version will show me how to do it. Sometimes the feedback jumps over the step I don’t understand. I’m not a fast learner, but I don’t give up.",
   background: ["23 years old; second-year BEd (mathematics) student","Weak secondary-school maths background; got in through a bridging programme","Makes many attempts on each quiz, sometimes 5–10","Often marked wrong for answers she believes are right (input format)","Embarrassed to ask questions in a class of 700"],
@@ -259,7 +249,7 @@ PERSONAS.push(
 },
 {
   id: "ivan-ssekandi", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "he", pos: "50% 30%",
+  pronoun: "he", pos: "50% 30%",
   name: "Ivan Ssekandi", tagline: "the Minimum-Effort Student", where: "Uganda", age: 20,
   quote: "I get 70% on the mastery quiz so the test opens, then I stop. Maths is not my thing. I just need the marks to move forward.",
   background: ["20 years old; first-year statistics student (it was not his first choice)","Sociable, popular, active in student politics and football","Does exactly enough to unlock each test quiz","Rarely reads feedback","Not struggling with access; struggling with interest"],
@@ -274,7 +264,7 @@ PERSONAS.push(
 },
 {
   id: "abena-owusu", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "she", pos: "85% 40%",
+  pronoun: "she", pos: "85% 40%",
   name: "Abena Owusu", tagline: "the Maths-Anxious Business Student", where: "Ghana", age: 19,
   quote: "I chose business because I thought I could avoid maths. Now I have Quantitative Methods with 1,000 people and my heart races every time a quiz opens.",
   background: ["19 years old; first-year business administration student","Took a compulsory mathematics service course she did not expect","Was told at school that she was “not a maths person”","Diligent, organised and hard-working in every other subject","Has a laptop and good data, but avoids opening the quizzes"],
@@ -289,7 +279,7 @@ PERSONAS.push(
 },
 {
   id: "grace-nangolo", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "she", pos: "35% 50%",
+  pronoun: "she", pos: "35% 50%",
   name: "Grace Nangolo", tagline: "the High Achiever", where: "Namibia", age: 21,
   quote: "I finish the quizzes on the first day and then I want something harder. Proofs, challenges, anything. And yes, classmates ask me to do their quizzes for them. I say no, but it’s not easy.",
   background: ["21 years old; third-year mathematics and statistics student","Top of her class; tutors younger students","Often finishes the weekly quizzes in one attempt","Is regularly offered money to do other students’ quizzes","Wants to do postgraduate study"],
@@ -304,7 +294,7 @@ PERSONAS.push(
 },
 {
   id: "peter-kiprono", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "students", tags: ["TVET"], pronoun: "he", pos: "45% 35%",
+  pronoun: "he", pos: "45% 35%",
   name: "Peter Kiprono", tagline: "the TVET Electrical Trainee", where: "Kenya", age: 19,
   quote: "I came to college to wire buildings, not to do algebra. But when the tutor showed me that the formula tells me which cable to use, I started to listen.",
   background: ["19 years old; first-year Diploma in Electrical Engineering at a technical training institute","Practical learner; best in the workshop, weakest in the classroom","Entry maths grade was low","Uses a basic Android phone; college computer lab is often booked","Helps his uncle on wiring jobs at weekends"],
@@ -319,7 +309,7 @@ PERSONAS.push(
 },
 {
   id: "clarisse-mbarga", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "students", tags: ["TVET"], pronoun: "she", pos: "25% 50%",
+  pronoun: "she", pos: "25% 50%",
   name: "Clarisse Mbarga", tagline: "the Returning TVET Learner", where: "Cameroon", age: 33,
   quote: "I left school at 17 and fixed cars for ten years. Now I want the certificate. The engines are easy; the maths I left behind is the hard part, and it is all in English online.",
   background: ["33 years old; married with two children","Experienced mechanic returning to formal training in automotive engineering","Studies part-time while working at a garage","Francophone; most online maths resources she finds are in English","Uses her phone and the garage’s laptop"],
@@ -334,7 +324,7 @@ PERSONAS.push(
 },
 {
   id: "esther-wanjiku", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "teaching", tags: ["TVET"], pronoun: "she", pos: "40% 25%",
+  pronoun: "she", pos: "40% 25%",
   name: "Esther Wanjiku", tagline: "the TVET Tutor", where: "Kenya", age: 29,
   quote: "I teach engineering maths to 200 trainees with one whiteboard and no marker some days. I was sceptical at the workshop, but if STACK can mark their practice, I can spend my time in the workshop with them.",
   background: ["29 years old; single","Tutor in mechanical and electrical engineering at a technical training institute","Teaches engineering mathematics and workshop practice","Attended a STACK training for TVET tutors","Has never used Moodle; college ICT support is minimal"],
@@ -349,7 +339,7 @@ PERSONAS.push(
 },
 {
   id: "yusuf-mohamed", category: "education", set: "africa", cases: ["africa-to-contracts"],
-  group: "teaching", tags: [], pronoun: "he", pos: "60% 20%",
+  pronoun: "he", pos: "60% 20%",
   name: "Dr. Yusuf Mohamed", tagline: "the Reluctant Lecturer", where: "Kenya", age: 58,
   quote: "I have taught this course on the blackboard for 25 years and my students pass. My colleague’s group uses STACK; mine does not. If it is so good, why do their exam results not match their quiz marks?",
   background: ["58 years old; married with grown children","Senior lecturer; teaches one of several parallel groups of a large course","Prefers chalk, paper tests and his own notes","Not against technology, but has seen several initiatives disappear","Respected by colleagues; his opinion carries weight in the department"],
@@ -364,7 +354,7 @@ PERSONAS.push(
 },
 {
   id: "marcus-alvarez", category: "education", set: "commercial", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "he", pos: "30% 30%",
+  pronoun: "he", pos: "30% 30%",
   name: "Marcus Alvarez", tagline: "the High-Flying Undergraduate", where: "USA", age: 19,
   quote: "I don’t mind hard questions. What I mind is submitting and not knowing if I’m right until next week, or losing points because a computer didn’t like how I wrote my answer. Give me instant feedback and a way to appeal, and I’m in.",
   background: ["19 years old; second-year physics major at a highly selective university","Top of his high-school class; used to getting things right first time","Takes a required applied-maths course (differential equations) alongside heavy lab and problem-set loads","Laptop, fast campus internet; time is his scarce resource, not access","Sceptical of automated grading until he trusts it"],
@@ -379,7 +369,7 @@ PERSONAS.push(
 },
 {
   id: "mei-lin-chen", category: "education", set: "commercial", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "she", pos: "45% 35%",
+  pronoun: "she", pos: "45% 35%",
   name: "Mei Lin Chen", tagline: "the PhD Student from Another Field", where: "USA", age: 26,
   quote: "I’m a first-year PhD student in environmental science and I haven’t solved a differential equation in five years. The practice quizzes were a lifeline, as long as I could fit them between lab shifts.",
   background: ["26 years old; first-year PhD student in environmental science and engineering","Took the applied-maths course because her programme requires it","Strong researcher; maths skills rusty after years of fieldwork","Juggles lab work, a teaching assistantship and coursework","Sits alongside undergraduates who seem much faster than her"],
@@ -394,7 +384,7 @@ PERSONAS.push(
 },
 {
   id: "giulia-moretti", category: "education", set: "commercial", cases: ["africa-to-contracts"],
-  group: "students", tags: [], pronoun: "she", pos: "45% 40%",
+  pronoun: "she", pos: "45% 40%",
   name: "Giulia Moretti", tagline: "the Biology Student in a Stats Service Course", where: "Italy", age: 20,
   quote: "I study biology because I love living things, not formulas. But when the statistics quizzes used real data from experiments like ours, I finally understood why I need this.",
   background: ["20 years old; second-year biology student","Takes a compulsory statistics course taught by the mathematics department","Good at memorising; less confident with abstract reasoning","Studies in Italian; much statistics software and help online is in English","Commutes by train from a nearby town"],
@@ -409,7 +399,7 @@ PERSONAS.push(
 },
 {
   id: "luca-ferrara", category: "education", set: "commercial", cases: ["africa-to-contracts","ai-authoring"],
-  group: "students", tags: [], pronoun: "he", pos: "60% 40%",
+  pronoun: "he", pos: "60% 40%",
   name: "Luca Ferrara", tagline: "the Mixed-Ability Linear Algebra Student", where: "Italy", age: 19,
   quote: "Some people in my course did linear algebra at school; I did not. With paper exercises I never knew if I was right. Now at least the computer tells me, but sometimes I still don’t understand why.",
   background: ["19 years old; first-year engineering student","Came from a technical high school with less abstract maths","Works weekends in his family’s bar","Linear algebra class has a very wide range of ability","Prefers working on paper, then typing answers in"],
@@ -424,7 +414,7 @@ PERSONAS.push(
 },
 {
   id: "daniel-brooks", category: "education", set: "commercial", cases: ["africa-to-contracts"],
-  group: "teaching", tags: [], pronoun: "he", pos: "55% 35%",
+  pronoun: "he", pos: "55% 35%",
   name: "Dr. Daniel Brooks", tagline: "the Instructor Redesigning on a Deadline", where: "USA", age: 37,
   quote: "We had to squeeze three terms of content into two and redesign the course at the same time. I could write the questions in LaTeX; I needed people who could make them work in STACK, fast and right.",
   background: ["37 years old; married with a young child","Assistant professor of applied mathematics","Leads a large required course taken by students from many departments","Strong teacher and researcher; no time to learn STACK authoring himself","Works with a head TA, several TAs and an external partner (IDEMS) that converts and reviews questions"],
@@ -439,7 +429,7 @@ PERSONAS.push(
 },
 {
   id: "priya-raman", category: "education", set: "commercial", cases: ["africa-to-contracts"],
-  group: "teaching", tags: [], pronoun: "she", pos: "50% 60%",
+  pronoun: "she", pos: "50% 60%",
   name: "Priya Raman", tagline: "the Head Teaching Assistant", where: "USA", age: 27,
   quote: "Every regrade request lands with me. Half are input problems, a few are real bugs, and some are students testing the system. If I can sort them fast and show we listen, the complaints stop.",
   background: ["27 years old; fourth-year PhD student in applied mathematics","Head TA for a large required course","Coordinates a team of TAs and handles student regrade requests","Reads the anonymous feedback after every quiz and reports to the instructor","Comfortable with code; picked up STACK quickly"],
@@ -454,7 +444,7 @@ PERSONAS.push(
 },
 {
   id: "paolo-benedetti", category: "education", set: "commercial", cases: ["africa-to-contracts","ai-authoring"],
-  group: "teaching", tags: [], pronoun: "he", pos: "50% 25%",
+  pronoun: "he", pos: "50% 25%",
   name: "Prof. Paolo Benedetti", tagline: "the Lecturer Who Built His Own Questions", where: "Italy", age: 55,
   quote: "We started by asking IDEMS for statistics questions for our biologists. Then I learned to write my own. Now we have hundreds, and some are not as good as they should be. I want them checked, improved and more of my exercises turned into STACK.",
   background: ["55 years old; married with two university-age children","Associate professor of mathematics","Teaches linear algebra to engineers and statistics to biology students","Learned STACK by working alongside IDEMS, then authored many questions independently","Has built a large question bank in Italian of uneven quality"],
@@ -469,7 +459,7 @@ PERSONAS.push(
 },
 {
   id: "halima-bello", category: "education", set: "commercial", cases: ["africa-to-contracts","ai-authoring"],
-  group: "support", tags: [], pronoun: "she", pos: "40% 35%",
+  pronoun: "she", pos: "40% 35%",
   name: "Halima Bello", tagline: "the IDEMS Question Author", where: "Nigeria (works remotely for IDEMS)", age: 30,
   quote: "In the morning I convert a US instructor’s LaTeX into STACK; in the afternoon I review Italian linear algebra questions with a translator open. Paying clients have hard deadlines, but I don’t want the African work to fall behind.",
   background: ["30 years old; married with one child","Mathematics graduate with an MSc; IDEMS STACK author and reviewer","Works remotely across time zones from Lagos to California","Converts, tests and improves questions for commercial clients","Also contributes to open question banks for African universities"],
@@ -484,7 +474,7 @@ PERSONAS.push(
 },
 {
   id: "george-wanyama", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "teaching", tags: [], pronoun: "he", pos: "40% 30%",
+  pronoun: "he", pos: "40% 30%",
   name: "Mr. George Wanyama", tagline: "the Confident Mixer of Methods", where: "Kenya", age: 36,
   quote: "Where the coursebook fails, on rotation, reflection and trigonometry, I open the e-book and move the slider, and the whole class says ‘aaah’. I take the best of both.",
   background: ["36 years old; married with two children","Secondary teacher of mathematics, physics and ICT for 10 years","Has used the Grade 10 digital textbook for one term","Taught himself with the student version over a week, then brought it into lessons topic by topic","His ICT background made the book easy to navigate"],
@@ -499,7 +489,7 @@ PERSONAS.push(
 },
 {
   id: "collins-kibet", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "teaching", tags: [], pronoun: "he", pos: "45% 35%",
+  pronoun: "he", pos: "45% 35%",
   name: "Mr. Collins Kibet", tagline: "the Newly Qualified Teacher", where: "Kenya", age: 24,
   quote: "I learned the book in a weekend, with an AI summary to help. The hard part is getting forty learners to the lab and back before the lesson is over.",
   background: ["24 years old; single","Five months into his first job: mathematics, ICT and computer studies","Has to follow the Ministry lesson plans, so cannot use the book’s own","The e-book is only available in the computer lab","Comfortable with technology; less confident on some topics"],
@@ -514,7 +504,7 @@ PERSONAS.push(
 },
 {
   id: "wilson-barasa", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "teaching", tags: [], pronoun: "he", pos: "50% 30%",
+  pronoun: "he", pos: "50% 30%",
   name: "Mr. Wilson Barasa", tagline: "the Teacher Who Follows the Book Step by Step", where: "Kenya", age: 33,
   quote: "When the new curriculum started, there were no coursebooks yet. The e-book was all we had, so I followed it page by page. Now I trust it, when the power and the projector allow.",
   background: ["33 years old; married with one child","Teaches mathematics, chemistry and ICT; 7 years’ experience","Adopted the e-book because the new curriculum coursebooks arrived late","Spent two months (December–February) learning it on his own","Follows the book in order (“biblically”) because it matches the coursebook"],
@@ -529,7 +519,7 @@ PERSONAS.push(
 },
 {
   id: "kevin-omondi", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "students", tags: [], pronoun: "he", pos: "30% 40%",
+  pronoun: "he", pos: "30% 40%",
   name: "Kevin Omondi", tagline: "the Grade 10 Learner Sharing Three Coursebooks", where: "Kenya", age: 15,
   quote: "The e-book is more visual. The coursebook is wordy, and there are only three in our class. If I could open the e-book at home I would check every answer.",
   background: ["15 years old; Grade 10 in a county secondary school","Uses the e-book three times a week in the lab, the coursebook twice","No device or internet at home; the teacher sends only the questions","The e-book arrived halfway through the term, with no introduction","Likes checking his own working against worked solutions"],
@@ -544,7 +534,7 @@ PERSONAS.push(
 },
 {
   id: "japheth-wekesa", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "teaching", tags: [], pronoun: "he", pos: "50% 25%",
+  pronoun: "he", pos: "50% 25%",
   name: "Mr. Japheth Wekesa", tagline: "the Master Teacher at a Model School", where: "Kenya", age: 45,
   quote: "We have the lab, the projector and Smart TVs in every Grade 10 room. Our girls are ready. But if a question accepts only one method, the book teaches them there is only one way to do mathematics.",
   background: ["45 years old; married with three children","Head of mathematics at a well-equipped girls’ secondary school","Leads a team of five maths teachers","His school has been proposed as a model school for the digital textbook","Expected to mentor teachers from neighbouring schools"],
@@ -559,7 +549,7 @@ PERSONAS.push(
 },
 {
   id: "stephen-mutai", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "leadership", tags: [], pronoun: "he", pos: "60% 35%",
+  pronoun: "he", pos: "60% 35%",
   name: "Mr. Stephen Mutai", tagline: "the Deputy Principal (Academics)", where: "Kenya", age: 50,
   quote: "We invested in computers before anyone asked us to. Make us the model school, and let our teachers show others how it is done.",
   background: ["50 years old; married with four children","Deputy Principal (Academics) at a secondary school","Oversees timetabling, teacher performance and the move to the new curriculum","Has invested in a computer lab and classroom Smart TVs","Sees the digital textbook as a chance to raise the school’s profile"],
@@ -574,7 +564,7 @@ PERSONAS.push(
 },
 {
   id: "victor-ochieng", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "support", tags: [], pronoun: "he", pos: "60% 40%",
+  pronoun: "he", pos: "60% 40%",
   name: "Victor Ochieng", tagline: "the Textbook Rollout Facilitator", where: "Kenya", age: 29,
   quote: "Once a teacher sees a learner get step-by-step feedback at the board, the conversation changes. My job is to get that moment into as many schools as possible, and to bring back what goes wrong.",
   background: ["29 years old; engaged","Works for the local hub organisation supporting the digital textbooks","Runs school demonstrations, teacher orientations and pilot interviews","Mathematics education graduate","Travels between schools by public transport"],
@@ -589,7 +579,7 @@ PERSONAS.push(
 },
 {
   id: "allan-kiprotich", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "content", tags: [], pronoun: "he", pos: "70% 40%",
+  pronoun: "he", pos: "70% 40%",
   name: "Allan Kiprotich", tagline: "the Intern Textbook Author", where: "Kenya", age: 23,
   quote: "Grades 7 to 9 we adapted from existing books. Grade 10 we wrote from nothing. Then we cleaned up the Ethiopian Ministry’s Word files equation by equation. I know PreTeXt better than my own handwriting now.",
   background: ["23 years old; single","Mathematics graduate; intern at the local hub","Writes PreTeXt and STACK content for the Kenyan Grade 7–10 books","Also fixed the conversion of Ethiopia’s Basic Maths book","Funding for the team has been interrupted more than once"],
@@ -604,7 +594,7 @@ PERSONAS.push(
 },
 {
   id: "yonas-tadesse", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "teaching", tags: [], pronoun: "he", pos: "60% 40%",
+  pronoun: "he", pos: "60% 40%",
   name: "Dr. Yonas Tadesse", tagline: "the Lecturer Reviewing the Ethiopian Book", where: "Ethiopia", age: 42,
   quote: "Every question has a feedback link that already knows which question I mean. I send a correction in the morning, and it can be fixed by the afternoon. That is new for us.",
   background: ["42 years old; married with three children","Mathematics lecturer teaching Basic Mathematics for Natural Sciences","Part of a cross-university team reviewing the interactive textbook","Many of his students use only their phones","Has taught the course from the Ministry’s printed module for years"],
@@ -619,7 +609,7 @@ PERSONAS.push(
 },
 {
   id: "biruk-hailu", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "students", tags: [], pronoun: "he", pos: "30% 35%",
+  pronoun: "he", pos: "30% 35%",
   name: "Biruk Hailu", tagline: "the First-Year Social Sciences Student", where: "Ethiopia", age: 18,
   quote: "I chose economics, and everyone must take Basic Mathematics. The online book lets me try a question again and again on my phone, as long as I have data.",
   background: ["18 years old; first-year economics student","Passed the national exam after a difficult school year","Takes the compulsory Basic Mathematics for Social Sciences","Uses a shared smartphone; campus Wi-Fi is unreliable","Reads the book in English, his third language"],
@@ -634,7 +624,7 @@ PERSONAS.push(
 },
 {
   id: "hodan-abdi", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "students", tags: [], pronoun: "she", pos: "50% 30%",
+  pronoun: "she", pos: "50% 30%",
   name: "Hodan Abdi", tagline: "the University Student in a Rebuilding System", where: "Somalia", age: 20,
   quote: "Our university has no Moodle. An open book with questions I can try on my phone is the first time I get feedback that isn’t from a teacher.",
   background: ["20 years old; second-year education student","Wants to be a secondary maths teacher","Studies at a university rebuilding after years of conflict","Has a smartphone; typing maths on it is hard","Learns in Somali, Arabic and English"],
@@ -649,7 +639,7 @@ PERSONAS.push(
 },
 {
   id: "abdirahman-warsame", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "funders", tags: [], pronoun: "he", pos: "45% 35%",
+  pronoun: "he", pos: "45% 35%",
   name: "Abdirahman Warsame", tagline: "the Government Liaison", where: "Somalia / South Sudan", age: 39,
   quote: "Officials ask me two questions: will it work on the devices we have, and who will train the teachers? If I can answer both, we can talk about the whole country.",
   background: ["39 years old; married with four children","Education consultant and former lecturer","Works with IDEMS’ partners to bring interactive textbooks to government","Knows the ministries, the universities and the donors","Has seen many education projects promise and disappear"],
@@ -664,7 +654,7 @@ PERSONAS.push(
 },
 {
   id: "deng-majok", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "leadership", tags: [], pronoun: "he", pos: "60% 35%",
+  pronoun: "he", pos: "60% 35%",
   name: "Mr. Deng Majok", tagline: "the Ministry Curriculum Director", where: "South Sudan", age: 54,
   quote: "We have more learners than textbooks and more textbooks than teachers trained to use them. If a digital book can reach a child where a printed one cannot, I am listening.",
   background: ["54 years old; married with six children","Director in the Ministry of General Education, responsible for curriculum","Former secondary mathematics teacher","Works with donors, NGOs and universities","Budgets are small and unpredictable"],
@@ -679,7 +669,7 @@ PERSONAS.push(
 },
 {
   id: "kwabena-asante", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "content", tags: [], pronoun: "he", pos: "60% 35%",
+  pronoun: "he", pos: "60% 35%",
   name: "Mr. Kwabena Asante", tagline: "the Official Textbook Author", where: "Ghana", age: 58,
   quote: "I co-wrote the books every senior high student in Ghana uses. Now every one of them has a tablet. It would be foolish to leave our book as a PDF.",
   background: ["58 years old; married; grandfather of two","Senior member of the national mathematics association","Co-author of the current official SHS mathematics textbooks","Former head of mathematics at a leading senior high school","Works with researchers in Ghana and the UK"],
@@ -694,7 +684,7 @@ PERSONAS.push(
 },
 {
   id: "akosua-boateng", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "students", tags: [], pronoun: "she", pos: "60% 35%",
+  pronoun: "she", pos: "60% 35%",
   name: "Akosua Boateng", tagline: "the Senior High Student with a Tablet", where: "Ghana", age: 16,
   quote: "Everyone got a tablet, but the maths book on it is just the paper book on a screen. If it could tell me where I went wrong, like a teacher, I would use it every night.",
   background: ["16 years old; SHS 2 student at a boarding school","Received a government-issued tablet","The tablet has the official textbooks as static files","Studies in the dormitory in the evenings when lights allow","Wants to study nursing"],
@@ -709,7 +699,7 @@ PERSONAS.push(
 },
 {
   id: "emmanuel-tetteh", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "content", tags: [], pronoun: "he", pos: "40% 40%",
+  pronoun: "he", pos: "40% 40%",
   name: "Mr. Emmanuel Tetteh", tagline: "the Educational Publisher", where: "Ghana", age: 47,
   quote: "Our business is selling books. Open, interactive books are the future, I can see that. Show me a model where we still exist in it.",
   background: ["47 years old; married with three children","Managing director of a Ghanaian educational publisher","Publishes the official SHS mathematics textbooks","Has invested in digital editions; most revenue is still print","Negotiates with the Ministry and the Ghana Education Service"],
@@ -724,7 +714,7 @@ PERSONAS.push(
 },
 {
   id: "ibrahim-alhassan", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "research", tags: [], pronoun: "he", pos: "50% 30%",
+  pronoun: "he", pos: "50% 30%",
   name: "Dr. Ibrahim Alhassan", tagline: "the Ghanaian Education Researcher", where: "Ghana", age: 41,
   quote: "The tablets are already in students’ hands. The research question is no longer access, it is use: what makes a student open the maths book at nine at night?",
   background: ["41 years old; married with two children","Senior lecturer in mathematics education","Collaborates with UK researchers on a digital textbook study","Former SHS mathematics teacher in northern Ghana","Works closely with the national mathematics association"],
@@ -739,7 +729,7 @@ PERSONAS.push(
 },
 {
   id: "hannah-clarke", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "research", tags: [], pronoun: "she", pos: "40% 30%",
+  pronoun: "she", pos: "40% 30%",
   name: "Dr. Hannah Clarke", tagline: "the UK Research Partner", where: "UK", age: 38,
   quote: "Ghana is doing what most countries only talk about: a tablet for every student. If we get the interactive books right, it is a study the whole world will want to read.",
   background: ["38 years old; partner, one child","Lecturer in mathematics education at a UK university","Researches digital textbooks and formative assessment","Co-investigator with Ghanaian colleagues","Has worked with PreTeXt and STACK"],
@@ -754,7 +744,7 @@ PERSONAS.push(
 },
 {
   id: "rachel-stein", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "content", tags: [], pronoun: "she", pos: "55% 30%",
+  pronoun: "she", pos: "55% 30%",
   name: "Dr. Rachel Stein", tagline: "the Lecturer Turning Notes into a Book", where: "USA", age: 35,
   quote: "I have 200 pages of lecture notes in LaTeX and STACK quizzes students love. Why not one open book where the notes and the questions live together?",
   background: ["35 years old; married","Assistant professor of applied mathematics","Already uses STACK quizzes in a large course","Has years of LaTeX lecture notes","Interested in open educational resources"],
@@ -769,7 +759,7 @@ PERSONAS.push(
 },
 {
   id: "margaret-hughes", category: "education", set: "textbooks", cases: ["textbooks"],
-  group: "content", tags: [], pronoun: "she", pos: "50% 30%",
+  pronoun: "she", pos: "50% 30%",
   name: "Dr. Margaret Hughes", tagline: "the Lecturer Re-imagining a Classic Textbook", where: "UK", age: 56,
   quote: "Our linear algebra textbook has served students for twenty years on paper. I want it to answer back: interactive examples, questions with feedback, open to anyone.",
   background: ["56 years old; married with grown children","Senior lecturer in mathematics at a UK university","Co-author of a published linear algebra textbook","Exploring adapting it into an interactive PreTeXt book with STACK","Needs to negotiate rights with the publisher"],
@@ -784,7 +774,7 @@ PERSONAS.push(
 },
 {
   id: "owen-price", category: "education", set: "ai", cases: ["ai-authoring"],
-  group: "content", tags: [], pronoun: "he", pos: "60% 35%",
+  pronoun: "he", pos: "60% 35%",
   name: "Dr. Owen Price", tagline: "the Expert Who Drives the Agents", where: "UK", age: 41,
   quote: "I give the coding assistant the repository, the rules and the tools, and it builds a chapter’s worth of questions overnight. It goes off track sometimes, but I know STACK well enough to catch it.",
   background: ["41 years old; married with two children","Mathematics lecturer and long-standing STACK author","Uses a general coding assistant (like Claude Code) in a question-bank repository","Lets the agents work freely and corrects them when they go wrong","Has years of STACK expertise; the coding itself is now almost trivial to him"],
@@ -799,7 +789,7 @@ PERSONAS.push(
 },
 {
   id: "claire-dubois", category: "education", set: "ai", cases: ["ai-authoring"],
-  group: "support", tags: [], pronoun: "she", pos: "55% 35%",
+  pronoun: "she", pos: "55% 35%",
   name: "Claire Dubois", tagline: "the IDEMS Author on Client Deadlines", where: "France (works remotely for IDEMS)", age: 38,
   quote: "I’m a former secondary teacher writing PDE questions I couldn’t solve myself. The lecturer writes the spec, the Planner and I turn it into a plan, the Author builds it, and I check every branch before it merges.",
   background: ["38 years old; partner, one child","Former secondary maths teacher; now a STACK author at IDEMS","Works on paid contracts for universities in the US and Italy","Uses the multi-agent interface daily: plan, preview, edit by hand, merge","Not a subject specialist in most of what she authors"],
@@ -814,7 +804,7 @@ PERSONAS.push(
 },
 {
   id: "chiara-fontana", category: "education", set: "ai", cases: ["ai-authoring"],
-  group: "teaching", tags: [], pronoun: "she", pos: "40% 40%",
+  pronoun: "she", pos: "40% 40%",
   name: "Chiara Fontana", tagline: "the Busy Teacher Who Wants to Start", where: "Italy", age: 39,
   quote: "I love the idea: practice with feedback for every student. But I have a full-time job and three children. If I have to learn HTML, Maxima and feedback trees first, I’ll never begin.",
   background: ["39 years old; married with three children","Secondary school mathematics teacher, highly motivated","Uses textbook exercises; gives page numbers for homework","Was introduced to STACK by a friend and was overwhelmed by the learning curve","Asks about assessing students’ written proofs"],
@@ -829,7 +819,7 @@ PERSONAS.push(
 },
 {
   id: "lucy-njoroge", category: "education", set: "ai", cases: ["ai-authoring"],
-  group: "teaching", tags: [], pronoun: "she", pos: "60% 30%",
+  pronoun: "she", pos: "60% 30%",
   name: "Dr. Lucy Njoroge", tagline: "the Lecturer Becoming an Author", where: "Kenya", age: 34,
   quote: "I never had time to learn STACK properly. With the planner I describe what I want my students to practise, check the plan, and watch it appear in the preview. I’m learning STACK by doing it.",
   background: ["34 years old; married, one child","Lecturer in mathematics teaching large first-year courses","Attended a STACK workshop but never authored alone","Uses the multi-agent interface with an API key paid by a project","Wants her questions in the open banks used across Kenya"],
@@ -844,7 +834,7 @@ PERSONAS.push(
 },
 {
   id: "emma-hartley", category: "education", set: "ai", cases: ["textbooks","ai-authoring"],
-  group: "content", tags: [], pronoun: "she", pos: "65% 30%",
+  pronoun: "she", pos: "65% 30%",
   name: "Emma Hartley", tagline: "the Textbook Converter Who Talks to the Robots", where: "UK", age: 29,
   quote: "I’ve converted dozens of open textbooks to PreTeXt. Now the agents cross-reference a chapter with our question bank and tell me what fits. I agree or disagree with the robots, and the good ones go in.",
   background: ["29 years old; single","Data scientist and statistics educator","Converts published open textbooks to PreTeXt","Uses the multi-agent system to match textbook exercises to open STACK questions","Hands near-matches to colleagues to adapt"],
@@ -859,7 +849,7 @@ PERSONAS.push(
 },
 {
   id: "samuel-adeyemi", category: "education", set: "ai", cases: ["textbooks","ai-authoring"],
-  group: "teaching", tags: [], pronoun: "he", pos: "40% 40%",
+  pronoun: "he", pos: "40% 40%",
   name: "Dr. Samuel Adeyemi", tagline: "the Subject Expert Who Writes the Spec", where: "Nigeria", age: 46,
   quote: "I know what a good estimate of a standard deviation looks like. I don’t know Maxima. If I write a clear plan and approve it, the authors and agents can do the rest, but only I can say what counts as close enough.",
   background: ["46 years old; married with four children","Senior lecturer in statistics","Collaborates with remote authors who build questions from his specifications","Reviews plans with fixed fields: goal, randomisation, answer tests, feedback","Values estimation and interpretation over formulas"],
@@ -874,7 +864,7 @@ PERSONAS.push(
 },
 {
   id: "fiona-macleod", category: "education", set: "ai", cases: ["ai-authoring"],
-  group: "support", tags: [], pronoun: "she", pos: "50% 30%",
+  pronoun: "she", pos: "50% 30%",
   name: "Dr. Fiona MacLeod", tagline: "the In-House STACK Professional", where: "UK (Scotland)", age: 44,
   quote: "Writing STACK questions is my job. AI could double what I produce, or it could convince my department they don’t need me. I want to use it on my own terms.",
   background: ["44 years old; married","Employed by a university to STACKify courses","Member of the STACK professionals network","Owns a large private question bank synchronised with Moodle","Has tried general chatbots; got hallucinated syntax"],
@@ -889,7 +879,7 @@ PERSONAS.push(
 },
 {
   id: "yaw-darko", category: "education", set: "ai", cases: ["ai-authoring"],
-  group: "support", tags: [], pronoun: "he", pos: "40% 35%",
+  pronoun: "he", pos: "40% 35%",
   name: "Yaw Darko", tagline: "the Hub Tech Lead Wanting the Tool", where: "Ghana", age: 31,
   quote: "We want to run the system for our universities, but every question costs a dollar of API calls and the best models are foreign and expensive. Show me a path to cheaper models and our own git server.",
   background: ["31 years old; married","Technical lead at a new local STACK hub","Computer science graduate; manages Moodle servers","Supports lecturers in several universities with small budgets","Interested in open models and self-hosting (e.g. Forgejo)"],
@@ -904,7 +894,7 @@ PERSONAS.push(
 },
 {
   id: "abdikarim-yusuf", category: "education", set: "ai", cases: ["ai-authoring"],
-  group: "students", tags: [], pronoun: "he", pos: "35% 40%",
+  pronoun: "he", pos: "35% 40%",
   name: "Abdikarim Yusuf", tagline: "the Student Who Finally Gets Feedback", where: "Somalia", age: 21,
   quote: "Last term the quiz just said ‘incorrect’. This term, when I make the same mistake, it tells me which step went wrong. I don’t know who changed it. I only know it helps.",
   background: ["21 years old; second-year mathematics student","Uses STACK quizzes and an interactive textbook on his phone","Doesn’t know or care how the questions are made","Many questions in his course were recently reviewed with AI support","Studies in a third language"],
@@ -919,7 +909,7 @@ PERSONAS.push(
 },
 {
   id: "jonas-weber", category: "education", set: "ai", cases: ["ai-authoring"],
-  group: "funders", tags: [], pronoun: "he", pos: "50% 50%",
+  pronoun: "he", pos: "50% 50%",
   name: "Jonas Weber", tagline: "the Funder Asking About Responsible AI", where: "Germany", age: 48,
   quote: "Everyone pitches me AI for education. I want the ones that make teachers more capable, not replace them, and that have a plan for cost and energy beyond next year’s models.",
   background: ["48 years old; married with two children","Programme manager at a European foundation funding digital education","Former teacher and edtech researcher","Reviews dozens of AI proposals a year","Interested in open-source and low-resource contexts"],

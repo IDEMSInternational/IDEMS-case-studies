@@ -12,12 +12,12 @@ Open `index.html` in a browser. No build step is needed.
 | `<category>/index.html` | Category page: its case studies, then a browser of its personas |
 | `<category>/<case>.html` | Case-study pages |
 | `data/catalogue.js` | Categories and case studies (titles, summaries, page names) |
-| `data/<category>.js` | One category's personas, plus its persona groups and sets |
+| `data/<category>.js` | One category's personas and its persona sets |
 | `assets/site.js` | Shared behaviour: navigation, theme, persona browser, persona cards and profile dialog |
 | `assets/site.css`, `assets/case.css` | Shared styles; `case.css` adds article typography for case-study pages |
 | `images/<persona-id>.jpg` | One photo per persona |
 
-Each persona has a name-based `id` and is tagged with its `category`, the `cases` it appears in, a `set` (a sub-context within the category, such as "Open textbooks"), a `group` (such as "Students") and optional free `tags` (such as "TVET"). Persona profiles follow the agreed format: Background, What they're looking for, Hopes & dreams, Worries & fears, Their data and expertise, A day in the life, a quote and "Grounded in".
+Each persona has a name-based `id` and is tagged with its `category`, the `cases` it appears in, and a `set` (a sub-context within the category, such as "Open textbooks"). Persona profiles follow the agreed format: Background, What they're looking for, Hopes & dreams, Worries & fears, Their data and expertise, A day in the life, a quote and "Grounded in".
 
 ### Adding a category's content
 

@@ -57,11 +57,12 @@
   function tagsHTML(p, withCategory) {
     let t = "";
     if (withCategory) t += `<span class="tag" style="--c:${CATEGORIES[p.category].color}">${esc(CATEGORIES[p.category].label)}</span>`;
-    t += `<span class="tag" style="--c:${GROUPS[p.group].color}">${esc(GROUPS[p.group].label)}</span>`;
     if (SETS[p.set]) t += `<span class="tag" style="--c:${SETS[p.set].color}">${esc(SETS[p.set].label)}</span>`;
-    for (const x of p.tags) t += `<span class="tag" style="--c:var(--muted)">${esc(x)}</span>`;
     return t;
   }
+
+  // Accent colour for a persona: its set, falling back to its category.
+  const color = p => (SETS[p.set] || CATEGORIES[p.category]).color;
 
   // Persona browser: <div id="persona-browser" data-category="education"></div> (no data-category = all personas)
   const browser = document.getElementById("persona-browser");
@@ -101,7 +102,7 @@
     function render() {
       const q = state.q.trim().toLowerCase();
       order = PERSONAS.filter(p => matches(p) && (!q || [p.name, p.tagline, p.where, p.quote, ...p.background, ...p.looking, ...p.hopes, ...p.worries].join(" ").toLowerCase().includes(q)));
-      grid.innerHTML = order.map(p => `<button class="card" style="--c:${GROUPS[p.group].color}" data-id="${p.id}" aria-label="Open profile: ${esc(p.name)}, ${esc(p.tagline)}">
+      grid.innerHTML = order.map(p => `<button class="card" style="--c:${color(p)}" data-id="${p.id}" aria-label="Open profile: ${esc(p.name)}, ${esc(p.tagline)}">
         <div class="ph"><img src="${img(p)}" alt="" loading="lazy" style="object-position:${p.pos}"></div>
         <div class="body">
           <h3 class="name">${esc(p.name)}</h3>
@@ -139,7 +140,7 @@
   document.querySelectorAll("a.pcard[data-p]").forEach(a => {
     const p = byId[a.dataset.p]; if (!p) return;
     a.href = personaHref(p);
-    a.style.setProperty("--c", GROUPS[p.group].color);
+    a.style.setProperty("--c", color(p));
     a.innerHTML = `<img src="${img(p)}" alt="" style="object-position:${p.pos}"><span><b>${esc(p.name)}</b><i>${esc(p.tagline)} · ${esc(p.where)}</i></span>`;
   });
   document.querySelectorAll("cite[data-p]").forEach(c => {
@@ -179,7 +180,7 @@
   function open(id) {
     const p = byId[id], c = p.credit, i = order.findIndex(x => x.id === id);
     const appears = p.cases.map(k => `<a href="${caseHref(k)}">${esc(CASES[k].short)}</a>`).join(" · ");
-    dlg.style.setProperty("--c", GROUPS[p.group].color);
+    dlg.style.setProperty("--c", color(p));
     dlg.innerHTML = `<div class="pf">
       <aside class="pf-side">
         <img src="${img(p)}" alt="Placeholder photo for ${esc(p.name)}" style="object-position:${p.pos}">

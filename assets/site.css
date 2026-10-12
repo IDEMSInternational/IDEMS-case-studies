@@ -6,9 +6,6 @@
   --shadow: 0 1px 2px rgba(30,25,15,.06), 0 6px 20px rgba(30,25,15,.06);
   /* Categories */
   --c-parenting: #be185d; --c-education: #1f5f8b; --c-climate: #15803d;
-  /* Persona groups */
-  --g-students: #c2410c; --g-teaching: #1f6f8b; --g-support: #6d28d9; --g-leadership: #9f1239;
-  --g-funders: #a16207; --g-research: #15803d; --g-content: #b45309;
   /* Education sets */
   --s-africa: #c2410c; --s-commercial: #334155; --s-textbooks: #0369a1; --s-ai: #7e22ce;
 }
@@ -17,8 +14,6 @@
     --bg: #161513; --surface: #1f1e1b; --surface-2: #2a2824; --text: #eeeae3; --muted: #a39d93;
     --line: #36332e; --accent: #7cb8e0; --accent-soft: #1d2b36; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
     --c-parenting: #f472b6; --c-education: #7cb8e0; --c-climate: #4ade80;
-    --g-students: #fb923c; --g-teaching: #5ab4d6; --g-support: #a78bfa; --g-leadership: #fb7185;
-    --g-funders: #facc15; --g-research: #4ade80; --g-content: #fbbf24;
     --s-africa: #fb923c; --s-commercial: #cbd5e1; --s-textbooks: #38bdf8; --s-ai: #c084fc;
   }
 }
@@ -26,8 +21,6 @@
   --bg: #161513; --surface: #1f1e1b; --surface-2: #2a2824; --text: #eeeae3; --muted: #a39d93;
   --line: #36332e; --accent: #7cb8e0; --accent-soft: #1d2b36; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
   --c-parenting: #f472b6; --c-education: #7cb8e0; --c-climate: #4ade80;
-  --g-students: #fb923c; --g-teaching: #5ab4d6; --g-support: #a78bfa; --g-leadership: #fb7185;
-  --g-funders: #facc15; --g-research: #4ade80; --g-content: #fbbf24;
   --s-africa: #fb923c; --s-commercial: #cbd5e1; --s-textbooks: #38bdf8; --s-ai: #c084fc;
 }
 * { box-sizing: border-box; }

@@ -24,7 +24,6 @@ const CASES = {
   },
 };
 
-// Persona groups (role types) and sets (sub-contexts within a category), filled in by the category files.
-const GROUPS = {};
+// Persona sets (sub-contexts within a category), filled in by the category files.
 const SETS = {};
 const PERSONAS = [];
