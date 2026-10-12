@@ -70,7 +70,7 @@
   if (browser) {
     onBrowserPage = true;
     const scopeCat = browser.dataset.category || "";
-    const state = { category: scopeCat, case: "", set: "", group: "", tag: "", q: "" };
+    const state = { category: scopeCat, case: "", set: "", q: "" };
     browser.innerHTML = `<div class="controls"><div class="filters"></div>
         <input class="search" type="search" placeholder="Search personas…" aria-label="Search personas"></div>
       <p class="result-count" aria-live="polite"></p>
@@ -82,8 +82,6 @@
       ...(scopeCat ? [] : [["category", "Category", () => Object.keys(CATEGORIES), k => CATEGORIES[k].label, (p, v) => p.category === v]]),
       ["case", "Case study", () => Object.keys(CASES), k => CASES[k].short, (p, v) => p.cases.includes(v)],
       ["set", "Set", () => Object.keys(SETS), k => SETS[k].label, (p, v) => p.set === v],
-      ["group", "Group", () => Object.keys(GROUPS), k => GROUPS[k].label, (p, v) => p.group === v],
-      ["tag", "Tag", () => [...new Set(PERSONAS.flatMap(p => p.tags))].sort(), k => k, (p, v) => p.tags.includes(v)],
     ];
     const matches = (p, skip) => dims.every(([key, , , , test]) => key === skip || !state[key] || test(p, state[key]));
 
@@ -125,7 +123,7 @@
     });
     filtersEl.addEventListener("click", e => {
       if (!e.target.closest(".reset")) return;
-      Object.assign(state, { category: scopeCat, case: "", set: "", group: "", tag: "", q: "" });
+      Object.assign(state, { category: scopeCat, case: "", set: "", q: "" });
       browser.querySelector(".search").value = "";
       render();
     });

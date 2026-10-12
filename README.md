@@ -8,7 +8,7 @@ Open `index.html` in a browser. No build step is needed.
 
 | Path | What it is |
 |---|---|
-| `index.html` | Home: the list of categories, then a browser of all personas with filters for category, case study, set, group and tag |
+| `index.html` | Home: the list of categories, then a browser of all personas with filters for category, case study and set |
 | `<category>/index.html` | Category page: its case studies, then a browser of its personas |
 | `<category>/<case>.html` | Case-study pages |
 | `data/catalogue.js` | Categories and case studies (titles, summaries, page names) |
