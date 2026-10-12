@@ -7,16 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="case.css">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/case.css">
 </head>
 <body>
-<nav class="topnav"><div class="in">
-  <span class="brand">IDEMS · STACK journey</span>
-  <a href="index.html">Personas</a>
-  <a href="case-1-africa-to-contracts.html">1 · Africa to contracts</a>
-  <a href="case-2-textbooks.html">2 · STACK and textbooks</a>
-  <a href="case-3-ai-authoring.html" aria-current="page">3 · AI authoring</a>
-</div></nav>
+<nav class="topnav" data-category="education" data-case="ai-authoring"></nav>
 
 <main class="wrap">
 <header class="hero">
@@ -42,18 +37,18 @@
 
 <h2>The bottleneck</h2>
 <p>Writing a STACK question is not one hard skill but many fairly simple ones done together. An author needs some HTML, some Maxima (STACK's computer algebra language), an understanding of how STACK checks answers and branches to different feedback, sensible randomisation, and, most of all, the teaching judgement to write good feedback. Few people have all of these. Even experts find it slow.</p>
-<p>The bottleneck shows up throughout this story. Lecturers at the 2022 Maseno workshop found authoring "time-consuming". The INNODEMS interns needed months of steep learning (<a href="case-1-africa-to-contracts.html">case study 1</a>). In 2025, demand for support was already greater than INNODEMS could meet. Commercial contracts come with deadlines. And as interactive textbooks multiply, every book needs questions (<a href="case-2-textbooks.html">case study 2</a>). Meanwhile most teachers are used to setting "page 42, exercises 1 to 10". About 2,000 institutions use STACK worldwide. The gap between that and every institution that could benefit is mainly a gap in authors.</p>
-<p><a href="index.html#p54">Chiara Fontana</a> is the persona for this gap: a motivated secondary teacher with a full-time job and three children, who loves the idea and cannot see how she would ever start.</p>
-<blockquote class="voice">“I love the idea: practice with feedback for every student. But I have a full-time job and three children. If I have to learn HTML, Maxima and feedback trees first, I’ll never begin.”<cite data-p="p54"></cite></blockquote>
+<p>The bottleneck shows up throughout this story. Lecturers at the 2022 Maseno workshop found authoring "time-consuming". The INNODEMS interns needed months of steep learning (<a href="africa-to-contracts.html">case study 1</a>). In 2025, demand for support was already greater than INNODEMS could meet. Commercial contracts come with deadlines. And as interactive textbooks multiply, every book needs questions (<a href="textbooks.html">case study 2</a>). Meanwhile most teachers are used to setting "page 42, exercises 1 to 10". About 2,000 institutions use STACK worldwide. The gap between that and every institution that could benefit is mainly a gap in authors.</p>
+<p><a href="index.html#chiara-fontana">Chiara Fontana</a> is the persona for this gap: a motivated secondary teacher with a full-time job and three children, who loves the idea and cannot see how she would ever start.</p>
+<blockquote class="voice">“I love the idea: practice with feedback for every student. But I have a full-time job and three children. If I have to learn HTML, Maxima and feedback trees first, I’ll never begin.”<cite data-p="chiara-fontana"></cite></blockquote>
 <div class="personas-label">Personas in this chapter</div>
 <div class="personas">
-  <a class="pcard" data-p="p54"></a><a class="pcard" data-p="p03"></a><a class="pcard" data-p="p55"></a><a class="pcard" data-p="p01"></a>
+  <a class="pcard" data-p="chiara-fontana"></a><a class="pcard" data-p="tesfaye-alemu"></a><a class="pcard" data-p="lucy-njoroge"></a><a class="pcard" data-p="samuel-okello"></a>
 </div>
 
 <h2>Stage 1: a chatbot beside the editor</h2>
 <p>The work began before its developer, Michele Pancera, joined IDEMS. A former secondary maths teacher who learned STACK while working for the University of Trieste, he built a personal assistant on a commercial chatbot platform. He trained it on STACK documentation and example questions. It produced question variables, question text and general feedback (Maxima code and HTML that work together), which he copied into Moodle by hand. It was useful in two ways. It acted as interactive documentation for someone still learning, and it made him perhaps five to ten times faster. Questions also came out tidier, with comments, and could easily be multilingual.</p>
 <p>When IDEMS adopted the assistant, its STACK authors used it every day on contract work. Santiago Borio said on the IDEMS podcast that he had not written a single question without it since. He described it as improving both speed and quality, but only because he knew STACK well enough to correct it. It sometimes made up syntax, for example for the function that checks multiple-choice answers, until he told it to check the documentation. It went round in circles on an old Parsons proof question until he asked whether it was using outdated code. It turned out it was. It was also very good at the dull but valuable jobs: adding clear comments to hard-to-read variables in older questions, and checking a revised question against a lecturer's list of requested changes, where it found one he had missed.</p>
-<p><a href="index.html#p31">Halima Bello, the IDEMS Question Author</a>, and <a href="index.html#p53">Claire Dubois</a> represent this stage: experts for whom AI enhances their skill rather than replacing it.</p>
+<p><a href="index.html#halima-bello">Halima Bello, the IDEMS Question Author</a>, and <a href="index.html#claire-dubois">Claire Dubois</a> represent this stage: experts for whom AI enhances their skill rather than replacing it.</p>
 
 <h2>Stage 2: what changed</h2>
 <p>Two years later, two things had changed. First, the models themselves improved. Earlier they could not reliably edit STACK's XML question files, where the trees that branch to different feedback are almost unreadable to a person. That is why the first assistant produced snippets for copying. Now editing XML is routine, and models can keep a whole set of questions consistent. Second, models became <em>agents</em>. They can work directly in a repository, call tools, check their own output and fix their mistakes.</p>
@@ -85,15 +80,15 @@
 
 <h3>The coding assistant: the same repository, for experts</h3>
 <p>The second way in is to open a general coding assistant in the same repository. There is no preview or editor, but it has every cheat-sheet, tool, rule and bank. It suits work outside the authoring cycle, such as "create a question tracker for this bank, then a report on the work done since last month". Each system improves the other. While reviewing questions with the coding assistant, the team found that Moodle's importer silently filled in missing values, and in one STACK version this set every incorrect branch's score to 1. The fix went into the code the agents use to write questions. Randomised Venn diagrams worked out in one coding-assistant session became a cheat-sheet and two examples that the Retriever can now give the Author. Rules that colleagues state during reviews are collected in one file that both systems read.</p>
-<p><a href="index.html#p52">Dr. Owen Price, the Expert Who Drives the Agents</a>, works mostly through the coding assistant. <a href="index.html#p53">Claire Dubois</a> works in the interface. <a href="index.html#p58">Dr. Fiona MacLeod</a>, a STACK professional employed by a university, sees both an opportunity and a threat to her job.</p>
-<blockquote class="voice">“I’m a former secondary teacher writing PDE questions I couldn’t solve myself. The lecturer writes the spec, the Planner and I turn it into a plan, the Author builds it, and I check every branch before it merges.”<cite data-p="p53"></cite></blockquote>
+<p><a href="index.html#owen-price">Dr. Owen Price, the Expert Who Drives the Agents</a>, works mostly through the coding assistant. <a href="index.html#claire-dubois">Claire Dubois</a> works in the interface. <a href="index.html#fiona-macleod">Dr. Fiona MacLeod</a>, a STACK professional employed by a university, sees both an opportunity and a threat to her job.</p>
+<blockquote class="voice">“I’m a former secondary teacher writing PDE questions I couldn’t solve myself. The lecturer writes the spec, the Planner and I turn it into a plan, the Author builds it, and I check every branch before it merges.”<cite data-p="claire-dubois"></cite></blockquote>
 <div class="personas-label">Personas in this chapter</div>
 <div class="personas">
-  <a class="pcard" data-p="p52"></a><a class="pcard" data-p="p53"></a><a class="pcard" data-p="p58"></a><a class="pcard" data-p="p31"></a>
+  <a class="pcard" data-p="owen-price"></a><a class="pcard" data-p="claire-dubois"></a><a class="pcard" data-p="fiona-macleod"></a><a class="pcard" data-p="halima-bello"></a>
 </div>
 
 <h2>Results so far</h2>
-<p>Together the two systems have been used to create or rework more than 120 questions in six banks. They supported IDEMS' Linear Algebra work for the University of Trieste (<a href="case-1-africa-to-contracts.html">case study 1</a>) and the conversion of a bank of 80 multiple-choice review questions. They also matched an open statistics bank to a PreTeXt textbook, selecting about 40 questions, half of them close matches (<a href="case-2-textbooks.html">case study 2</a>).</p>
+<p>Together the two systems have been used to create or rework more than 120 questions in six banks. They supported IDEMS' Linear Algebra work for the University of Trieste (<a href="africa-to-contracts.html">case study 1</a>) and the conversion of a bank of 80 multiple-choice review questions. They also matched an open statistics bank to a PreTeXt textbook, selecting about 40 questions, half of them close matches (<a href="textbooks.html">case study 2</a>).</p>
 <p>An audit of 32 questions from the Trieste Linear Algebra batch shows the kind of quality gain involved:</p>
 <ul>
   <li>All 32 pass validation with the STACK API, import safely and pass their question tests.</li>
@@ -102,31 +97,31 @@
   <li>Five questions that previously could not be tested now can be.</li>
   <li>Proof questions moved from all-or-nothing marking to partial credit.</li>
 </ul>
-<p>For <a href="index.html#p27">Luca Ferrara</a> in Trieste, and for <a href="index.html#p60">Abdikarim Yusuf</a> in a course whose questions were reviewed the same way, the difference is simple: a wrong answer now comes with an explanation.</p>
-<blockquote class="voice">“Last term the quiz just said ‘incorrect’. This term, when I make the same mistake, it tells me which step went wrong. I don’t know who changed it. I only know it helps.”<cite data-p="p60"></cite></blockquote>
-<p>The subject expert's role is still central. <a href="index.html#p30">Prof. Paolo Benedetti</a> wants his own bank checked and extended. <a href="index.html#p57">Dr. Samuel Adeyemi</a> writes the specification and alone decides what counts as "close enough". The plan, with its fixed fields, is where his judgement goes in. <a href="index.html#p56">Emma Hartley</a> uses the system to match questions across textbooks, then makes the final decision herself.</p>
+<p>For <a href="index.html#luca-ferrara">Luca Ferrara</a> in Trieste, and for <a href="index.html#abdikarim-yusuf">Abdikarim Yusuf</a> in a course whose questions were reviewed the same way, the difference is simple: a wrong answer now comes with an explanation.</p>
+<blockquote class="voice">“Last term the quiz just said ‘incorrect’. This term, when I make the same mistake, it tells me which step went wrong. I don’t know who changed it. I only know it helps.”<cite data-p="abdikarim-yusuf"></cite></blockquote>
+<p>The subject expert's role is still central. <a href="index.html#paolo-benedetti">Prof. Paolo Benedetti</a> wants his own bank checked and extended. <a href="index.html#samuel-adeyemi">Dr. Samuel Adeyemi</a> writes the specification and alone decides what counts as "close enough". The plan, with its fixed fields, is where his judgement goes in. <a href="index.html#emma-hartley">Emma Hartley</a> uses the system to match questions across textbooks, then makes the final decision herself.</p>
 <div class="personas-label">Personas in this chapter</div>
 <div class="personas">
-  <a class="pcard" data-p="p30"></a><a class="pcard" data-p="p27"></a><a class="pcard" data-p="p60"></a><a class="pcard" data-p="p57"></a><a class="pcard" data-p="p56"></a>
+  <a class="pcard" data-p="paolo-benedetti"></a><a class="pcard" data-p="luca-ferrara"></a><a class="pcard" data-p="abdikarim-yusuf"></a><a class="pcard" data-p="samuel-adeyemi"></a><a class="pcard" data-p="emma-hartley"></a>
 </div>
 
 <h2>Two kinds of AI: for experts, and for building expertise</h2>
 <p>Building both systems side by side brought out a distinction that now shapes IDEMS' thinking about AI. A general coding assistant driven by an expert is very powerful. The agents have a lot of freedom, the expert catches them when they go off track, and one skilled person can achieve what used to take a team. That is how Owen works. But taken to its logical end, that model does not need teachers at all.</p>
-<p>The interface takes the other approach. Its agents have narrow, well-defined roles, the workflow is fixed, every step is visible as an issue or a branch, and the human approves at set points. It is designed so that people who are <em>not yet</em> experts can do good work, and learn while they do it. <a href="index.html#p55">Dr. Lucy Njoroge</a>, a Kenyan lecturer who never had time to learn STACK properly, can describe what she wants her students to practise, check the plan and watch the question appear in the preview. IDEMS sees this kind of AI, which serves many people in their own settings, as getting much less attention than it deserves, and as central to the jobs of the future.</p>
-<blockquote class="voice">“I never had time to learn STACK properly. With the planner I describe what I want my students to practise, check the plan, and watch it appear in the preview. I’m learning STACK by doing it.”<cite data-p="p55"></cite></blockquote>
+<p>The interface takes the other approach. Its agents have narrow, well-defined roles, the workflow is fixed, every step is visible as an issue or a branch, and the human approves at set points. It is designed so that people who are <em>not yet</em> experts can do good work, and learn while they do it. <a href="index.html#lucy-njoroge">Dr. Lucy Njoroge</a>, a Kenyan lecturer who never had time to learn STACK properly, can describe what she wants her students to practise, check the plan and watch the question appear in the preview. IDEMS sees this kind of AI, which serves many people in their own settings, as getting much less attention than it deserves, and as central to the jobs of the future.</p>
+<blockquote class="voice">“I never had time to learn STACK properly. With the planner I describe what I want my students to practise, check the plan, and watch it appear in the preview. I’m learning STACK by doing it.”<cite data-p="lucy-njoroge"></cite></blockquote>
 <p>The hope for Chiara is concrete. Within a few months she might have assessment for the textbook she already uses, with her input at the centre. Within a year she might be contributing to open question banks as part of a network of teachers, where the AI suggests "someone has improved this question, do you want to look?" The quality would rise because of the teachers, with the AI as, in the words of IDEMS director David Stern, "the oil that makes the machine work".</p>
 
 <h2>Responsible by design</h2>
 <p>Right now the agents need models at roughly the level of Claude Sonnet 5, and few models are at that level. That raises questions of cost, dependence on a few providers, and energy and water use. The system is built to be model-agnostic so these can be managed. Each agent can run on a different model or provider. The Planner does the heavy thinking so the Author can run cheaply. Small edits can be made by hand with no model at all. The approach mirrors one used by partners in other fields: use the strongest models now to build systems that can later run on smaller, cheaper and eventually open models, possibly small enough for a laptop or a phone. IDEMS is also moving towards open-source git hosting with Forgejo.</p>
-<p>These questions matter most to the people at the edges. <a href="index.html#p59">Yaw Darko</a>, technical lead at a new West African hub, wants to run the system for his universities but cannot pay a dollar per question in foreign currency indefinitely. <a href="index.html#p61">Jonas Weber</a>, a funder, wants AI that makes teachers more capable and a plan for cost and energy that outlasts the next generation of models.</p>
-<blockquote class="voice">“We want to run the system for our universities, but every question costs a dollar of API calls and the best models are foreign and expensive. Show me a path to cheaper models and our own git server.”<cite data-p="p59"></cite></blockquote>
+<p>These questions matter most to the people at the edges. <a href="index.html#yaw-darko">Yaw Darko</a>, technical lead at a new West African hub, wants to run the system for his universities but cannot pay a dollar per question in foreign currency indefinitely. <a href="index.html#jonas-weber">Jonas Weber</a>, a funder, wants AI that makes teachers more capable and a plan for cost and energy that outlasts the next generation of models.</p>
+<blockquote class="voice">“We want to run the system for our universities, but every question costs a dollar of API calls and the best models are foreign and expensive. Show me a path to cheaper models and our own git server.”<cite data-p="yaw-darko"></cite></blockquote>
 <div class="personas-label">Personas in this chapter</div>
 <div class="personas">
-  <a class="pcard" data-p="p54"></a><a class="pcard" data-p="p55"></a><a class="pcard" data-p="p59"></a><a class="pcard" data-p="p61"></a>
+  <a class="pcard" data-p="chiara-fontana"></a><a class="pcard" data-p="lucy-njoroge"></a><a class="pcard" data-p="yaw-darko"></a><a class="pcard" data-p="jonas-weber"></a>
 </div>
 
 <h2>Beyond questions: adapting whole textbooks</h2>
-<p>The same approach of specialist agents with people in charge now also supports IDEMS' work on textbook variants (<a href="case-2-textbooks.html">case study 2</a>). Agents help translate content, switch a book from one programming language to another, adapt examples to a new context, and apply a correction across every linked version of a book. As with questions, they do the routine work at scale. Authors decide what they want, subject experts review the results, and people remain responsible for what is published.</p>
+<p>The same approach of specialist agents with people in charge now also supports IDEMS' work on textbook variants (<a href="textbooks.html">case study 2</a>). Agents help translate content, switch a book from one programming language to another, adapt examples to a new context, and apply a correction across every linked version of a book. As with questions, they do the routine work at scale. Authors decide what they want, subject experts review the results, and people remain responsible for what is published.</p>
 
 <h2>Challenges</h2>
 <ul>
@@ -159,11 +154,11 @@
   <li>Supporting question banks hosted on Forgejo as well as GitHub.</li>
   <li>Offering the system to others beyond IDEMS.</li>
 </ul>
-<p>The longer-term aim connects all three case studies. The question banks built in Africa and improved through contracts, and the questions placed in textbooks, could be maintained and extended by a wide network of lecturers, interns and teachers, with AI handling the routine work so they can focus on teaching. If that works, the people at the start of this story, <a href="index.html#p01">Samuel</a> with his 900 scripts and <a href="index.html#p03">Tesfaye</a> with no mentor, would no longer need to become STACK experts. The tools would do that part for them.</p>
+<p>The longer-term aim connects all three case studies. The question banks built in Africa and improved through contracts, and the questions placed in textbooks, could be maintained and extended by a wide network of lecturers, interns and teachers, with AI handling the routine work so they can focus on teaching. If that works, the people at the start of this story, <a href="index.html#samuel-okello">Samuel</a> with his 900 scripts and <a href="index.html#tesfaye-alemu">Tesfaye</a> with no mentor, would no longer need to become STACK experts. The tools would do that part for them.</p>
 
 <div class="next">
-  <a href="case-1-africa-to-contracts.html"><span>Case study 1</span><b>← From Africa to commercial contracts</b></a>
-  <a href="case-2-textbooks.html"><span>Case study 2</span><b>← STACK and textbooks</b></a>
+  <a href="africa-to-contracts.html"><span>Case study 1</span><b>← From Africa to commercial contracts</b></a>
+  <a href="textbooks.html"><span>Case study 2</span><b>← STACK and textbooks</b></a>
 </div>
 
 <footer>
@@ -175,10 +170,11 @@
     <li>IDEMS podcast episodes on the STACK AI assistant, AI agents and STACK authoring, AI for experts and AI that builds expertise, STACK authoring contracts, PreTeXt textbooks and statistics assessment (2025–2026).</li>
     <li>STACK case studies at stack-assessment.org: Maseno Workshop 2022; INNODEMS Internship 2023; INNODEMS Model 2025; STACK International Meeting Nairobi 2026; SMP A-level textbooks built in STACK with AI agents (2026).</li>
   </ul>
-  Personas are fictional. Placeholder photos are credited on the <a href="index.html">personas page</a>.
+  Personas are fictional. Placeholder photos are credited on the <a href="index.html">Education page</a>.
 </footer>
 </main>
-<script src="personas-data.js"></script>
-<script src="persona-dialog.js"></script>
+<script src="../data/catalogue.js"></script>
+<script src="../data/education.js"></script>
+<script src="../assets/site.js"></script>
 </body>
 </html>

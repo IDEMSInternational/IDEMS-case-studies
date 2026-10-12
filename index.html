@@ -3,328 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>STACK in Africa Personas</title>
+<title>IDEMS Case Studies</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #f6f3ee;
-  --surface: #ffffff;
-  --surface-2: #f1ede6;
-  --text: #1d1b18;
-  --muted: #6b655c;
-  --line: #e2dcd2;
-  --accent: #1f5f8b;
-  --shadow: 0 1px 2px rgba(30,25,15,.06), 0 6px 20px rgba(30,25,15,.06);
-  --g-students: #c2410c;
-  --g-teaching: #1f6f8b;
-  --g-support: #6d28d9;
-  --g-leadership: #9f1239;
-  --g-funders: #a16207;
-  --g-research: #15803d;
-  --tvet: #0f766e;
-  --commercial: #334155;
-  --g-content: #b45309;
-  --textbooks: #0369a1;
-  --ai: #7e22ce;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #161513; --surface: #1f1e1b; --surface-2: #2a2824; --text: #eeeae3; --muted: #a39d93;
-    --line: #36332e; --accent: #7cb8e0; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
-    --g-students: #fb923c; --g-teaching: #5ab4d6; --g-support: #a78bfa; --g-leadership: #fb7185;
-    --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1; --g-content: #fbbf24; --textbooks: #38bdf8; --ai: #c084fc;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #161513; --surface: #1f1e1b; --surface-2: #2a2824; --text: #eeeae3; --muted: #a39d93;
-  --line: #36332e; --accent: #7cb8e0; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
-  --g-students: #fb923c; --g-teaching: #5ab4d6; --g-support: #a78bfa; --g-leadership: #fb7185;
-  --g-funders: #facc15; --g-research: #4ade80; --tvet: #2dd4bf; --commercial: #cbd5e1; --g-content: #fbbf24; --textbooks: #38bdf8; --ai: #c084fc;
-}
-* { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  margin: 0; background: var(--bg); color: var(--text);
-  font: 15px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
-}
-.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
-header.top { padding: 40px 0 20px; }
-.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-h1 { font-family: Fraunces, Georgia, serif; font-weight: 650; font-size: clamp(30px, 5vw, 46px); line-height: 1.1; margin: 6px 0 12px; }
-.cases { margin: 0 0 14px; font-size: 14px; font-weight: 500; }
-.cases a { color: var(--accent); }
-.lede { max-width: 760px; color: var(--muted); font-size: 16px; margin: 0; }
-.note {
-  margin-top: 16px; max-width: 760px; font-size: 13px; color: var(--muted);
-  border-left: 3px solid var(--accent); padding: 6px 12px; background: var(--surface);
-}
-.controls {
-  position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(6px); padding: 12px 0; border-bottom: 1px solid var(--line); margin-bottom: 20px;
-}
-.controls .wrap { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.chip {
-  border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px;
-  padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
-}
-.chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--muted)); }
-.chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
-.chip .n { opacity: .6; font-size: 12px; }
-.search {
-  margin-left: auto; min-width: 0; flex: 1 1 180px; max-width: 260px; border: 1px solid var(--line); background: var(--surface);
-  color: var(--text); border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 13px;
-}
-.theme-btn { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; width: 34px; height: 34px; cursor: pointer; font-size: 15px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; padding-bottom: 40px; }
-.card {
-  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
-  box-shadow: var(--shadow); display: flex; flex-direction: column; cursor: pointer; text-align: left;
-  padding: 0; font: inherit; color: inherit; transition: transform .15s ease, box-shadow .15s ease;
-}
-.card:hover, .card:focus-visible { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(30,25,15,.12); outline: none; }
-.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.card .ph { position: relative; aspect-ratio: 4/3; background: var(--surface-2); overflow: hidden; }
-.card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-.num {
-  position: absolute; top: 10px; left: 10px; background: var(--surface); color: var(--text); border-radius: 999px;
-  font-size: 12px; font-weight: 600; padding: 2px 9px; box-shadow: var(--shadow);
-}
-.newtag {
-  position: absolute; top: 10px; right: 10px; background: var(--text); color: var(--bg);
-  border-radius: 999px; font-size: 11px; font-weight: 600; padding: 2px 8px; letter-spacing: .03em;
-}
-.card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; border-top: 4px solid var(--c); }
-.name { font-family: Fraunces, Georgia, serif; font-size: 20px; font-weight: 650; line-height: 1.2; margin: 0; }
-.tagline { font-style: italic; color: var(--muted); font-size: 14px; margin: 0; }
-.meta { font-size: 12.5px; color: var(--muted); }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
-.tag { font-size: 11.5px; font-weight: 600; color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); border-radius: 999px; padding: 1px 8px; }
-.card blockquote { margin: 6px 0 0; font-size: 13.5px; color: var(--text); opacity: .9; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-.empty { color: var(--muted); padding: 40px 0; text-align: center; display: none; }
-
-/* Profile dialog */
-dialog {
-  border: none; padding: 0; width: min(1000px, calc(100vw - 24px)); max-height: calc(100vh - 24px);
-  border-radius: 16px; background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgba(0,0,0,.35);
-}
-dialog::backdrop { background: rgba(15,12,8,.55); }
-.pf { display: grid; grid-template-columns: 340px 1fr; }
-.pf-side { background: var(--surface-2); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-.pf-side img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; display: block; }
-.pf-quote {
-  margin: 0; background: color-mix(in srgb, var(--c) 14%, var(--surface)); border-left: 4px solid var(--c);
-  padding: 14px 16px; border-radius: 8px; font-family: Fraunces, Georgia, serif; font-style: italic; font-size: 16px; line-height: 1.45;
-}
-.pf-main { padding: 22px 26px 26px; overflow: auto; }
-.pf-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
-.pf-head h2 { font-family: Fraunces, Georgia, serif; font-size: 28px; margin: 0; line-height: 1.15; }
-.pf-head .tagline { font-size: 16px; }
-.close { margin-left: auto; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; width: 36px; height: 36px; font-size: 18px; cursor: pointer; flex: none; }
-.sections { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 28px; }
-.sec h3 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin: 14px 0 6px; color: var(--c); }
-.sec ul { margin: 0; padding-left: 18px; }
-.sec li { margin: 3px 0; font-size: 14px; }
-.grounded { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); margin-top: 18px; padding-top: 10px; }
-details.prompt { font-size: 12.5px; color: var(--muted); }
-details.prompt summary { cursor: pointer; font-weight: 600; color: var(--text); }
-details.prompt p { margin: 8px 0 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-family: ui-monospace, Consolas, monospace; font-size: 12px; line-height: 1.5; }
-.credit { font-size: 11.5px; color: var(--muted); }
-.credit a { color: inherit; }
-.nav { display: flex; gap: 8px; margin-top: 18px; }
-.nav button { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 13px; cursor: pointer; }
-
-footer { border-top: 1px solid var(--line); padding: 28px 0 60px; color: var(--muted); font-size: 13px; }
-footer h2 { font-family: Fraunces, Georgia, serif; color: var(--text); font-size: 20px; margin: 0 0 8px; }
-footer ol { padding-left: 20px; columns: 2 380px; column-gap: 32px; }
-footer li { margin: 4px 0; break-inside: avoid; }
-footer a { color: var(--accent); }
-
-@media (max-width: 760px) {
-  .pf { grid-template-columns: 1fr; }
-  .pf-side img { aspect-ratio: 4/3; }
-  .sections { grid-template-columns: 1fr; }
-  .pf-main { padding: 18px 16px 22px; }
-  .search { max-width: none; margin-left: 0; flex-basis: 100%; }
-}
-@media print {
-  .controls, .theme-btn { display: none; }
-  .card { break-inside: avoid; box-shadow: none; }
-}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
+<nav class="topnav"></nav>
+
 <header class="top">
   <div class="wrap">
-    <div class="eyebrow">IDEMS · STACK in Africa and beyond · Draft for internal review</div>
-    <h1>Who STACK and open textbooks are for</h1>
-    <p class="cases">Case studies: <a href="case-1-africa-to-contracts.html">1 · From STACK in Africa to commercial contracts</a> · <a href="case-2-textbooks.html">2 · STACK and textbooks</a> · <a href="case-3-ai-authoring.html">3 · AI agents for STACK authoring</a></p>
-    <p class="lede"><span id="count">61</span> fictional personas in four sets. <strong>STACK in Africa</strong> draws on IDEMS’ STACK case studies (2019–2026) and the Maseno student-engagement study (Juma et al., 2022). <strong>Commercial partners</strong> covers the contracts that grew out of the African work, with a highly selective US university and a public university in Italy. <strong>Open textbooks</strong> covers interactive PreTeXt books with STACK questions: Kenya’s Grade 7–10 books, Ethiopia’s Basic Maths, emerging work in Somalia, South Sudan and Ghana, and interest from lecturers in the US and UK. <strong>AI authoring</strong> covers the people who use, and are affected by, IDEMS’ AI tools for writing STACK questions, from a single chatbot to a multi-agent system. Select a card to read the full profile.</p>
-    <p class="note"><strong>Preview only.</strong> Names, details and quotes are fictional composites. The photos are Creative Commons placeholders from Wikimedia Commons showing real, unrelated people. Before publication, replace them with generated or consented images; each profile includes an image prompt for this.</p>
+    <div class="eyebrow">IDEMS · Draft for internal review</div>
+    <h1>IDEMS case studies</h1>
   </div>
 </header>
 
-<nav class="controls" aria-label="Filter personas">
-  <div class="wrap" id="filters"></div>
-</nav>
-
 <main class="wrap">
-  <div class="grid" id="grid"></div>
-  <p class="empty" id="empty">No personas match that filter.</p>
+  <div class="cat-list" id="category-list"></div>
+
+  <h2 class="section">Personas</h2>
+  <p class="note"><strong>Preview only.</strong> Names, details and quotes are fictional composites. The photos are Creative Commons placeholders from Wikimedia Commons showing real, unrelated people, and must be replaced before publication.</p>
+  <div id="persona-browser"></div>
 </main>
 
-<footer>
+<footer class="site">
   <div class="wrap">
-    <h2>Sources</h2>
-    <p>Grounding: STACK case studies at stack-assessment.org (Maseno 2019; Maseno workshop 2022; INNODEMS internship 2023; Bahir Dar workshop 2023; African STACK Conferences 2023, 2024, 2025; the INNODEMS model 2025; PreTeXt integration 2025; International Meeting Nairobi 2026; a US university case study 2025), Grade 10 digital textbook pilot interviews and a school visit report (Kenya, 2026), project information from IDEMS staff, a draft case study on AI agents for STACK authoring (2026) and IDEMS podcast episodes on AI, STACK and textbooks, and Juma, Ayere, Oyengo &amp; Osang (2022), “Evaluating Engagement and Learning Based on a Student Categorization using STACK…”, iJET 17(23). Format adapted from IDEMS’ PLH Digital parenting personas (2020).</p>
-    <h2 style="margin-top:22px">Photo credits</h2>
-    <p>All photos via Wikimedia Commons, mostly from the Wiki Loves Africa “African people at work” collection; licences as listed. Images were cropped for display.</p>
+    <h2>Photo credits</h2>
+    <p>All placeholder photos via Wikimedia Commons; licences as listed. Images were cropped for display.</p>
     <ol id="credits"></ol>
   </div>
 </footer>
 
-<dialog id="dlg" aria-labelledby="dlg-title"></dialog>
-
-<script src="personas-data.js"></script>
-<script>
-
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-const grid = document.getElementById("grid");
-const dlg = document.getElementById("dlg");
-let filter = "all";
-let query = "";
-let visible = [];
-
-function tagsHTML(p) {
-  let t = `<span class="tag" style="--c:${GROUPS[p.group].color}">${GROUPS[p.group].label}</span>`;
-  if (p.tvet) t += `<span class="tag" style="--c:var(--tvet)">TVET</span>`;
-  if (p.context === "commercial") t += `<span class="tag" style="--c:var(--commercial)">Commercial partner</span>`;
-  if (p.context === "textbooks") t += `<span class="tag" style="--c:var(--textbooks)">Open textbooks</span>`;
-  if (p.context === "ai") t += `<span class="tag" style="--c:var(--ai)">AI authoring</span>`;
-  return t;
-}
-
-function render() {
-  const q = query.trim().toLowerCase();
-  visible = PERSONAS.filter(p => {
-    const inFilter = filter === "all" || (filter === "tvet" ? p.tvet : filter === "new" ? p.isNew : filter in CONTEXTS ? p.context === filter : p.group === filter);
-    const hay = [p.name, p.tagline, p.where, p.quote, ...p.background, ...p.looking, ...p.hopes, ...p.worries].join(" ").toLowerCase();
-    return inFilter && (!q || hay.includes(q));
-  });
-  grid.innerHTML = visible.map(p => {
-    const n = PERSONAS.indexOf(p) + 1;
-    return `<button class="card" style="--c:${GROUPS[p.group].color}" data-id="${p.id}" aria-label="Open profile: ${esc(p.name)}, ${esc(p.tagline)}">
-      <div class="ph"><img src="images/${p.id}.jpg" alt="" loading="lazy" style="object-position:${p.pos}"><span class="num">${n}</span>${p.isNew ? '<span class="newtag">NEW</span>' : ""}</div>
-      <div class="body">
-        <h2 class="name">${esc(p.name)}</h2>
-        <p class="tagline">${esc(p.tagline)}</p>
-        <div class="meta">${p.age} · ${esc(p.where)}</div>
-        <div class="tags">${tagsHTML(p)}</div>
-        <blockquote>“${esc(p.quote)}”</blockquote>
-      </div>
-    </button>`;
-  }).join("");
-  document.getElementById("empty").style.display = visible.length ? "none" : "block";
-}
-
-function list(items) { return `<ul>${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>`; }
-
-function open(id) {
-  const p = PERSONAS.find(x => x.id === id);
-  const c = CREDITS[p.id];
-  const i = visible.findIndex(x => x.id === id);
-  dlg.style.setProperty("--c", GROUPS[p.group].color);
-  dlg.innerHTML = `<div class="pf">
-    <aside class="pf-side">
-      <img src="images/${p.id}.jpg" alt="Placeholder photo for ${esc(p.name)}" style="object-position:${p.pos}">
-      <blockquote class="pf-quote">“${esc(p.quote)}”</blockquote>
-      <details class="prompt"><summary>Image-generation prompt</summary><p>${esc(p.prompt)}</p></details>
-      <div class="credit">Placeholder photo: <a href="${c[2]}" target="_blank" rel="noopener">${esc(c[0])}</a> by ${esc(c[1])}, ${lic(c)}, via Wikimedia Commons (cropped).</div>
-    </aside>
-    <section class="pf-main">
-      <div class="pf-head">
-        <div>
-          <h2 id="dlg-title">${esc(p.name)}</h2>
-          <p class="tagline">${esc(p.tagline)}</p>
-          <div class="tags" style="margin-top:8px">${tagsHTML(p)}${p.isNew ? '<span class="tag" style="--c:var(--text)">New persona</span>' : ""}</div>
-        </div>
-        <button class="close" aria-label="Close" data-close>×</button>
-      </div>
-      <div class="sections">
-        <div class="sec"><h3>Background</h3>${list(p.background)}</div>
-        <div class="sec"><h3>What ${FEMALE.has(p.id) ? "she’s" : "he’s"} looking for</h3>${list(p.looking)}</div>
-        <div class="sec"><h3>Hopes &amp; dreams</h3>${list(p.hopes)}</div>
-        <div class="sec"><h3>Worries &amp; fears</h3>${list(p.worries)}</div>
-        <div class="sec" style="grid-column:1/-1"><h3>Their data and expertise</h3>${list(p.data)}</div>
-        <div class="sec" style="grid-column:1/-1"><h3>A day in the life of ${esc(p.name.replace(/^(Dr|Prof|Mr|Mrs|Ms)\.\s*/, "").split(" ")[0])}</h3>${list(p.day)}</div>
-      </div>
-      <p class="grounded"><strong>Grounded in:</strong> ${esc(p.grounded)}</p>
-      <div class="nav">
-        <button data-step="-1" ${i <= 0 ? "disabled" : ""}>← Previous</button>
-        <button data-step="1" ${i >= visible.length - 1 ? "disabled" : ""}>Next →</button>
-      </div>
-    </section>
-  </div>`;
-  dlg.dataset.id = id;
-  if (!dlg.open) dlg.showModal();
-  dlg.querySelector(".pf-main").scrollTop = 0;
-}
-
-grid.addEventListener("click", e => {
-  const card = e.target.closest(".card");
-  if (card) open(card.dataset.id);
-});
-dlg.addEventListener("click", e => {
-  if (e.target === dlg || e.target.closest("[data-close]")) return dlg.close();
-  const step = e.target.closest("[data-step]");
-  if (step && !step.disabled) {
-    const i = visible.findIndex(x => x.id === dlg.dataset.id) + Number(step.dataset.step);
-    if (visible[i]) open(visible[i].id);
-  }
-});
-document.addEventListener("keydown", e => {
-  if (!dlg.open || e.target.closest("summary")) return;
-  const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-  if (!d) return;
-  const i = visible.findIndex(x => x.id === dlg.dataset.id) + d;
-  if (visible[i]) open(visible[i].id);
-});
-
-// Filters
-const counts = { all: PERSONAS.length, new: PERSONAS.filter(p => p.isNew).length, tvet: PERSONAS.filter(p => p.tvet).length };
-for (const g in GROUPS) counts[g] = PERSONAS.filter(p => p.group === g).length;
-for (const k in CONTEXTS) counts[k] = PERSONAS.filter(p => p.context === k).length;
-document.getElementById("count").textContent = PERSONAS.length;
-const filterDefs = [["all", "All", "var(--muted)"], ["africa", "STACK in Africa", "var(--g-students)"], ["commercial", "Commercial partners", "var(--commercial)"], ["textbooks", "Open textbooks", "var(--textbooks)"], ["ai", "AI authoring", "var(--ai)"], ...Object.entries(GROUPS).map(([k, v]) => [k, v.label, v.color]), ["tvet", "TVET", "var(--tvet)"], ["new", "New personas", "var(--text)"]];
-const fwrap = document.getElementById("filters");
-fwrap.innerHTML = filterDefs.map(([k, l, c]) =>
-  `<button class="chip" data-f="${k}" aria-pressed="${k === "all"}" style="--c:${c}"><span class="dot"></span>${l} <span class="n">${counts[k]}</span></button>`
-).join("") + `<input class="search" type="search" placeholder="Search personas…" aria-label="Search personas"><button class="theme-btn" aria-label="Toggle dark mode" title="Toggle theme">◐</button>`;
-fwrap.addEventListener("click", e => {
-  const b = e.target.closest("[data-f]");
-  if (b) {
-    filter = b.dataset.f;
-    fwrap.querySelectorAll("[data-f]").forEach(x => x.setAttribute("aria-pressed", x === b));
-    render();
-  }
-  if (e.target.closest(".theme-btn")) {
-    const root = document.documentElement;
-    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-    root.dataset.theme = dark ? "light" : "dark";
-    try { localStorage.setItem("persona-theme", root.dataset.theme); } catch (_) {}
-  }
-});
-fwrap.querySelector(".search").addEventListener("input", e => { query = e.target.value; render(); });
-try { const t = localStorage.getItem("persona-theme"); if (t) document.documentElement.dataset.theme = t; } catch (_) {}
-
-document.getElementById("credits").innerHTML = PERSONAS.map((p, i) => {
-  const c = CREDITS[p.id];
-  return `<li>${esc(p.name)}: <a href="${c[2]}" target="_blank" rel="noopener">${esc(c[0])}</a> by ${esc(c[1])}, ${lic(c)}</li>`;
-}).join("");
-
-render();
-if (location.hash && PERSONAS.some(p => p.id === location.hash.slice(1))) open(location.hash.slice(1));
-</script>
+<script src="data/catalogue.js"></script>
+<script src="data/education.js"></script>
+<script src="assets/site.js"></script>
 </body>
 </html>
