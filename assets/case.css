@@ -43,3 +43,25 @@ footer { border-top: 1px solid var(--line); margin-top: 48px; padding: 24px 0 60
 footer ul { padding-left: 18px; }
 .pcard { border-left: 4px solid var(--c, var(--line)); cursor: pointer; }
 @media print { .pcard { box-shadow: none; } }
+
+/* Closing socio-technical section: the Social, the Technical and the Innovation */
+:root { --sti-social: #b45309; --sti-technical: #0f766e; --sti-innovation: #6d28d9; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --sti-social: #fbbf24; --sti-technical: #2dd4bf; --sti-innovation: #a78bfa; } }
+:root[data-theme="dark"] { --sti-social: #fbbf24; --sti-technical: #2dd4bf; --sti-innovation: #a78bfa; }
+.sti-intro { color: var(--muted); }
+.sti { display: grid; gap: 14px; margin: 20px 0 32px; }
+.sti section { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 12px; padding: 16px 20px 10px; }
+.sti section.social { --c: var(--sti-social); }
+.sti section.technical { --c: var(--sti-technical); }
+.sti section.innovation { --c: var(--sti-innovation); }
+.sti h3 { margin: 0 0 6px; color: var(--c); font-family: Fraunces, Georgia, serif; font-size: 22px; }
+.sti ul { padding-left: 20px; margin: 8px 0 10px; }
+.sti li { margin: 6px 0; }
+
+/* In-text citations and APA reference list */
+a.cref { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; }
+a.cref:hover { color: var(--accent); }
+.refs-title { font-size: 22px; margin: 0 0 10px; }
+ul.refs { list-style: none; padding: 0; margin: 0 0 16px; }
+ul.refs li { padding-left: 2em; text-indent: -2em; margin: 0 0 8px; overflow-wrap: anywhere; }
+ul.refs li:target { background: var(--accent-soft); }
