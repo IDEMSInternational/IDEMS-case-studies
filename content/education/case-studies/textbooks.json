@@ -1,0 +1,588 @@
+{
+  "id": "textbooks",
+  "short": "STACK and textbooks",
+  "title": "STACK and textbooks: assessment that travels with the book",
+  "summary": "STACK questions inside open, interactive PreTeXt textbooks, from Ethiopian universities and Kenyan secondary schools to tablets in Ghana.",
+  "standfirst": "A quiz inside a learning management system only reaches students whose institution has set them up to log in. In 2025 an IDEMS developer made it possible to put STACK questions inside open, interactive textbooks that anyone can open on a phone. Within a year those books were in use in Ethiopian universities and Kenyan secondary schools, and drawing interest from Ghana, Somalia, South Sudan, the US and the UK. This case study follows the people writing, teaching from and learning with them.",
+  "note": "Personas are fictional composites. Select any persona to open the full profile. Kenyan pilot schools and the teachers and learners interviewed are not named. The US partner university is not named.",
+  "stats": [
+    {
+      "value": "4,000+",
+      "label": "Ethiopian students on the Basic Maths companion course in its first term, of up to 100,000 who take the course each year"
+    },
+    {
+      "value": "4",
+      "label": "Kenyan secondary mathematics books (Grades 7–10) written by an intern team"
+    },
+    {
+      "value": "22,000",
+      "label": "Kenyan maths teachers the open Grade 10 materials are designed to support"
+    },
+    {
+      "value": "33+",
+      "label": "Open statistics and data science books online in IDEMS' library, with about 40 converted"
+    },
+    {
+      "value": "~40",
+      "label": "Open STACK questions matched to a single statistics textbook, half of them closely"
+    }
+  ],
+  "sections": [
+    {
+      "id": "where-the-idea-came-from",
+      "heading": "Where the idea came from",
+      "blocks": [
+        {
+          "id": "deea1e",
+          "type": "paragraph",
+          "text": "IDEMS' interest in assessment began with a textbook. Years ago, when David Stern lectured in Kenya, one of his master's students was a tutor at a technical college who could not type his own notes and paid a cyber café to do it. He used CAST, a set of interactive statistics textbooks built over ten years by Doug Stirling, with his class. On a centralised exam his students scored 20% higher than others. A colleague who used the same materials got the same gain, so it was not the teacher. Students who read the book but skipped its exercises did not improve at all. It was the exercises, not the book, that made the difference. That finding is why IDEMS later threw itself into STACK ({{stern2026o}})."
+        },
+        {
+          "id": "264df0",
+          "type": "paragraph",
+          "text": "The second thread is a conversation. David once taught at the AIMS institute in South Africa at the same time as Rob Beezer, author of an open linear algebra textbook. David said he loved the book but could not use it with students in Kenya, because it was too heavy for their internet connections. A year later Rob had rewritten it to work for them, and then went on to create PreTeXt, an open-source system in which an author writes once and the same source becomes an interactive web book, a PDF, an EPUB or braille. From 2019 David asked the PreTeXt team, again and again, whether it could work with STACK ({{borio2025a}}; {{stern2025o}})."
+        },
+        {
+          "id": "961c0b",
+          "type": "paragraph",
+          "text": "The idea of a STACK textbook for African schools, with an offline version for schools with poor Wi-Fi, was already in IDEMS' plans after the first Maseno pilot in 2019 ({{borio2019}}). At the 2023 Bahir Dar workshop, Ethiopian lecturers writing the national secondary textbooks for the Ministry asked whether their books could include STACK questions, and IDEMS built a two-topic prototype with one of them ({{stern2023}}). What was missing was the technology to do it properly."
+        }
+      ]
+    },
+    {
+      "id": "why-textbooks",
+      "heading": "Why textbooks?",
+      "blocks": [
+        {
+          "id": "ac791e",
+          "type": "paragraph",
+          "text": "By 2025 STACK was running in more than 78 university courses across East Africa ([[case:africa-to-contracts|case study 1]]). Every one depended on Moodle: a server, someone to run it, student accounts and a connection. That was often the hardest part. The University of Namibia serves 29,000 students across 12 campuses ({{oyengo2025}}). Universities in Somalia and South Sudan are rebuilding with very little. And as IDEMS found in Ethiopia, even a university with Moodle and STACK installed may never enrol its biggest classes ({{borio2025b}}). IDEMS had been trying to solve access at the level of the institution. A book works at the level of the student: it needs no login, it can be read on a phone, a tablet, a classroom smart TV or as a PDF, and the practice and feedback go wherever it goes ({{borio2025b}}; {{oyengo2025}})."
+        },
+        {
+          "id": "b87a47",
+          "type": "paragraph",
+          "text": "That matters most for people like [[p:hodan-abdi]], and [[p:deng-majok]], who advises his Ministry and has seen many projects promise and disappear."
+        },
+        {
+          "id": "f15e53",
+          "type": "quote",
+          "persona": "hodan-abdi"
+        }
+      ]
+    },
+    {
+      "id": "making-stack-work-inside-a-book",
+      "heading": "Making STACK work inside a book",
+      "blocks": [
+        {
+          "id": "19db9d",
+          "type": "paragraph",
+          "text": "The breakthrough came from Kenya. In 2024 a workshop of the American Institute of Mathematics in Kenya brought together researchers from the US with mathematicians and educators from across Africa, among them the developers of PreTeXt and of WeBWorK, an assessment system often used with it. There the possibility of joining PreTeXt and STACK was first discussed ({{osang2025}}; {{stern2025o}}). Mike Obiero, the Maseno lecturer at the centre of [[case:africa-to-contracts|case study 1]], then started writing Kenyan textbooks in PreTeXt and collecting STACK questions separately, ready for the day the two would work together ({{stern2025o}})."
+        },
+        {
+          "id": "23cbd6",
+          "type": "paragraph",
+          "text": "IDEMS' Georg Osang made that day happen. Using the STACK API, which lets STACK questions run outside Moodle, he designed and built a new `<stack>` element for PreTeXt. A question exported from Moodle can now sit inside a book. In the web version it runs live, so students can answer, get feedback and try new variants. In the PDF a fixed version is printed ({{osang2025}}). PreTeXt's creator, Rob Beezer, reviewed and reshaped the code until it matched PreTeXt's principles, and IDEMS' Ian Stride set up IDEMS' own copy of the STACK API to serve the books ({{osang2025}}; {{borio2025a}})."
+        },
+        {
+          "id": "1c8782",
+          "type": "paragraph",
+          "text": "Mike's deadlines set the pace. As he put it, developers like things to be perfect before they are used, and his teachers did not have time to wait: give us something that works, and the feedback from using it will help you perfect it ({{stern2025o}}). David Stern, who had asked for the integration since 2019, credits Mike's push for getting it done. Other groups in the US are now building PreTeXt books with STACK questions, and STACK's own developers are putting effort into making the two work smoothly together ({{stern2025o}})."
+        },
+        {
+          "id": "82cd8a",
+          "type": "paragraph",
+          "text": "It was not straightforward. \"A question looking fine in Moodle is not a guarantee that it also looks fine in PreTeXt,\" as Georg wrote ({{osang2025}}):"
+        },
+        {
+          "id": "07eeb4",
+          "type": "list",
+          "items": [
+            "Questions that fit in Moodle overflowed the book's layout.",
+            "Interactive graphs with very large coordinate ranges made pages lag.",
+            "STACK and PreTeXt used different versions of the maths display library.",
+            "Some interactive question types cannot become a fixed version for print."
+          ]
+        },
+        {
+          "id": "1571d4",
+          "type": "paragraph",
+          "text": "The book also does not yet record answers for grading. It is for practice and self-assessment. IDEMS' ideas for the future include generating a Moodle course directly from the book's source, or letting students log in from the book so that their marks reach a gradebook ({{osang2025}})."
+        },
+        {
+          "id": "4f6aeb",
+          "type": "paragraph",
+          "text": "[[p:allan-kiprotich]], represents the people who did much of the work in the books: Kenyan graduates who learned PreTeXt, STACK and the quirks of both at once."
+        },
+        {
+          "id": "854905",
+          "type": "quote",
+          "persona": "allan-kiprotich"
+        }
+      ]
+    },
+    {
+      "id": "ethiopia-a-book-for-every-first-year-stu",
+      "heading": "Ethiopia: a book for every first-year student",
+      "blocks": [
+        {
+          "id": "2f6b23",
+          "type": "paragraph",
+          "text": "Ethiopia's harmonised curriculum requires every first-year university student to take Basic Mathematics. There are two versions, for Natural Sciences and Social Sciences, which share about half their content. Up to 100,000 students take it each year, and the grade helps decide which department they enter next ({{borio2025b}}; {{juma2025}}). After the 2023 workshop, Bahir Dar had compiled STACK practice questions for the course, but because students had to be enrolled in Moodle first, few ever used them ({{osang2025}})."
+        },
+        {
+          "id": "cb4ddd",
+          "type": "paragraph",
+          "text": "The day before the 2025 African STACK Conference at Bahir Dar, IDEMS received the Ministry's Word files for the Natural Sciences book. Converting them was messy: old and new Word equations, images and no consistent structure. Georg wrote scripts to split the content into sections, and the Kenyan intern team spent the conference week cleaning it, alongside Ethiopian lecturers from around ten universities. Another script placed the 2023 STACK questions into the right sections. By the end of the week there was a working interactive book ({{osang2025}}; {{oyengo2025}}). The lecturers reorganised the course to match their teaching calendar and formed a shared teaching team to keep improving it. Lecturers from Addis Ababa University, the country's oldest university, took on much of the drive, which made it a shared effort rather than Bahir Dar's alone. Three graduate students support development and piloting as part of their research ({{oyengo2025}}; {{borio2025b}})."
+        },
+        {
+          "id": "513b72",
+          "type": "paragraph",
+          "text": "[[p:tesfaye-alemu|Tesfaye Alemu]], the young lecturer from [[case:africa-to-contracts|case study 1]], was one of those turning the PDF into an interactive book. [[p:hayat-seid]], finally sees STACK reach the course that needed it most."
+        },
+        {
+          "id": "1d250c",
+          "type": "paragraph",
+          "text": "One small design decision has proved important. Every question in the book has its own feedback link, which opens a form already filled in with the question's identifier. A lecturer who spots a mistake can report it in seconds. Because the questions are kept in sync between the Moodle server and the book's repository, the team can fix the question once and it updates in both ({{osang2025}}). [[p:yonas-tadesse]], is one of those reviewers."
+        },
+        {
+          "id": "c4461e",
+          "type": "quote",
+          "persona": "yonas-tadesse"
+        },
+        {
+          "id": "6ee609",
+          "type": "paragraph",
+          "text": "The Natural Sciences book went into use in September 2025, and the Social Sciences book followed in January 2026 ({{osang2025}}). Alongside the book, a companion course on an Ethiopia-wide Moodle server lets lecturers set quizzes for continuous assessment. In its first term more than 4,000 students from two universities enrolled, and three more universities were in discussion. Abdu Mohammed Seid of Bahir Dar began running workshops for other universities on using the materials ({{borio2025c}}). Against up to 100,000 students a year, it is a beginning. [[p:biruk-hailu]], an aspiring economist reading in his third language on a shared phone, is who it is for."
+        },
+        {
+          "id": "4b8cdb",
+          "type": "quote",
+          "persona": "biruk-hailu"
+        },
+        {
+          "id": "2be10c",
+          "type": "personas",
+          "ids": [
+            "hayat-seid",
+            "yonas-tadesse",
+            "biruk-hailu",
+            "allan-kiprotich"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kenya-a-new-curriculum-a-new-kind-of-boo",
+      "heading": "Kenya: a new curriculum, a new kind of book",
+      "blocks": [
+        {
+          "id": "3f8da5",
+          "type": "paragraph",
+          "text": "Kenya began moving to a competency-based curriculum in 2017. Mike describes its ideas as excellent and its implementation as the problem. The new junior secondary schools, Grades 7 to 9, were placed inside primary schools at two months' notice. At first the government could hire only about two new teachers per school, so teachers trained in one subject found themselves teaching all of them, sometimes primary teachers teaching secondary mathematics. Classes were large and textbooks scarce. Private and better-resourced urban schools coped, while rural public schools struggled most ({{stern2025o}}). Many schools had received tablets or computers through an earlier government programme ({{stern2025o}})."
+        },
+        {
+          "id": "8a26ef",
+          "type": "paragraph",
+          "text": "Mike secured a grant from the US Embassy and redirected it to textbooks. From October 2024, ten recent graduates working with INNODEMS began writing interactive books for Grades 7 to 10, adapting existing books for Grades 7 to 9 and writing Grade 10 from scratch ({{osang2025}}; {{stern2025m}}). The grant was for 25,000, of which about 15,000 arrived before it was stopped halfway, when the new US administration cancelled projects using words like \"inclusive\" ({{stern2025o}}). The team kept going without pay while SAMI, a UK charity IDEMS works with closely, ran a crowdfunding campaign. It raised £7,110, enough to keep people working but not to run the planned pilots with teachers ({{sami}}; {{stern2026o}}). By late 2025 four books were written ({{borio2025c}})."
+        },
+        {
+          "id": "45b8a4",
+          "type": "paragraph",
+          "text": "INNODEMS' director, Zachary (Zach) Mbasu, keeps a die in his pocket when he trains teachers. Throughout school and university he solved probability problems about dice without ever having seen one. When he finally bought one in Nairobi, it looked nothing like he had imagined. Open books can be adapted, so the examples can come from a farming community or a pastoralist one rather than a city that rural learners have never seen. That is the promise IDEMS sees in open books for the new curriculum ({{stern2025m}})."
+        },
+        {
+          "id": "0eba62",
+          "type": "subheading",
+          "text": "The Grade 10 sprint"
+        },
+        {
+          "id": "4ef5f9",
+          "type": "paragraph",
+          "text": "In early 2026 the need for Grade 10 materials became urgent across the country. The Ministry of Education and CEMASTEA, the national body that trains science and maths teachers for the new curriculum, took a strong interest in the open books. Their only criticism was that the whole Grade 10 curriculum had to be covered, and the team set about covering it ({{borio2026d}}). [[p:moses-mutua]], represents the people in those bodies who could put the materials in front of every teacher."
+        },
+        {
+          "id": "71f4b1",
+          "type": "quote",
+          "persona": "moses-mutua"
+        },
+        {
+          "id": "d0c4fe",
+          "type": "paragraph",
+          "text": "IDEMS gave the push from behind, unfunded. Georg Osang worked on the ground in Kenya with volunteers ({{borio2026d}}). The book itself has *variants*: a student version and a teacher version, and versions for classrooms with and without devices. Its STACK use is deliberately minimal for now, focused on mastery practice with feedback. Around the book, the team built Moodle courses: a short course training teachers in the new curriculum and in how to contribute to the books, and one course for each Grade 10 topic. Each topic course is organised by learning objective, with at least one example lesson plan for a class with computers and one without, written by Zach and two INNODEMS colleagues. Each objective has a forum. Teachers earn a certificate from INNODEMS, the Kenya Mathematical Society and IDEMS by sharing their own experience and responding to others. The aim is not to hand teachers lesson plans. It is to get them teaching each other ({{borio2026d}}). Santiago Borio, a maths educator rather than a web developer, built the project website in about ten hours with AI help, fed from the same spreadsheets that can feed the books and courses ({{borio2026d}})."
+        },
+        {
+          "id": "595cae",
+          "type": "paragraph",
+          "text": "The longer route to teachers runs through a new MSc in Mathematical Innovation, which IDEMS has co-developed with the Open University of Kenya under an MoU and which launches in September 2026 ({{stern2026o}}). Mike and David have discussed it for more than a decade. It is modular, online and designed for working teachers, who can take one module at a time towards a diploma or the MSc and do their project with their own class. The university is aiming for up to a thousand students a year. Its modules could also become professional development for the national teacher bodies ({{stern2026o}})."
+        },
+        {
+          "id": "809bf3",
+          "type": "subheading",
+          "text": "Three teachers, three ways of using the book"
+        },
+        {
+          "id": "51251c",
+          "type": "paragraph",
+          "text": "In 2026 the INNODEMS team began visiting schools to see the books in use ({{stern2026o}}). Teacher interviews found no single way of using them. [[p:george-wanyama]], has ten years' experience and an ICT background. He taught himself the book in a week and now mixes it with the coursebook, turning to the e-book where the coursebook is weakest and moving the sliders while the class reacts. [[p:wilson-barasa]], adopted it because the new coursebooks had not arrived, and follows it page by page because he has come to trust it. A newly qualified colleague learned it quickly with the help of an AI summary, but must follow the Ministry's lesson plans and feels the book's own plans take away his judgement ({{pilot}})."
+        },
+        {
+          "id": "150d88",
+          "type": "quote",
+          "persona": "george-wanyama"
+        },
+        {
+          "id": "e68282",
+          "type": "paragraph",
+          "text": "Infrastructure decided how far they could go, more than attitude did. One smartboard or projector was shared across every class and sometimes every subject. The book opened only in the computer lab, so moving a class there ate into a 40-minute lesson. Learners at the back could not see a screen only the teacher controlled. There were power cuts and no internet. The teachers also gave precise feedback on content: gridded plots, labelled diagrams, a continuous slider for special angles, shorter introductions, fuller worked examples for the laws of logarithms and short videos. They found the checkpoint questions too hard, or never used them. One teacher had been sending feedback to the team by WhatsApp until someone showed him the feedback link inside the book. After that, the link became his preferred route ({{pilot}})."
+        },
+        {
+          "id": "5df89f",
+          "type": "subheading",
+          "text": "What learners said"
+        },
+        {
+          "id": "1a896b",
+          "type": "paragraph",
+          "text": "Grade 10 learners described the e-book as clearer, more visual and more detailed than the \"wordy\" coursebook. They liked worked solutions they could check their own work against, and seeing more than one method. They also described their reality. The book arrived halfway through the term with no introduction. Their class shared three printed coursebooks. They used the e-book three times a week in the lab and had no access at home. They wanted more steps in the examples, especially for reflection, a clearer difference between congruence and similarity, and a short video on data handling. One pointed out that some exam questions appear in neither book ({{pilot}}). [[p:kevin-omondi]], brings these voices together."
+        },
+        {
+          "id": "19be9c",
+          "type": "quote",
+          "persona": "kevin-omondi"
+        },
+        {
+          "id": "b14aae",
+          "type": "subheading",
+          "text": "A model school"
+        },
+        {
+          "id": "53b843",
+          "type": "paragraph",
+          "text": "A demonstration in July 2026 at a well-equipped girls' secondary school showed the other end of the range. Seventy-three learners and all five maths teachers worked through rotation and congruence, and indices and logarithms, in a lab with a projector. Learners solved \"stuck questions\" at the board while the book gave marks and step-by-step guidance. One teacher noticed that a logarithms question accepted only one method, and was shown how to send alternative methods through the feedback link. The school offered itself as a benchmark for piloting the book, with its maths teachers mentoring other schools, and plans to install it on the smart TVs in its Grade 10 classrooms ({{visit}}). [[p:japheth-wekesa]], comes from this visit."
+        },
+        {
+          "id": "46b5ac",
+          "type": "quote",
+          "persona": "japheth-wekesa"
+        },
+        {
+          "id": "013087",
+          "type": "paragraph",
+          "text": "The visits taught the team something it already suspected. Teachers need to be at the centre of developing the books, and that takes regular, scheduled visits to many kinds of school ({{stern2026o}}). The online teacher courses, built because there was no money for visits, have not yet caught on: teachers overwhelmed by a new curriculum do not take on extra things alone ({{stern2026o}}). Mike's hope is that teachers will improve the books and then tell their government which tools they want ({{stern2025o}})."
+        },
+        {
+          "id": "cf33cc",
+          "type": "box",
+          "title": "What teachers and learners asked for",
+          "blocks": [
+            {
+              "id": "b7671b",
+              "type": "table",
+              "head": [
+                "Request",
+                "Who raised it"
+              ],
+              "rows": [
+                [
+                  "Accept more than one valid solution method",
+                  "Teachers at the model school; learners asking for alternative methods"
+                ],
+                [
+                  "Short explanatory videos and animations",
+                  "Two pilot teachers, learners and the visit report"
+                ],
+                [
+                  "More steps in worked examples",
+                  "Learners (reflection, quadratics)"
+                ],
+                [
+                  "Simpler, clearer checkpoints",
+                  "A pilot teacher; checkpoints unused by others"
+                ],
+                [
+                  "Labelled diagrams, gridded plots, continuous sliders",
+                  "Pilot teachers"
+                ],
+                [
+                  "Orientation when the book arrives",
+                  "Learners (it arrived mid-term); teachers who taught themselves"
+                ],
+                [
+                  "Training on the in-book feedback link",
+                  "Visit report; a teacher who used WhatsApp until shown it"
+                ],
+                [
+                  "Access beyond the lab: smart TVs, offline copies, home",
+                  "Model school; learners"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bce443",
+          "type": "personas",
+          "ids": [
+            "moses-mutua",
+            "george-wanyama",
+            "wilson-barasa",
+            "kevin-omondi",
+            "japheth-wekesa",
+            "allan-kiprotich"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "widening-horizons",
+      "heading": "Widening horizons",
+      "blocks": [
+        {
+          "id": "136517",
+          "type": "subheading",
+          "text": "Somalia and South Sudan"
+        },
+        {
+          "id": "80eee2",
+          "type": "paragraph",
+          "text": "Universities in Somalia and South Sudan joined the African STACK conferences, and in 2025 IDEMS committed to support the University of Juba and Somali National University with STACK, new degree programmes and online learning ({{oyengo2025}}). INNODEMS has begun early technical support ({{juma2025}}). Their students mostly have phones and rarely a working learning management system, and Somali National University reported how hard it is to type maths on a phone ({{rao2026}}). Through IDEMS' contacts, conversations with government officials in both countries are under way about deploying interactive textbooks at scale (S. Borio, personal communication, October 2026). Deng hears the same two questions every time: will it work on the devices we have, and who will train the teachers?"
+        },
+        {
+          "id": "1842ab",
+          "type": "subheading",
+          "text": "Ghana"
+        },
+        {
+          "id": "ca46aa",
+          "type": "paragraph",
+          "text": "Ghana has a rare advantage: senior high school students have government-issued tablets. Today those tablets mostly hold the official textbooks as fixed files (S. Borio, personal communication, October 2026). GHAIDEMS, IDEMS' Ghanaian counterpart, has piloted STACK at the University of Ghana and is localising interactive textbooks inspired by Kenya's, and Ghanaian teachers are using the Kenyan books as a template ({{oyengo2025}}; {{stern2025o}}). IDEMS is working with researchers in Ghana and the UK, with senior members of the Mathematical Association of Ghana who wrote the current official textbooks, with publishers and possibly the Ministry of Education, to make those books interactive (S. Borio, personal communication, October 2026). [[p:kwabena-asante]], needs a model the publisher can live with. [[p:akosua-boateng]], would use the book every night if it could tell her where she went wrong. [[p:ibrahim-alhassan]], wants to find out what makes a student open the book at nine at night."
+        },
+        {
+          "id": "52a92c",
+          "type": "quote",
+          "persona": "kwabena-asante"
+        },
+        {
+          "id": "bccb07",
+          "type": "subheading",
+          "text": "Beyond Africa"
+        },
+        {
+          "id": "90051e",
+          "type": "paragraph",
+          "text": "Interest is coming from well-resourced universities too. A lecturer at the US partner university wants to bring years of LaTeX lecture notes and well-liked STACK quizzes together in one open PreTeXt book. A UK lecturer is considering turning a published, printed linear algebra textbook into an interactive online one (S. Borio, personal communication, October 2026). [[p:rachel-stein]], represents them. What works for an Ethiopian first-year course works for a lecturer at a leading university."
+        },
+        {
+          "id": "f11a54",
+          "type": "personas",
+          "ids": [
+            "hodan-abdi",
+            "deng-majok",
+            "kwabena-asante",
+            "akosua-boateng",
+            "ibrahim-alhassan",
+            "rachel-stein"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "one-layer-of-questions-for-many-books",
+      "heading": "One layer of questions for many books",
+      "blocks": [
+        {
+          "id": "7b8ee1",
+          "type": "paragraph",
+          "text": "While the African books were being built, IDEMS data scientist Lily Clements was building a library of open statistics and data science textbooks converted to PreTeXt, published at [statsbooks.idems.international](https://statsbooks.idems.international/) ({{statsbooks}}). At least 33 are online and about 40 have been converted ({{borio2026c}}). IDEMS also keeps open STACK question banks with thousands of questions, more than a hundred of them in statistics, many inspired by CAST ({{clements2026}}; {{borio2026c}}). The obvious next step was to bring the two together."
+        },
+        {
+          "id": "067a4b",
+          "type": "paragraph",
+          "text": "In 2026 Lily and Michele Pancera used IDEMS' multi-agent AI system ([[case:ai-authoring|case study 3]]) to match one introductory statistics textbook against the open statistics bank. A first pass found questions that matched the book's exercises closely. A second found questions that could fit with changes, and the agents commented on each one, for example that a question used grouped data while the chapter did not. Lily accepted or rejected each suggestion, \"agreeing or disagreeing with the robots\", and Santiago Borio reworked the chosen questions ({{borio2026c}}). About 40 were chosen, half of them closely matching exercises already in the book, and one or two chapters can be fully covered with small changes ({{borio2026c}}). [[p:emma-hartley]], represents this way of working."
+        },
+        {
+          "id": "9fdf17",
+          "type": "quote",
+          "persona": "emma-hartley"
+        },
+        {
+          "id": "bbfc0c",
+          "type": "paragraph",
+          "text": "The work also showed what is missing. Many conceptual questions are plain multiple choice and need randomising, for example by varying the wording so that the correct option changes. Application questions, such as finding percentiles from a stem-and-leaf plot, carry over well. Skills questions, where students analyse real data themselves, rarely matched anything. Estimation questions raised the hardest design problem: how close to the true standard deviation counts as correct? Only a statistics specialist can set that tolerance, and Doug Stirling spent a long time on exactly this in CAST ({{borio2026c}}). CAST's interactive graphs were lost when Java applets stopped working. JSXGraph, which works in both STACK and PreTeXt, offers a way to rebuild them, and converting CAST itself to PreTeXt would rescue a lost resource ({{borio2026c}})."
+        },
+        {
+          "id": "efba6c",
+          "type": "paragraph",
+          "text": "This points to a bigger idea. Many open textbooks cover the same topics in different ways, so the same interactive questions could serve all of them. Today a textbook author has to write both the book and the exercises. Instead, specialists in learning through assessment could contribute across many books, and lecturers could take questions from the library into their own version of a book. In discussions with US educators, David Stern has suggested \"assessment-focused faculty\", alongside the \"teaching-focused faculty\" that many universities now hire for large service courses ({{clements2026}})."
+        }
+      ]
+    },
+    {
+      "id": "we-never-wanted-two-books",
+      "heading": "We never wanted two books",
+      "blocks": [
+        {
+          "id": "2fe159",
+          "type": "paragraph",
+          "text": "Adding assessment to open textbooks exposed a deeper problem, one IDEMS has lived through. One educator wants to add their own assessments to an open statistics textbook, and another wants a different set. Now there are two books. One asks for the book in Python instead of R, and there are three. The other wants Python too, and the work is repeated: four books. Then come requests for French, for examples set in Kenya or in agriculture, for a non-statistical audience, for different notation or a different way of teaching. Each request is reasonable and each book is useful. But if every combination becomes a separate book, there are soon too many to manage, and when the original author fixes an error, none of the copies get the fix ({{variants}})."
+        },
+        {
+          "id": "4ed696",
+          "type": "paragraph",
+          "text": "The underlying issue, as the IDEMS team puts it, is that good content almost always exists in the wrong context: the wrong audience, the wrong format, the wrong software. AI has made new content cheap to produce, but producing it does not make it good, because *semantics don't travel*: the ideas that made the original good are not attached to it. The bottleneck has moved from creating content to checking, adapting and maintaining it ({{variants}})."
+        },
+        {
+          "id": "a367d5",
+          "type": "paragraph",
+          "text": "IDEMS' answer is a **variant-based ecosystem** for open educational resources. A book can have variants for different assessments, software, languages, notation, contexts, datasets or teaching approaches, and the variants stay linked to the original. Variants can build on other variants: a French version can use Python, the Python version can use agricultural examples, and a community can add its own assessments on top of both. Authors can pull in corrections from related variants in a traceable way. AI agents do much of the adapting, such as translating, switching software and applying a change across variants, while authors and educators decide what they want, subject experts review the results, and people remain responsible for what is published. The aim is more adaptation, not less. Someone who needs a French, Python-based statistics book with agricultural examples from Mali and their own assessments should be able to make one without writing a whole new book. Even educators who would never write a book from scratch can start by adapting one ({{variants}}; {{statsbooks}})."
+        },
+        {
+          "id": "78a958",
+          "type": "subheading",
+          "text": "Personalised for whom?"
+        },
+        {
+          "id": "718879",
+          "type": "paragraph",
+          "text": "Big technology companies are also promising adaptable textbooks. In 2025 Google's LearnLM team published a study of an AI-augmented textbook, \"Learn Your Way\", which personalises content to each student's interests ({{learnlm2025}}). IDEMS' Michele Pancera and David Stern discussed it on the IDEMS podcast ({{pancera2025b}}). They agree that context matters, and noted that language was missing from the discussion. But the study removes what it calls \"arduous human effort\", when in education that effort is the work of teachers everywhere, and it is better enhanced than removed. Its students used material that experts had reviewed first, and that \"adult in the room\" should stay. And personalising for each individual can cut learners off from each other. David's preference is personalisation at the level of a class or a community, where everyone can see each other's variant and learn together. STACK's deterministic feedback could be the reliable core of richer AI interaction, rather than something AI replaces ({{pancera2025b}}; {{borio2026d}})."
+        },
+        {
+          "id": "85320e",
+          "type": "paragraph",
+          "text": "[[p:thandiwe-nkosi]], represents the educators asking these questions. Variants that a teacher can choose for a whole class, in the class's language and context, are IDEMS' answer to her."
+        },
+        {
+          "id": "51bd3c",
+          "type": "quote",
+          "persona": "thandiwe-nkosi"
+        },
+        {
+          "id": "c6b8b8",
+          "type": "subheading",
+          "text": "Who pays for open?"
+        },
+        {
+          "id": "586a5d",
+          "type": "paragraph",
+          "text": "Commercial publishers offer lecturers a joined-up package today: a textbook, lecture notes, a ready-made course for their learning management system and quizzes, paid for by textbook sales. Open resources could offer the same, and let lecturers make every piece their own, but they need a business model too: perhaps licences that share income with authors, or services built on open content. IDEMS does not intend to become a textbook company, but textbook services, offered with partners, may become part of its work ({{clements2026}}). That is the question facing Kwabena's publisher. And where academic systems are still developing, as in parts of West Africa, adapting an international textbook to the local context could count towards promotion. That would reward the local authorship that lecturers there say they have been missing ({{clements2026}})."
+        },
+        {
+          "id": "ba7ac1",
+          "type": "personas",
+          "ids": [
+            "emma-hartley",
+            "thandiwe-nkosi",
+            "rachel-stein",
+            "kwabena-asante"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "what-comes-next",
+      "heading": "What comes next",
+      "blocks": [
+        {
+          "id": "d1bc50",
+          "type": "list",
+          "items": [
+            "Accept more than one method in the Kenyan questions, add the requested videos and interactives, and give every pilot school an introduction to the book and its feedback link.",
+            "Support the model school's smart TV deployment, and find funding for regular visits to many kinds of school.",
+            "Hand the Grade 10 courses to national bodies that can reach all teachers, and launch the MSc in Mathematical Innovation.",
+            "Keep improving Ethiopia's two Basic Maths books with the shared teaching team, and help more universities adopt them.",
+            "Turn conversations in Ghana, Somalia and South Sudan into pilots.",
+            "Develop a way for books to record marks, so they can be used for assessment as well as practice.",
+            "Grow the shared layer of STACK questions across the statistics library, and build the variant infrastructure that keeps every version connected."
+          ]
+        },
+        {
+          "id": "1e7920",
+          "type": "paragraph",
+          "text": "The bigger challenge is the one STACK has always faced: there are not enough people who can write good questions. As books multiply, the demand for interactive questions grows faster than any team can write them. That is why the third part of the journey matters."
+        }
+      ]
+    },
+    {
+      "id": "the-social-the-technical-and-the-innovat",
+      "heading": "The social, the technical and the innovation",
+      "blocks": [
+        {
+          "id": "1bab6a",
+          "type": "sti",
+          "intro": "IDEMS describes its work as socio-technical innovation: change that only happens when new technology and new ways of working with people move together ({{stern2025o}}). Read that way, this case study has three layers.",
+          "social": [
+            {
+              "title": "Teachers as co-authors.",
+              "text": "Mike's view that \"it's the teachers who are going to make it perfect\" ({{stern2025o}}) shapes everything: books released early, feedback links on every question, and certificates earned by sharing practice in forums."
+            },
+            {
+              "title": "Reaching the right level.",
+              "text": "IDEMS stopped waiting for institutions to enrol students and reached students and lecturers directly."
+            },
+            {
+              "title": "Contextualisation.",
+              "text": "Zach's die, examples from farming and pastoralist communities, and learners' own languages."
+            },
+            {
+              "title": "Collaboration across countries.",
+              "text": "Ethiopian lecturers from ten universities in one teaching team, Kenyan interns cleaning an Ethiopian book, and Ghanaian teachers adapting Kenyan books."
+            },
+            {
+              "title": "Doing much with little.",
+              "text": "A cancelled grant, a crowdfunder and volunteer help. INNODEMS designs everything so that it still works without funding, and treats funding as added value."
+            },
+            {
+              "title": "Institutions and incentives.",
+              "text": "National teacher bodies, an MSc for working teachers, publishers' business models, and the idea that adapting a textbook could count towards promotion."
+            }
+          ],
+          "technical": [
+            {
+              "title": "PreTeXt:",
+              "text": "write once, publish as web, PDF, EPUB or braille, and so serve both connected and offline learners."
+            },
+            {
+              "title": "The `<stack>` element",
+              "text": "built by IDEMS, running live questions through the STACK API in the web book and fixed versions in print."
+            },
+            {
+              "title": "Review built in:",
+              "text": "pre-filled feedback forms on every question, and questions kept in sync between Moodle and the book's repository."
+            },
+            {
+              "title": "Variants:",
+              "text": "student and teacher editions, versions for classrooms with and without devices, and infrastructure for linked variants of statistics books."
+            },
+            {
+              "title": "Surrounding systems:",
+              "text": "Moodle courses organised by learning objective, and a project website fed from the same spreadsheets as the books."
+            },
+            {
+              "title": "AI cross-referencing",
+              "text": "of a whole book against an open question bank, with a person accepting or rejecting each match."
+            }
+          ],
+          "innovation": [
+            {
+              "title": "Assessment that travels with the book.",
+              "text": "Practice with feedback moves from institutions' learning systems into books that need no login, which opens STACK to students in Ethiopia, Kenyan schools and rebuilding universities that Moodle never reached."
+            },
+            {
+              "title": "Open books that improve themselves.",
+              "text": "A book that teachers can correct and adapt, rather than a finished product, could change who writes curriculum materials and how fast they improve."
+            },
+            {
+              "title": "Assessment as a shared layer.",
+              "text": "One bank of questions serving many books and many variants, maintained by assessment specialists, separates writing the book from writing the practice."
+            },
+            {
+              "title": "Variants instead of copies.",
+              "text": "Linked versions mean that adaptation for a new context no longer breaks the maintenance chain. It is IDEMS' answer to both commercial lock-in and one-size-fits-all AI personalisation."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

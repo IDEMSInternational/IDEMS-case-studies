@@ -9,34 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
 </head>
-<body>
-<nav class="topnav"></nav>
-
-<header class="top">
-  <div class="wrap">
-    <div class="eyebrow">IDEMS · Draft for internal review</div>
-    <h1>IDEMS case studies</h1>
-  </div>
-</header>
-
-<main class="wrap">
-  <div class="cat-list" id="category-list"></div>
-
-  <h2 class="section">Personas</h2>
-  <p class="note"><strong>Preview only.</strong> Names, details and quotes are fictional composites. The photos are Creative Commons placeholders from Wikimedia Commons showing real, unrelated people, and must be replaced before publication.</p>
-  <div id="persona-browser"></div>
-</main>
-
-<footer class="site">
-  <div class="wrap">
-    <h2>Photo credits</h2>
-    <p>All placeholder photos via Wikimedia Commons; licences as listed. Images were cropped for display.</p>
-    <ol id="credits"></ol>
-  </div>
-</footer>
-
-<script src="data/catalogue.js"></script>
-<script src="data/education.js"></script>
+<!-- Content comes from content/*.json and is rendered by assets/site.js. -->
+<body data-page="home">
+<div id="app"></div>
 <script src="assets/site.js"></script>
 </body>
 </html>

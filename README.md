@@ -2,31 +2,69 @@
 
 Case studies and personas from IDEMS' work, by category: Parenting, Education and Climate. Education (STACK) has content; Parenting and Climate are placeholders for now.
 
-Open `index.html` in a browser. No build step is needed.
+All content is data: everything you read on the site lives in JSON files in `content/`, and the HTML pages are empty shells that `assets/site.js` fills in. There is no build step. Because pages load their content with `fetch`, preview them through a local web server rather than by opening the files directly, for example `python -m http.server` in the repository folder, then visit http://localhost:8000.
 
 ## Structure
 
 | Path | What it is |
 |---|---|
-| `index.html` | Home: the list of categories, then a browser of all personas with filters for category, case study and set |
-| `<category>/index.html` | Category page: its case studies, then a browser of its personas |
-| `<category>/<case>.html` | Case-study pages |
-| `data/catalogue.js` | Categories and case studies (titles, summaries, page names) |
-| `data/<category>.js` | One category's personas and its persona sets |
-| `assets/site.js` | Shared behaviour: navigation, theme, persona browser, persona cards and profile dialog |
+| `content/site.json` | Site-wide text: title, status line, notes shown on the home and case-study pages |
+| `content/categories.json` | The categories in order: label, colour, page text (lede, notes, sources), persona sets and the case studies in reading order |
+| `content/<category>/personas.json` | That category's personas |
+| `content/<category>/case-studies/<id>.json` | One case study: title, standfirst, note, stats and sections made of blocks |
+| `content/references.json` | Every source once, with its fields (authors, year, title, URL…); the site formats them in APA |
+| `index.html`, `<category>/index.html`, `<category>/<case>.html` | Page shells: `<body data-page="home|category|case" …>` |
+| `assets/site.js` | Renders every page from the JSON: navigation, persona browser and dialog, case studies, citations and reference lists |
 | `assets/site.css`, `assets/case.css` | Shared styles; `case.css` adds article typography for case-study pages |
 | `images/<persona-id>.jpg` | One photo per persona |
+| `tools/validate.js` | Checks the content for broken links, unknown references, missing photos and duplicate ids; runs on every push and pull request |
 
-Each persona has a name-based `id` and is tagged with its `category`, the `cases` it appears in, and a `set` (a sub-context within the category, such as "Open textbooks"). Persona profiles follow the agreed format: Background, What they're looking for, Hopes & dreams, Worries & fears, Their data and expertise, A day in the life, a quote and "Grounded in".
+### Personas
+
+Each persona has a name-based `id`, a `set` (a sub-context within the category, such as "Open textbooks") and the `cases` it appears in. Profiles follow the agreed format: Background, What they're looking for, Hopes & dreams, Worries & fears, Their data and expertise, A day in the life, a quote and "Grounded in".
+
+### Case studies
+
+A case study is a list of `sections`, each with a `heading` and a list of `blocks`. Every block has a permanent `id`, which never changes when blocks are added, edited or moved. Block types:
+
+| Type | Fields |
+|---|---|
+| `paragraph` | `text` |
+| `subheading` | `text` |
+| `quote` | `persona` (the quote comes from the persona), or `text` and `source` |
+| `personas` | `ids`: a row of persona cards |
+| `list` | `items` |
+| `timeline` | `items`: `label` and `text` |
+| `table` | `head`, `rows` |
+| `box` | `title`, `blocks` |
+| `sti` | `intro`, then `social`, `technical` and `innovation`, each a list of `title` and `text` |
+
+The "next case study" links and the reference list are generated automatically.
+
+### Text markup
+
+Text fields can use a small markup:
+
+| Markup | Result |
+|---|---|
+| `**bold**`, `*italic*`, `` `code` `` | Formatting |
+| `[text](https://…)` | External link |
+| `[[p:persona-id]]` or `[[p:persona-id\|link text]]` | Link that opens a persona's profile (default text: name and tagline) |
+| `[[case:case-id\|link text]]` | Link to a case study |
+| `{{ref-key}}` | Citation in the form "Authors, year", linked to the reference list |
+| `{{ref-key\|n}}` | Narrative citation in the form "Authors (year)" |
+
+Write the brackets of a citation yourself: `… as reported ({{osang2025}}; {{rao2026}}).` Facts from personal communication are written out in full, for example "(S. Borio, personal communication, October 2026)", and are not added to `references.json`.
+
+### Checking content
+
+Run `node tools/validate.js` before committing. It lists every problem, such as a citation to a reference that does not exist or a link to a persona that has been renamed. The same check runs automatically on GitHub.
 
 ### Adding a category's content
 
-1. Add its case studies to `CASES` in `data/catalogue.js`.
-2. Create `data/<category>.js` following `data/education.js`, and add its photos to `images/`.
-3. Load `data/<category>.js` on `index.html` and on the category page, and replace the "Coming soon" text on the category page with a case list and a persona browser (copy `education/index.html`).
-4. Add the case-study pages to the category folder, loading the same scripts as the education case studies.
-
-On case-study pages, `<a class="pcard" data-p="<id>"></a>` renders a persona card, `<cite data-p="<id>"></cite>` renders a persona citation, and any link to `index.html#<id>` opens that persona's profile.
+1. In `content/categories.json`, remove `comingSoon` from the category and add its `sets`, `caseStudies` and page text.
+2. Create `content/<category>/personas.json` and `content/<category>/case-studies/<id>.json`, and add the photos to `images/`.
+3. Add a shell page for each case study at `<category>/<id>.html`, copying an Education one and changing `data-category` and `data-case`.
 
 ## Status
 
@@ -34,4 +72,4 @@ Internal draft. Names, details and quotes are fictional composites. The Educatio
 
 **Images:** `images/` holds placeholder photos from Wikimedia Commons (CC BY / CC BY-SA / public domain; credits are listed on the pages). They show real, unrelated people and must be replaced with generated or consented images before publication. Each persona includes an image-generation prompt for this.
 
-**Confidentiality:** do not name the US commercial partner in any external version. Source material lives in a local, gitignored `sources/` folder and is never committed.
+**Confidentiality:** Caltech, the US partner, is named only in case study 1 where its published case study is cited; elsewhere it is "the US partner". Source material lives in a local, gitignored `sources/` folder and is never committed.

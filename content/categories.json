@@ -1,0 +1,50 @@
+[
+  {
+    "id": "parenting",
+    "label": "Parenting",
+    "color": "var(--c-parenting)",
+    "comingSoon": true
+  },
+  {
+    "id": "education",
+    "label": "Education",
+    "color": "var(--c-education)",
+    "lede": "IDEMS’ work with STACK, the open-source assessment system for mathematics, and open textbooks. The personas come in four sets. **STACK in Africa** draws on IDEMS’ STACK case studies (2019–2026) and the Maseno student-engagement study (Juma et al., 2022). **Commercial partners** covers the contracts that grew out of the African work, with a highly selective US university and a public university in Italy. **Open textbooks** covers interactive PreTeXt books with STACK questions: Kenya’s Grade 7–10 books, Ethiopia’s Basic Maths, emerging work in Somalia, South Sudan and Ghana, and interest from lecturers in the US and UK. **AI authoring** covers the people who use, and are affected by, IDEMS’ AI tools for writing STACK questions, from a single chatbot to a multi-agent system.",
+    "personasNote": "**Preview only.** Names, details and quotes are fictional composites. The photos are Creative Commons placeholders from Wikimedia Commons showing real, unrelated people. Before publication, replace them with generated or consented images; each profile includes an image prompt for this.",
+    "sources": "Grounding: STACK case studies at stack-assessment.org (Maseno 2019; Maseno workshop 2022; INNODEMS internship 2023; Bahir Dar workshop 2023; African STACK Conferences 2023, 2024, 2025; the INNODEMS model 2025; PreTeXt integration 2025; International Meeting Nairobi 2026; a US university case study 2025), Grade 10 digital textbook pilot interviews and a school visit report (Kenya, 2026), project information from IDEMS staff, a draft case study on AI agents for STACK authoring (2026) and IDEMS podcast episodes on AI, STACK and textbooks, and Juma, Ayere, Oyengo & Osang (2022), “Evaluating Engagement and Learning Based on a Student Categorization using STACK…”, iJET 17(23). Format adapted from IDEMS’ PLH Digital parenting personas (2020).",
+    "creditsNote": "All photos via Wikimedia Commons, mostly from the Wiki Loves Africa “African people at work” collection; licences as listed. Images were cropped for display.",
+    "sets": [
+      {
+        "id": "africa",
+        "label": "STACK in Africa",
+        "color": "var(--s-africa)"
+      },
+      {
+        "id": "commercial",
+        "label": "Commercial partners",
+        "color": "var(--s-commercial)"
+      },
+      {
+        "id": "textbooks",
+        "label": "Open textbooks",
+        "color": "var(--s-textbooks)"
+      },
+      {
+        "id": "ai",
+        "label": "AI authoring",
+        "color": "var(--s-ai)"
+      }
+    ],
+    "caseStudies": [
+      "africa-to-contracts",
+      "textbooks",
+      "ai-authoring"
+    ]
+  },
+  {
+    "id": "climate",
+    "label": "Climate",
+    "color": "var(--c-climate)",
+    "comingSoon": true
+  }
+]

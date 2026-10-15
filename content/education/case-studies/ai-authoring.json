@@ -1,0 +1,526 @@
+{
+  "id": "ai-authoring",
+  "short": "AI authoring",
+  "title": "Product development: AI agents for writing STACK questions",
+  "summary": "How IDEMS went from a personal chatbot to a multi-agent system that plans, writes and checks questions with a human author.",
+  "standfirst": "Every chapter of IDEMS' STACK story has run into the same limit: too few people who can write good questions. This case study follows how IDEMS went from one teacher's personal chatbot to a multi-agent system that plans, writes and checks questions with a human author, and how the same work is reshaping what IDEMS means by responsible AI: tools that help experts go further, and tools that help many more people become authors.",
+  "note": "Personas are fictional composites. Select any persona to open the full profile. The system described is in active development, and its figures come from a case study dated September 2026.",
+  "stats": [
+    {
+      "value": "2 hrs–2 wks",
+      "label": "Time for an expert to write one STACK question by hand, from a simple question to a complex one"
+    },
+    {
+      "value": "120+",
+      "label": "Questions created or reworked with IDEMS' AI systems across six question banks"
+    },
+    {
+      "value": "~$1",
+      "label": "Typical model cost of a new question from scratch, taking 10–15 minutes"
+    },
+    {
+      "value": "51",
+      "label": "Branches where students lost marks with no feedback, now with a message (in 32 audited questions)"
+    },
+    {
+      "value": "25.9k → 11.4k",
+      "label": "Tokens in the Author agent's instructions after the documentation was redesigned"
+    }
+  ],
+  "sections": [
+    {
+      "id": "the-bottleneck",
+      "heading": "The bottleneck",
+      "blocks": [
+        {
+          "id": "fd215c",
+          "type": "paragraph",
+          "text": "Writing a STACK question is not one hard skill but many fairly simple ones done together. An author needs some HTML, some Maxima (STACK's computer algebra language), an understanding of how STACK checks answers and branches to different feedback, sensible randomisation and, above all, the teaching judgement to write good feedback. Few people have all of these. Santiago Borio, who has written STACK questions for IDEMS since 2019, reckons a quick question takes him two hours and a complex one can take two weeks ({{borio2024c}}; {{borio2024a}})."
+        },
+        {
+          "id": "774244",
+          "type": "paragraph",
+          "text": "The bottleneck shows up throughout IDEMS' work. Lecturers at the 2022 Maseno workshop found authoring \"time-consuming\" ({{maseno2022}}). The INNODEMS interns needed months of steep learning, and by 2025 demand for their support outstripped the team ({{juma2025}}; [[case:africa-to-contracts|case study 1]]). Commercial contracts come with deadlines. Every new interactive textbook needs questions ([[case:textbooks|case study 2]]). And most teachers are used to setting \"page 42, exercises 1 to 10\" ({{stern2025p}})."
+        },
+        {
+          "id": "8e308b",
+          "type": "paragraph",
+          "text": "[[p:chiara-fontana]], is the persona for this gap. She is based on a real teacher, a friend of an IDEMS colleague: one of the most motivated maths teachers he knows, who asked to be introduced to STACK. As he explained everything she would need to learn, it became clear that with a full-time job and three children she would never get started ({{pancera2026b}})."
+        },
+        {
+          "id": "bb0606",
+          "type": "quote",
+          "persona": "chiara-fontana"
+        },
+        {
+          "id": "e5c75c",
+          "type": "paragraph",
+          "text": "She is not alone. [[p:samuel-okello|Samuel Okello]] and [[p:tesfaye-alemu|Tesfaye Alemu]], the lecturers at the start of [[case:africa-to-contracts|case study 1]], face the same climb."
+        },
+        {
+          "id": "e0ecd4",
+          "type": "personas",
+          "ids": [
+            "chiara-fontana",
+            "samuel-okello",
+            "tesfaye-alemu"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stage-1-a-chatbot-beside-the-editor",
+      "heading": "Stage 1: a chatbot beside the editor",
+      "blocks": [
+        {
+          "id": "84bd42",
+          "type": "paragraph",
+          "text": "The first tool was built by a teacher for himself. Michele Pancera taught mathematics at an international secondary school for seven years, then learned STACK as the local question author at the University of Trieste, a role that existed because IDEMS had helped Trieste start with STACK ([[case:africa-to-contracts|case study 1]]). He found STACK powerful and its learning curve steep. To help himself, he built an assistant on a commercial chatbot platform and trained it on STACK documentation and example questions. It wrote question variables, question text and general feedback, which he copied into Moodle by hand. It worked as interactive documentation while he was still learning, and it made him much faster ({{stern2025p}}; {{pancera2026a}})."
+        },
+        {
+          "id": "8f29fc",
+          "type": "paragraph",
+          "text": "The path from there to IDEMS was not an accident. Danilo Lewański at Trieste, a long-standing collaborator, told David Stern that Michele was looking for STACK work. IDEMS was not hiring STACK authors, but it was looking for someone to take on its Open App Builder, a project nobody could be an expert in yet. Michele had never used its tools. Before the interview he spent five days getting the software running on his own computer, which turned out to be the \"impossible task\" the interviewer had planned to set him. He joined IDEMS in 2025 as an Impact Activation Fellow, and his STACK assistant came with him ({{stern2025p}})."
+        },
+        {
+          "id": "bb9085",
+          "type": "paragraph",
+          "text": "IDEMS' authors adopted it for their contract work. On the IDEMS podcast, Santiago said he had not written a single question without it since. He described it as improving both speed and quality, but only because he knew STACK well enough to correct it. It made up the syntax of the function that checks multiple-choice answers, until he told it to check the documentation. It went round in circles on an old proof question until he asked whether it was using outdated code, and it was. It was very good at the dull but valuable jobs: commenting hard-to-read variables in other people's old questions, better than he would have himself, and checking a revised question against a lecturer's list of requested changes, where it found one he had missed. David Stern's point is that the strength lies in the cycle: a person checks the AI and the AI checks the person, and the system becomes robust to either of them getting it wrong ({{borio2026a}})."
+        },
+        {
+          "id": "2164b0",
+          "type": "paragraph",
+          "text": "[[p:tomas-ferreyra]], represents this stage: an expert for whom AI improves the work rather than replacing it."
+        },
+        {
+          "id": "e0ae33",
+          "type": "quote",
+          "persona": "tomas-ferreyra"
+        }
+      ]
+    },
+    {
+      "id": "stage-2-what-changed",
+      "heading": "Stage 2: what changed",
+      "blocks": [
+        {
+          "id": "1ac024",
+          "type": "paragraph",
+          "text": "Two years later, two things had changed. First, the models improved. Earlier they could not reliably edit STACK's XML question files, in which the feedback trees are almost unreadable to a person. That is why the first assistant produced snippets to copy. Now editing XML is routine, and a model can keep a whole set of questions consistent. Second, models became *agents*. They can work directly in a repository, call tools, check their own output and fix their mistakes ({{pancera2026a}})."
+        },
+        {
+          "id": "2207d1",
+          "type": "paragraph",
+          "text": "Ben Davies and Adam Clearwater at the University of Southampton showed what that made possible. In their published case study, supervised agents working in a coding assistant built a school textbook's worth of STACK questions for the SMP A-level books. Working with Ben was Michele's first close look at how multi-agent systems are built. One surprise was that the coding itself almost disappears: he still has to read code and understand what is happening, but writing it is becoming the easy part ({{davies2026}}; {{pancera2026a}})."
+        },
+        {
+          "id": "f16a8f",
+          "type": "paragraph",
+          "text": "That raised a design question IDEMS now asks across all its AI work: when are more agents worth the cost? As Michele put it on the IDEMS podcast, \"if you have a kitchen filled with 50 people, cooking a dish of pasta is going to be more difficult than with one.\" Splitting work between agents only helps if the parts can work without the whole context. A separate agent just for feedback trees looked attractive, but it would need the whole question as context anyway. And a loop between one agent and the STACK validator is not a multi-agent system at all ({{pancera2026a}})."
+        }
+      ]
+    },
+    {
+      "id": "stage-3-two-systems-one-repository",
+      "heading": "Stage 3: two systems, one repository",
+      "blocks": [
+        {
+          "id": "15bc7e",
+          "type": "paragraph",
+          "text": "What IDEMS has built is really two systems that share the same question banks, documentation and tools."
+        },
+        {
+          "id": "f1644e",
+          "type": "subheading",
+          "text": "The interface: several agents working with a human author"
+        },
+        {
+          "id": "786e64",
+          "type": "paragraph",
+          "text": "Each question bank is a git repository. A question is a folder holding the standard Moodle XML file, a one-page description with fixed fields (goal, description, structure, randomisation, answer tests, feedback, implementation notes, additional languages) and a log of every change. Work is organised as issues: a parent issue for a review, say, and one sub-issue per question. Each piece of work happens on its own branch and closes its issue when merged. This is how IDEMS' software teams have always worked, and that is the point: the agents work through the team's existing structures, so every decision stays visible to the people ({{pancera2026cs}}; {{pancera2026b}})."
+        },
+        {
+          "id": "89739d",
+          "type": "timeline",
+          "items": [
+            {
+              "label": "Concierge",
+              "text": "Reads every configured bank: questions, descriptions, logs, open issues. Answers questions such as \"how many multiple-choice questions does this bank have?\", and drafts and files issues for the work."
+            },
+            {
+              "label": "Planner",
+              "text": "Works with the author on a detailed plan in the same fixed fields. It runs at higher effort so the other agents can run at lower effort."
+            },
+            {
+              "label": "Retriever",
+              "text": "A small agent that chooses which documentation the Author sees."
+            },
+            {
+              "label": "Author",
+              "text": "Edits the question field by field, never touching the raw XML. It checks the question with the STACK API, fixes errors using STACK's own messages, and reports back."
+            },
+            {
+              "label": "Human",
+              "text": "Watches a live preview, answers the question, edits it by hand, confirms or rejects test results and decides whether to merge."
+            }
+          ]
+        },
+        {
+          "id": "517ace",
+          "type": "paragraph",
+          "text": "The design choices are about cost and control. Converting XML into fields that agents edit, much as a person edits the Moodle form, keeps prompts short while the files stay standard Moodle XML. Instead of the full STACK documentation, the agents use concise cheat-sheets: 128 relevant pages have been selected and 62 rewritten so far, each listing first the mistakes that fail silently. Choosing which sheets to load, through a fixed table, the Planner's suggestions and the Retriever, cut the Author's instructions from 25,900 to 11,400 tokens. Each agent can use a different model, chosen in the interface. Banks can stay in sync with Moodle through the gitsync plugin, so a revised question arrives in Moodle as a new version rather than a duplicate. Santiago contributed the layout that lets the system work directly on gitsync banks ({{pancera2026cs}})."
+        },
+        {
+          "id": "b6b27e",
+          "type": "table",
+          "head": [
+            "Most recent full test (two Planner–Author rounds)",
+            "Calls",
+            "Cost"
+          ],
+          "rows": [
+            [
+              "Planner",
+              "10",
+              "$0.296"
+            ],
+            [
+              "Retriever",
+              "2",
+              "$0.132"
+            ],
+            [
+              "Author",
+              "2",
+              "$0.084"
+            ],
+            [
+              "Concierge",
+              "4",
+              "$0.062"
+            ],
+            [
+              "**Total, 7.3 minutes**",
+              "**18**",
+              "**$0.575**"
+            ]
+          ]
+        },
+        {
+          "id": "297473",
+          "type": "paragraph",
+          "text": "The orchestration is IDEMS' own Python code rather than an agent framework, and the agents act through typed tools rather than free text. An interrupted session resumes from its branch. During live tests, whenever an agent was seen making a mistake, a matching instruction was added to its prompt in the same change ({{pancera2026cs}}). [[p:pablo-ruiz]], represents the developers doing this work."
+        },
+        {
+          "id": "785828",
+          "type": "quote",
+          "persona": "pablo-ruiz"
+        },
+        {
+          "id": "7dde3c",
+          "type": "subheading",
+          "text": "The coding assistant: the same repository, for experts"
+        },
+        {
+          "id": "285d81",
+          "type": "paragraph",
+          "text": "The second way in is to open a general coding assistant in the same repository. There is no preview or editor, but it has every cheat-sheet, tool, rule and bank. It suits work outside the authoring cycle, such as \"create a question tracker for this bank, then a report on the work done since last month\". [[p:owen-price]], works mostly this way."
+        },
+        {
+          "id": "60f172",
+          "type": "paragraph",
+          "text": "Each system improves the other. While reviewing questions with the coding assistant, the team found that Moodle's importer silently filled in missing values, and in one STACK version this set the score of every incorrect branch to 1. The fix went into the code the agents use to write questions. Randomised Venn diagrams worked out in one coding-assistant session became a cheat-sheet and two examples that the Retriever can now give the Author. Rules that colleagues state during reviews are collected in one file that both systems read ({{pancera2026cs}})."
+        },
+        {
+          "id": "9336ca",
+          "type": "personas",
+          "ids": [
+            "tomas-ferreyra",
+            "pablo-ruiz",
+            "owen-price"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "results-so-far",
+      "heading": "Results so far",
+      "blocks": [
+        {
+          "id": "514953",
+          "type": "paragraph",
+          "text": "Together the two systems have been used to create or rework more than 120 questions in six banks ({{pancera2026cs}}). They supported IDEMS' Linear Algebra work for the University of Trieste ([[case:africa-to-contracts|case study 1]]) and the conversion of a bank of 80 multiple-choice review questions. Lily Clements and Michele used them to match an open statistics bank to a PreTeXt textbook, selecting about 40 questions, half of them close matches ({{borio2026c}}; [[case:textbooks|case study 2]])."
+        },
+        {
+          "id": "be4a07",
+          "type": "paragraph",
+          "text": "An audit of 32 questions from the Trieste Linear Algebra batch shows the kind of quality gain involved ({{pancera2026cs}}):"
+        },
+        {
+          "id": "0c706e",
+          "type": "list",
+          "items": [
+            "All 32 pass validation with the STACK API, import safely and pass their question tests.",
+            "There were 51 branches, across 15 questions, where students lost marks with no explanation. Each now gives a message.",
+            "Four branches that carry an earlier error through to later parts were added, each with a test to catch future breakage.",
+            "Five questions that previously could not be tested now can be.",
+            "Proof questions moved from all-or-nothing marking to partial credit."
+          ]
+        },
+        {
+          "id": "d1439a",
+          "type": "paragraph",
+          "text": "For [[p:luca-ferrara|Luca Ferrara]] in Trieste, and for [[p:hodan-abdi|Hodan Abdi]] in a course whose questions were reviewed the same way, the difference is simple: a wrong answer now comes with an explanation."
+        },
+        {
+          "id": "0800dc",
+          "type": "quote",
+          "persona": "hodan-abdi"
+        },
+        {
+          "id": "d5db3b",
+          "type": "paragraph",
+          "text": "The subject expert stays at the centre. [[p:paolo-benedetti|Prof. Paolo Benedetti]] wants his own bank checked and extended. [[p:daniel-brooks|Dr. Daniel Brooks]] writes the specification and alone decides what counts as \"close enough\"; the plan, with its fixed fields, is where his judgement goes in. [[p:emma-hartley|Emma Hartley]] uses the system to match questions across textbooks, then makes the final decision herself."
+        },
+        {
+          "id": "b7e900",
+          "type": "personas",
+          "ids": [
+            "luca-ferrara",
+            "hodan-abdi",
+            "paolo-benedetti",
+            "daniel-brooks",
+            "emma-hartley"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "two-kinds-of-ai-for-experts-and-for-buil",
+      "heading": "Two kinds of AI: for experts, and for building expertise",
+      "blocks": [
+        {
+          "id": "3b2452",
+          "type": "paragraph",
+          "text": "Building both systems side by side brought out a distinction that now shapes IDEMS' thinking about AI. A general coding assistant driven by an expert is very powerful. The agents have a lot of freedom, the expert catches them when they go off track, and one skilled person can do what used to take a team. That is how Owen works. But taken to its logical end, that model does not need teachers at all ({{pancera2026b}})."
+        },
+        {
+          "id": "09b4ae",
+          "type": "quote",
+          "persona": "owen-price"
+        },
+        {
+          "id": "de045a",
+          "type": "paragraph",
+          "text": "The interface takes the other approach. Its agents have narrow, well-defined roles, the workflow is fixed, every step is visible as an issue or a branch, and the human approves at set points. It is designed so that people who are *not yet* experts can do good work and learn while they do it. [[p:lucy-njoroge]], never had time to learn STACK properly. She can describe what she wants her students to practise, check the plan and watch the question appear in the preview. IDEMS sees this second kind of AI, which serves many people in their own settings, as getting far less attention than it deserves, and as central to the jobs of the future ({{pancera2026b}})."
+        },
+        {
+          "id": "fd6af5",
+          "type": "quote",
+          "persona": "lucy-njoroge"
+        },
+        {
+          "id": "368f3d",
+          "type": "paragraph",
+          "text": "The hope for Chiara is concrete. Within a few months she might have assessment for the textbook she already uses, with her input at the centre. Within a year she might be contributing to open question banks as part of a network of teachers, where the system points out that someone has improved a question she uses. The quality would rise because of the teachers, with the AI as, in David Stern's words, \"the oil that makes the machine work\" ({{pancera2026b}}). The tool would serve her, instead of her having to learn the tool."
+        },
+        {
+          "id": "39cf23",
+          "type": "subheading",
+          "text": "Whose jobs?"
+        },
+        {
+          "id": "cb41a1",
+          "type": "paragraph",
+          "text": "The same tools raise hard questions about work. On the IDEMS podcast, Michele argued that AI should take away the repetitive parts of a job so people can focus on the creative ones. David pointed out the catch: in most organisations those repetitive tasks are exactly what entry-level staff are given, and they are already disappearing ({{pancera2025a}}). His answer is that responsible AI should change the roles people play in a team rather than remove them, so that the tasks that need more attention finally get it ({{pancera2025a}}). The INNODEMS interns learned STACK by converting and reviewing questions by hand ([[case:africa-to-contracts|case study 1]]). [[p:efua-mensah]], starts in a world where agents do the converting and her job is to catch what they get wrong. Tools designed to build expertise are what would make that a better apprenticeship rather than a smaller one."
+        },
+        {
+          "id": "cbf062",
+          "type": "quote",
+          "persona": "efua-mensah"
+        },
+        {
+          "id": "742408",
+          "type": "paragraph",
+          "text": "[[p:fiona-macleod]], sees both an opportunity and a threat to her job. IDEMS' own model points the other way: a cross-institution team that complements in-house authors like her rather than replacing them, and tools she controls on her institution's terms ({{borio2026b}})."
+        },
+        {
+          "id": "6cd6ad",
+          "type": "personas",
+          "ids": [
+            "owen-price",
+            "lucy-njoroge",
+            "chiara-fontana",
+            "efua-mensah",
+            "fiona-macleod"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "responsible-by-design",
+      "heading": "Responsible by design",
+      "blocks": [
+        {
+          "id": "af64f9",
+          "type": "paragraph",
+          "text": "Right now the agents need models at roughly the level of Claude Sonnet 5, and few models are at that level ({{pancera2026cs}}). That raises questions of cost, dependence on a few providers, and energy and water use. The system is built to be model-agnostic so these can be managed. Each agent can run on a different model or provider. The Planner does the heavy thinking so that the Author can run cheaply. Small edits can be made by hand with no model at all. The approach mirrors one used by IDEMS partners in agriculture such as Digital Green: use the strongest models now to build systems that can later run on smaller, cheaper and eventually open models, small enough perhaps for a laptop or a phone ({{pancera2026a}}; {{pancera2025a}}). Once a multi-agent system works, IDEMS expects to benchmark which tasks really need a large model and which do not ({{pancera2026a}}). IDEMS is also moving its git hosting towards the open-source Forgejo ({{pancera2026b}})."
+        },
+        {
+          "id": "7bea9a",
+          "type": "paragraph",
+          "text": "These questions matter most to the people at the edges. [[p:joseph-kamau]], wants to run the system for his university but cannot pay in dollars indefinitely, and would rather host it himself. [[p:ruth-achieng|Ruth Achieng]], a programme officer for an education funder, wants AI that makes teachers more capable, with a plan for cost and energy that outlasts the next generation of models."
+        },
+        {
+          "id": "0f2f3d",
+          "type": "quote",
+          "persona": "joseph-kamau"
+        },
+        {
+          "id": "acf15b",
+          "type": "personas",
+          "ids": [
+            "joseph-kamau",
+            "ruth-achieng"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beyond-questions-textbooks-and-personali",
+      "heading": "Beyond questions: textbooks and personalisation",
+      "blocks": [
+        {
+          "id": "0f7148",
+          "type": "paragraph",
+          "text": "The same approach, with specialist agents and people in charge, now supports IDEMS' work on textbook variants ([[case:textbooks|case study 2]]). Agents help translate content, switch a book from one programming language to another, adapt examples to a new context, and apply a correction across every linked version of a book. As with questions, they do the routine work at scale. Authors decide what they want, subject experts review the results, and people remain responsible for what is published ({{variants}})."
+        },
+        {
+          "id": "481c5d",
+          "type": "paragraph",
+          "text": "It also puts IDEMS in a wider debate. Some see generative AI as a replacement for tools like STACK: why write feedback trees when a chatbot can comment on any answer? IDEMS' view is that STACK's deterministic, carefully designed feedback is worth keeping as a reliable core, around which AI can build richer interaction ({{borio2026d}}). When Michele and David discussed Google's study of an AI-personalised textbook, they argued for keeping experts reviewing AI-generated material and an adult in the room, and for personalising at the level of a class rather than isolating each learner ({{pancera2025b}}; {{learnlm2025}}). [[p:thandiwe-nkosi]], voices that caution."
+        },
+        {
+          "id": "9f1fba",
+          "type": "quote",
+          "persona": "thandiwe-nkosi"
+        }
+      ]
+    },
+    {
+      "id": "beyond-authoring-proof",
+      "heading": "Beyond authoring: proof",
+      "blocks": [
+        {
+          "id": "585507",
+          "type": "paragraph",
+          "text": "AI also changes what can be assessed. Proof has long been STACK's weak point. Parsons problems, where students drag the steps of a proof into order, came partly from accepting that written proofs could not be marked automatically, and partly from research suggesting that understanding proofs is often the better learning goal. IDEMS' proof questions usually add follow-up questions about understanding for this reason ({{pancera2026b}}). One of Chiara's own questions was whether STACK could assess the proofs her students write by hand. With Chris Sangwin's recent work on free-text input in STACK, and AI's growing ability to read mathematical writing, automatic assessment of written proofs may be within reach in the next year or so ({{pancera2026b}}). The open question then becomes a teaching question rather than a technical one: what balance of reading and writing proofs actually helps students learn?"
+        }
+      ]
+    },
+    {
+      "id": "challenges",
+      "heading": "Challenges",
+      "blocks": [
+        {
+          "id": "51fd93",
+          "type": "list",
+          "items": [
+            "**Moodle with gitsync.** To use the system fully, banks need to stay in sync with a Moodle site that has the gitsync plugin. Without it, questions are imported by hand and arrive as new questions rather than new versions ({{pancera2026cs}}).",
+            "**Few models at the required level.** Smaller models can be selected, but are not yet expected to handle hard questions.",
+            "**Question tests are hard for AI to write.** A test may target an answer that the input rejects before marking, or be meant to fail but pass for some random variants. So a failing test never blocks a question on its own: a person confirms or rejects the result ({{pancera2026cs}}).",
+            "**People must stay in charge.** The 2026 Nairobi meeting stressed this for every AI-assisted authoring approach discussed, including Santiago's demonstration of the STACK assistant. The workflow builds it in: plans are approved, previews checked and merges decided by people ({{rao2026}})."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "what-comes-next",
+      "heading": "What comes next",
+      "blocks": [
+        {
+          "id": "bd46bb",
+          "type": "paragraph",
+          "text": "The next steps are letting users upload their own files as context for the agents, supporting question banks hosted on Forgejo as well as GitHub, and offering the system to others beyond IDEMS ({{pancera2026cs}}). The longer-term aim connects all three case studies. The question banks built in Africa and improved through contracts, and the questions placed in textbooks, could be maintained and extended by a wide network of lecturers, interns and teachers, with AI handling the routine work so they can focus on teaching. If that works, Samuel with his 900 scripts and Tesfaye with no mentor would no longer need to become STACK experts first. The tools would do that part for them."
+        }
+      ]
+    },
+    {
+      "id": "the-social-the-technical-and-the-innovat",
+      "heading": "The social, the technical and the innovation",
+      "blocks": [
+        {
+          "id": "7f7f56",
+          "type": "sti",
+          "intro": "IDEMS describes its work as socio-technical innovation: change that only happens when new technology and new ways of working with people move together ({{stern2025o}}). Read that way, this case study has three layers.",
+          "social": [
+            {
+              "title": "Who gets to author.",
+              "text": "The real problem is not code but people: too few authors for every course and book that needs questions, and teachers like Chiara who have no time to climb the learning curve."
+            },
+            {
+              "title": "Human judgement at the centre.",
+              "text": "Subject experts write specifications and set tolerances, authors approve plans and check previews, and people decide what is merged and published."
+            },
+            {
+              "title": "Agents that join the team's way of working.",
+              "text": "Issues, branches and logs, the way IDEMS' teams already work, keep AI work transparent to the people responsible for it."
+            },
+            {
+              "title": "The future of work.",
+              "text": "Entry-level tasks are changing, in-house professionals feel threatened, and IDEMS argues for AI that changes roles rather than removing them."
+            },
+            {
+              "title": "Fairness of access.",
+              "text": "Costs in foreign currency, dependence on a few providers, and energy use decide who can benefit."
+            }
+          ],
+          "technical": [
+            {
+              "title": "From chatbot to agents:",
+              "text": "models that can now edit XML reliably, call tools and correct themselves."
+            },
+            {
+              "title": "A designed multi-agent workflow:",
+              "text": "Concierge, Planner, Retriever and Author, typed tools, and IDEMS' own orchestration code."
+            },
+            {
+              "title": "Careful use of context:",
+              "text": "fields instead of XML, cheat-sheets instead of full documentation, and a Retriever, together halving the Author's instructions."
+            },
+            {
+              "title": "Validation:",
+              "text": "every question checked through the STACK API, with question tests confirmed by a person."
+            },
+            {
+              "title": "Two systems, one repository:",
+              "text": "an interface for building expertise and a coding assistant for experts, sharing banks, rules and tools so that each improves the other."
+            },
+            {
+              "title": "Model-agnostic and open where possible:",
+              "text": "per-agent model choice, gitsync with Moodle, and a move towards Forgejo."
+            }
+          ],
+          "innovation": [
+            {
+              "title": "AI that builds expertise.",
+              "text": "Most AI tools amplify experts. IDEMS is also building one designed so that non-experts can author well and learn as they go, which could turn the authoring bottleneck into a network of teacher-authors."
+            },
+            {
+              "title": "Experts' tools feeding everyone's tools.",
+              "text": "Anything an expert works out with the coding assistant, whether a rule, a cheat-sheet or a fix, flows into the structured system that serves less experienced authors."
+            },
+            {
+              "title": "A deterministic core with AI around it.",
+              "text": "STACK's carefully designed feedback stays the reliable heart of assessment, while AI speeds up authoring, matching and adaptation around it."
+            },
+            {
+              "title": "Responsible scaling.",
+              "text": "Building with the strongest models now in a way that allows smaller, cheaper and open models later, so the tools can reach the places that need them most."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

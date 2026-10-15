@@ -1,0 +1,534 @@
+{
+  "id": "africa-to-contracts",
+  "short": "Africa to contracts",
+  "title": "From STACK in Africa to commercial contracts",
+  "summary": "A small pilot in Kenya in 2019 that grew into a pan-African community and a paid assessment service for universities in the US and Italy.",
+  "standfirst": "In 2018 a Kenyan mathematician, newly back from a PhD in the US, was close to giving up. He had hundreds of students and no way to give them feedback. IDEMS introduced him to STACK and wrote his first quizzes. Seven years later that pilot has grown into a pan-African community, a Kenyan team of STACK professionals, and a paid assessment service that IDEMS now offers universities in the US and Italy. This case study follows that journey through the people it reached.",
+  "note": "Personas are fictional composites grounded in the sources listed at the end. Select any persona to open their full profile. Real people are named only where published sources name them. Caltech, the US partner, is named only where its published case study is cited; that case study states that it is not an endorsement of STACK by Caltech.",
+  "stats": [
+    {
+      "value": "2019",
+      "label": "First IDEMS-authored STACK quizzes at Maseno University, in courses of 800 to 1,000 students"
+    },
+    {
+      "value": "78+",
+      "label": "Courses using STACK across Kenya, Ethiopia and Tanzania by 2025"
+    },
+    {
+      "value": "4 → 14",
+      "label": "From the first four interns trained by IDEMS to the INNODEMS team in 2025"
+    },
+    {
+      "value": "10,000+",
+      "label": "Students reached each year through INNODEMS support"
+    },
+    {
+      "value": "150+",
+      "label": "Lecturers and technical-college tutors trained"
+    },
+    {
+      "value": "2",
+      "label": "Commercial contracts, in the US and Italy, delivered by IDEMS staff and since extended"
+    }
+  ],
+  "sections": [
+    {
+      "id": "one-lecturer-a-thousand-students",
+      "heading": "One lecturer, a thousand students",
+      "blocks": [
+        {
+          "id": "64ac6f",
+          "type": "paragraph",
+          "text": "Michael (Mike) Obiero Oyengo turned down a permanent post at the University of Illinois to return to Maseno University in Kenya in 2018. He wanted to change the system. Within six months he was ready to give up ({{borio2024c}}). First-year service courses such as Calculus and Linear Algebra enrol 500 to 1,200 students. The School of Mathematics had 16 staff, each teaching four or more courses with no assistants. A lecturer in that position sets one or two paper tests a semester, because that is all he can mark, and returns them just before the exam ({{juma2022}}; {{borio2024a}})."
+        },
+        {
+          "id": "d3bd9d",
+          "type": "paragraph",
+          "text": "That is the life of [[p:samuel-okello]]. Samuel knows his students need weekly practice and feedback. He is one person with 900 scripts."
+        },
+        {
+          "id": "9c39ef",
+          "type": "quote",
+          "persona": "samuel-okello"
+        },
+        {
+          "id": "ad1c1a",
+          "type": "paragraph",
+          "text": "IDEMS director David Stern had known Mike for years. In 2018 IDEMS brought him to the UK and on to Edinburgh to meet Chris Sangwin, who created STACK, the open-source assessment system for mathematics ({{borio2024c}}). STACK questions are randomised, so every student gets a different version. A computer algebra system checks answers mathematically rather than by matching text, and the question can respond to specific mistakes with tailored feedback ({{borio2024a}})."
+        },
+        {
+          "id": "5a7e62",
+          "type": "paragraph",
+          "text": "In 2019 IDEMS proposed a pilot to Maseno and delivered it. Santiago Borio, then freelancing for IDEMS from Argentina, had first met STACK as one of its earliest student interns back in 2005 ({{borio2024c}}). He wrote questions with IDEMS colleagues Danny Parsons and David Stern, alongside Mike and his Maseno colleague David Ambogo. Chris Sangwin gave the team crash courses, and the University of Edinburgh hosted the course so that the authors could concentrate on questions. Calculus I and Introduction to Linear Algebra replaced their two paper tests with weekly quizzes. Each week students took a *mastery quiz* with unlimited attempts. Reaching the threshold, first 80% and later 70%, unlocked a single-attempt *test quiz*. Together they counted for 30% of the grade ({{borio2019}}; {{oyengo2024}})."
+        },
+        {
+          "id": "f1c36b",
+          "type": "paragraph",
+          "text": "The pilot worked, and it also showed what would shape everything that followed. Maseno had no reliable Wi-Fi, so most students did the quizzes on their own phones with data they paid for. They valued the multiple attempts, the weekly rhythm and the feedback, and asked for more of it. Time pressure meant the first quizzes carried only worked solutions or outlines, and some arrived late. Better feedback became IDEMS' first goal for the next round ({{borio2019}})."
+        },
+        {
+          "id": "122225",
+          "type": "quote",
+          "text": "My first class was an introduction to Linear Algebra that had 1000 students and I did not have any support in terms of teaching assistants. […] The next time I taught the course, I used STACK questions and was able to give weekly homework assignments and my students received immediate feedback which promoted learning on their part. […] Formative assessment was easier and the exam performance for students that used STACK was much improved.",
+          "source": "Dr. Michael Oyengo, Maseno University, in {{odhiambo2024|n}}"
+        }
+      ]
+    },
+    {
+      "id": "from-one-campus-to-a-region",
+      "heading": "From one campus to a region",
+      "blocks": [
+        {
+          "id": "5da3a4",
+          "type": "paragraph",
+          "text": "Mike did not want to be the only lecturer in Africa doing this. Later in 2019 Maseno hosted the first African STACK workshop, run by IDEMS and funded by the International Mathematical Union. Lecturers came from 16 public universities in Kenya, Uganda, Rwanda, Ethiopia and Tanzania ({{oyengo2024}}; {{lawi2023}}). IDEMS moved the pilot courses onto its own server, built to cope with classes of over a thousand, so that any university could use them. It went on writing questions for more Maseno courses and began training Maseno lecturers to write their own ({{borio2019}})."
+        },
+        {
+          "id": "0729f1",
+          "type": "paragraph",
+          "text": "Two universities took the workshop home and kept going. Bahir Dar University in Ethiopia used STACK for practice. At the University of Dar es Salaam, Idrissa Said Amour built STACK into engineering courses of about 950 students, funded by his university's competitive research grant. Dar es Salaam could not get its own Moodle set up for STACK, so IDEMS gave it unlimited use of its own server, and still hosts those courses ({{amour2024}}; {{borio2024b}}). [[p:rehema-salim]], is a composite of lecturers like him: writing most of the questions themselves, for years the only person at their institution doing it."
+        },
+        {
+          "id": "316a50",
+          "type": "quote",
+          "persona": "rehema-salim"
+        },
+        {
+          "id": "2f6d3a",
+          "type": "paragraph",
+          "text": "His students are [[p:amina-hassan|Amina Hassan]], the first in her family at university, doing her coursework on a phone. When 725 students answered a survey in the second year, most disagreed that online maths had hurt their thinking, said STACK helped them work independently, and judged it worth the cost of the data. About half struggled with typing maths in STACK's syntax. Live quizzes overloaded the server, so each quiz was opened for a week to spread the load. When students said the pass marks were exhausting, the mastery quizzes were split into smaller ones ({{amour2024}})."
+        },
+        {
+          "id": "088275",
+          "type": "personas",
+          "ids": [
+            "samuel-okello",
+            "rehema-salim",
+            "amina-hassan"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "what-students-actually-did",
+      "heading": "What students actually did",
+      "blocks": [
+        {
+          "id": "ab52fe",
+          "type": "paragraph",
+          "text": "By 2021 there were enough students using STACK to study what they did with it. Zevick Juma, a Maseno master's student supervised by Mike, analysed the 2021 Complex Analysis course with Mildred Ayere, Mike and IDEMS' Georg Osang. They combined quiz logs, exam results, interviews and focus groups, and sorted students by how they engaged with the quizzes and how they then did in the exam ({{juma2022}}; {{borio2024c}})."
+        },
+        {
+          "id": "768de7",
+          "type": "paragraph",
+          "text": "The most uncomfortable finding was about students with high quiz scores who failed the exam. Seventeen of twenty interviewees and thirty-one of thirty-two focus-group participants said students paid or \"booked\" stronger classmates to do their quizzes, and called it ordinary \"help\". [[p:brian-wafula]], is a composite of that experience. He has an evening job, the quizzes keep coming, and he only realises in the exam what he has given up."
+        },
+        {
+          "id": "030922",
+          "type": "quote",
+          "persona": "brian-wafula"
+        },
+        {
+          "id": "c212b1",
+          "type": "paragraph",
+          "text": "Other groups were more hopeful. Some students had poor weekly scores but passed by going back over the mastery quizzes before the exam. Others made many attempts and still struggled, partly because the feedback skipped steps. [[p:dawit-bekele]], brings these together: he once took the same mastery quiz eighteen times before he got it, as one student at MMUST did ({{borio2026b}}). Around one in five students struggled with access. Data bundles ran out, the Wi-Fi was down, or the outdoor Wi-Fi spot had no shelter from the rain. Even so, 19 of 20 interviewees wanted STACK in all their maths courses."
+        },
+        {
+          "id": "057843",
+          "type": "paragraph",
+          "text": "For IDEMS the study turned \"STACK helps\" into a list of design problems that still drive the work. Make cheating less tempting by keeping the stakes low. Write feedback that shows every step. Stop access problems from turning into grade problems. And remember that some feedback is far better than none: eighteen attempts is too many, but Dawit got there."
+        },
+        {
+          "id": "c65863",
+          "type": "personas",
+          "ids": [
+            "brian-wafula",
+            "dawit-bekele",
+            "amina-hassan"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "building-people-not-just-questions",
+      "heading": "Building people, not just questions",
+      "blocks": [
+        {
+          "id": "669d05",
+          "type": "paragraph",
+          "text": "A pilot cannot grow if a few people abroad have to write every question. In July 2022 the second African STACK workshop, again at Maseno, brought together 49 lecturers and interns from 14 institutions in Kenya, Tanzania and Ethiopia, on a budget of under US$10,000. IDEMS co-funded it, paid for Georg Osang to travel and facilitate, and helped plan and run it. A research fund at the University of Geneva raised participation from about 20 to about 50. The plan was to share existing courses as templates. By day two the lecturers had changed the agenda: they wanted to learn to *write* questions. They found it \"time-consuming, requires a little bit of ICT experience and hard work\", and they were excited by it ({{maseno2022}})."
+        },
+        {
+          "id": "a2131c",
+          "type": "paragraph",
+          "text": "[[p:tesfaye-alemu]], comes out of moments like this: thrilled by his first working randomised question, then back home with no mentor and no Wi-Fi. The workshop also exposed the infrastructure behind the teaching. Seven universities had no Moodle at all, so IDEMS agreed to host their courses, as it had done for Maseno and Dar es Salaam since 2019. At Masinde Muliro University of Science and Technology (MMUST), the STACK plugin had stopped working after a Moodle upgrade ({{maseno2022}}). [[p:joseph-kamau]], is the person whose phone rings when that happens, or when a thousand students open a quiz at 11.55 pm."
+        },
+        {
+          "id": "0895da",
+          "type": "quote",
+          "persona": "tesfaye-alemu"
+        },
+        {
+          "id": "e9f1ed",
+          "type": "subheading",
+          "text": "The internship"
+        },
+        {
+          "id": "21e5fa",
+          "type": "paragraph",
+          "text": "The answer to \"no one to ask\" was to grow local experts. Mike's idea was to hire recent graduates and train them. INNODEMS, IDEMS' Kenyan counterpart, hosted them, and IDEMS designed and ran the training. About twenty people applied, and four recent Maseno graduates were chosen in July 2022. Santiago Borio and Georg Osang trained them remotely from the UK and Austria, through two sessions a week and tasks between sessions. Georg's tasks built specific skills. Santiago's were \"author, get it wrong, and we'll work out together where it went wrong\". On the ground, Juma and Wastalas Dogbalou, both postgraduate students working for IDEMS as subcontractors, supported the team day to day ({{borio2024c}}; {{juma2023}})."
+        },
+        {
+          "id": "f5de81",
+          "type": "paragraph",
+          "text": "It did not work at first. For two months Santiago argued that the four of them could produce better questions faster themselves, and David Stern asked for more time. Two changes turned it round. The training had been shared with four other INNODEMS staff busy with maths camps and school projects; it was refocused on the four interns. Then, in December 2022, Georg and an Oxford undergraduate volunteer travelled to Kenya to work with the team in person. After that sprint the quality of the questions climbed and kept climbing. The investment was substantial, about two days a week of IDEMS staff time for almost eight months, and no grant paid for it. Every question went through peer review, revision and a second review by a more experienced author ({{borio2024c}}; {{odhiambo2024}})."
+        },
+        {
+          "id": "3f7125",
+          "type": "paragraph",
+          "text": "[[p:faith-chebet]], stands for the four. They learned LaTeX, HTML and JavaScript on the job, with remote mentors whose working culture was very different from their own. By the first African STACK conference a year later, they were running workshops, and the lecturers they supported recognised them as experts."
+        },
+        {
+          "id": "dc22f5",
+          "type": "quote",
+          "text": "Through the internship program, I gained skills in question authoring, technical support, debugging and Moodle management. It helped me gain professional experience, networking opportunities and I was able to understand different cultures in terms of their educational systems.",
+          "source": "Emmaculate Atieno, INNODEMS intern, in {{juma2023|n}}"
+        },
+        {
+          "id": "d91b70",
+          "type": "paragraph",
+          "text": "In one academic year the team put three courses onto STACK in the first semester and five more in the second, and built open question banks in six areas of undergraduate mathematics, about 150 questions each. The banks are hosted free of charge on IDEMS servers and are now used well beyond Kenya. All four interns were then employed full time by INNODEMS. Juma and Wastalas went on to PhDs on STACK at the University of Trieste ({{juma2023}}; {{borio2024c}})."
+        },
+        {
+          "id": "5994ed",
+          "type": "subheading",
+          "text": "\"Teach as normal\""
+        },
+        {
+          "id": "04dd8b",
+          "type": "paragraph",
+          "text": "The interns arrived just as George Lawi at MMUST set out to put several courses onto STACK at once. His approach to his colleagues was simple: teach as normal, and the continuous assessment you used to mark by hand will be done electronically for you. Your workload goes down. IDEMS and the interns built the courses, and MMUST integrated STACK into eight courses in 2022/23 ({{borio2024c}}; {{juma2023}})."
+        },
+        {
+          "id": "f57786",
+          "type": "paragraph",
+          "text": "One lecturer had no interest in STACK and agreed only because it saved her marking. She changed nothing in her teaching. That year her Complex Analysis students, in a course most students used to fail, answered the exam question they always got wrong, and the results moved from mostly failing to a healthy spread of passes. She is now one of STACK's strongest advocates. [[p:nafula-simiyu]], is built on her story, which IDEMS staff still retell ({{borio2024a}}; {{borio2025c}})."
+        },
+        {
+          "id": "d4dee6",
+          "type": "quote",
+          "text": "The Department of Mathematics was able to integrate STACK in the delivery of 8 courses. […] It was evidently clear that the integration of STACK in course delivery is positively correlated with student performance. We can’t thank IDEMS enough for the support offered so far.",
+          "source": "Prof. George Lawi, MMUST, in {{odhiambo2024|n}}"
+        },
+        {
+          "id": "3296f3",
+          "type": "paragraph",
+          "text": "MMUST has since grown to around 20 courses using STACK and has given a room for an African STACK Centre. In a Kenyan university, where space is scarce, the room itself is the statement. One of the people Santiago began mentoring four years earlier is expected to manage it ({{borio2025c}}; {{rao2026}}). [[p:njeri-wambui]], represents the university leaders who made that call."
+        },
+        {
+          "id": "490c53",
+          "type": "personas",
+          "ids": [
+            "tesfaye-alemu",
+            "joseph-kamau",
+            "faith-chebet",
+            "nafula-simiyu",
+            "njeri-wambui"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crisis-as-a-catalyst-ethiopia-2023",
+      "heading": "Crisis as a catalyst: Ethiopia, 2023",
+      "blocks": [
+        {
+          "id": "7f0dc3",
+          "type": "paragraph",
+          "text": "David Stern has worked with the mathematics department at Bahir Dar University for about fifteen years ({{borio2025b}}). In 2023 Ethiopian higher education was in upheaval. Only about 3% of school leavers passed the national exit exam. Universities were told to run remedial courses for those who failed, while also preparing their own students for the first national exit exams for graduates. Bahir Dar called 49 people from 12 universities to a workshop in March 2023, led and co-facilitated by three IDEMS staff and a Kenyan colleague, to decide what to do in the four months available ({{stern2023}})."
+        },
+        {
+          "id": "9f3395",
+          "type": "paragraph",
+          "text": "[[p:hayat-seid]], is the person who has to make such decisions work. Three priorities came out. IDEMS and Bahir Dar co-designed a STACK remedial course covering 13 topics, released week by week, that any university could enrol up to 100,000 students on, and the INNODEMS interns completed its curriculum in six weeks. Existing Kenyan and Tanzanian questions covered 50–75% of the exit-exam blueprints straight away. And the compulsory first-year Basic Mathematics course was piloted with STACK for up to 1,500 students. To host it all, IDEMS set up STACK servers free for every Ethiopian university ({{stern2023}}; {{oyengo2024}}; {{juma2023}})."
+        },
+        {
+          "id": "af6ce3",
+          "type": "quote",
+          "text": "Our fruitful collaboration with IDEMS led to the successful implementation of a STACK-based Remedial Program, providing crucial support to a large number of students. […] Together with IDEMS, we are paving the way for a brighter future in mathematics education at Bahir Dar University.",
+          "source": "Mebratu Fenta Wakeni, Bahir Dar University, in {{odhiambo2024|n}}"
+        },
+        {
+          "id": "5e748d",
+          "type": "paragraph",
+          "text": "Not all of it worked, and IDEMS learned as much from what did not. The national servers ran into administrative, security and privacy barriers. Even at Bahir Dar, which had Moodle with STACK installed, students were not enrolled automatically when they joined, so the biggest courses never got going. IDEMS concluded that it had been working at the wrong level, the institution, when the barrier could be avoided by reaching lecturers and students directly ({{borio2025b}}). That lesson led to interactive textbooks ([[case:textbooks|case study 2]]). In 2025 a Memorandum of Understanding between Bahir Dar University, Wollo University and IDEMS made the partnership formal ({{oyengo2025}})."
+        },
+        {
+          "id": "555a55",
+          "type": "quote",
+          "persona": "hayat-seid"
+        }
+      ]
+    },
+    {
+      "id": "a-community-that-runs-itself",
+      "heading": "A community that runs itself",
+      "blocks": [
+        {
+          "id": "c721ec",
+          "type": "paragraph",
+          "text": "From 2023 the work had a yearly gathering. IDEMS helped organise every one, ran hands-on authoring workshops and paid for some participants to come. Year by year, the leadership moved to African hands."
+        },
+        {
+          "id": "d3befc",
+          "type": "timeline",
+          "items": [
+            {
+              "label": "2023",
+              "text": "First African STACK Conference at MMUST: 66 participants from 16 institutions, on about US$9,700 from the European Mathematical Society, the University of Geneva, SAMI, IDEMS and INNODEMS. Santiago Borio led most of the workshops with Juma, Wastalas and the interns. The conference set up the African STACK Community Leadership Team and committed to yearly conferences in rotating venues ({{lawi2023}})."
+            },
+            {
+              "label": "2024",
+              "text": "The second conference was planned for Ethiopia, but insecurity made international travel there inadvisable, so the Technical University of Kenya stepped in. The Kenya Mathematical Society owned the event. Technical and vocational colleges joined for the first time, and the newly founded Open University of Kenya arrived as a major new player. Institutions praised the INNODEMS team, and asked what would happen if it went away ({{juma2024}}; {{borio2024b}})."
+            },
+            {
+              "label": "2025",
+              "text": "Third conference at Bahir Dar: more than 50 participants from 11 African countries, and 78+ courses now using STACK. The MoU was signed with IDEMS. IDEMS committed to support the University of Juba and Somali National University, and the University of Namibia was supported to bring STACK into three courses ({{oyengo2025}})."
+            },
+            {
+              "label": "2026",
+              "text": "The International Meeting of the STACK Community came to Nairobi, its first time outside Europe, after years of lobbying by Mike from inside the international advisory board. Generative AI, entering maths on phones, academic integrity and Kenya's curriculum reform were all on the programme. GHAIDEMS, IDEMS' Ghanaian counterpart, offered to host the African meeting in 2027 ({{rao2026}}; {{borio2025c}})."
+            }
+          ]
+        },
+        {
+          "id": "2f437e",
+          "type": "subheading",
+          "text": "New kinds of learners"
+        },
+        {
+          "id": "9fe062",
+          "type": "paragraph",
+          "text": "Each widening of the community brought people the first pilot never imagined. Kenya has tens of public universities but a few hundred technical and vocational (TVET) colleges, which teach a far larger share of young people, to a more standardised curriculum ({{borio2024b}}). [[p:esther-wanjiku]], sees that a good set of questions could serve hundreds of colleges like hers. [[p:peter-kiprono]], came to college to wire buildings, not to do algebra. INNODEMS interns now train TVET tutors, and Juma's PhD studies STACK in six technical colleges ({{juma2025}}; {{borio2025c}})."
+        },
+        {
+          "id": "14ba4c",
+          "type": "quote",
+          "persona": "esther-wanjiku"
+        },
+        {
+          "id": "68c2fa",
+          "type": "paragraph",
+          "text": "Further west, IDEMS' research methods apprentices in Niger, Burkina Faso and Mali use STACK questions on data skills in the trainings they give agricultural research groups. In Burkina Faso a lecturer remarked that the questions had stretched the lecturers as well as the students ({{borio2025c}}). [[p:fatima-diallo]], represents them. For French-speaking West Africa, the next step is resources in French ({{diawara2026}})."
+        },
+        {
+          "id": "ffd5f9",
+          "type": "subheading",
+          "text": "The harder truths"
+        },
+        {
+          "id": "98278e",
+          "type": "paragraph",
+          "text": "Growth has not removed resistance. Some lecturers did not want to change how they taught, and some students objected to the extra work and the cost of data, though better results won many of them over ({{oyengo2024}}). The 2026 meeting surfaced a newer problem. At MMUST, some lecturers teaching parallel groups of the same course used STACK and others did not, so students in the same course had very different experiences. Gaps between quiz and exam marks raised questions about impersonation, Brian's world again. Trieste reported the same pattern between parallel groups. The meeting's conclusion was that providing technology is not enough. Scaling STACK also needs \"broad staff participation, consistent implementation practices and sustained institutional support\" ({{rao2026}})."
+        },
+        {
+          "id": "2610d3",
+          "type": "paragraph",
+          "text": "Sustainability runs through all of it. By 2025 INNODEMS had grown from four interns to fourteen staff, supported institutions in five countries, more than 20 courses and over 10,000 students a year, and trained more than 150 lecturers and tutors. The original four now mentor a new cohort of ten ({{juma2025}}). But INNODEMS is a support organisation, not an income-generating one, and most of its partners cannot pay ({{juma2025}}). The conferences have run on many small contributions. [[p:ruth-achieng]], asks the questions any funder would: will it last, who owns it locally, and what did the money actually do?"
+        },
+        {
+          "id": "296bfe",
+          "type": "quote",
+          "persona": "ruth-achieng"
+        },
+        {
+          "id": "44b30d",
+          "type": "personas",
+          "ids": [
+            "hayat-seid",
+            "esther-wanjiku",
+            "peter-kiprono",
+            "fatima-diallo",
+            "ruth-achieng"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crossing-over-the-commercial-contracts",
+      "heading": "Crossing over: the commercial contracts",
+      "blocks": [
+        {
+          "id": "fcc78e",
+          "type": "paragraph",
+          "text": "The step from community work to paid work came through people, not marketing. Danilo Lewański, a mathematician at the University of Trieste and a long-standing friend of IDEMS' work in Africa, had seen STACK through IDEMS' Kenyan partners and wanted it in Italy. Italian universities rely almost entirely on end-of-semester written and oral exams, with no obligation to assess during the semester. IDEMS was subcontracted to write Trieste's first questions, starting with probability and statistics for biology students, and supplied questions from the African open banks. Trieste then found it cheaper to employ a local author, trained through that work ({{stern2025p}}; {{doz2024}}). Italy's national recovery plan funded two PhD positions on STACK at Trieste, and Danilo recruited Juma and Wastalas, the same people who had supported the Kenyan interns ({{doz2024}}; {{borio2024c}})."
+        },
+        {
+          "id": "c77c65",
+          "type": "paragraph",
+          "text": "Trieste's lecturers and doctoral students went on to write many questions of their own. Their evaluation found clear gains in one Linear Algebra group that used every quiz, but none in a parallel group that used only some ({{doz2024}}). [[p:luca-ferrara]], likes knowing at once whether he is right, but notices that the quiz only looks at his final answer. [[p:paolo-benedetti]], now has a large bank in Italian of uneven quality. The relationship has grown into a wider contract: IDEMS reviews and improves Trieste's questions, especially in Linear Algebra, and turns more of the department's paper exercises into STACK (S. Borio, personal communication, October 2026). The relationship now runs both ways. In May 2026 Trieste hosted its own STACK meeting, supported by IDEMS, where colleagues from Maseno and MMUST presented alongside Georg Osang's textbook work and Michele Pancera's AI authoring tool ({{lewanski2026}})."
+        },
+        {
+          "id": "b188c1",
+          "type": "quote",
+          "persona": "paolo-benedetti"
+        },
+        {
+          "id": "367855",
+          "type": "paragraph",
+          "text": "The second contract is with a highly selective US research university, the California Institute of Technology (Caltech). In spring 2025 a large required course on ordinary and partial differential equations was redesigned with STACK at its core, possibly the first STACK course at a US institution. It had 130 to 190 students from many departments, undergraduates and PhD students together, in ten weeks, with content squeezed from three terms into two. [[p:daniel-brooks]], wrote questions in LaTeX. IDEMS, with colleagues at Edinburgh, turned 43 of them into STACK and adapted 11 more from ETH Zurich, with two rounds of review for each. IDEMS ran the STACK server and analysed student responses after the course. The university used Canvas rather than Moodle, so IDEMS worked for months with the university's IT teams to build a secure connection between the two ({{bryant2026}})."
+        },
+        {
+          "id": "588886",
+          "type": "paragraph",
+          "text": "Students at a highly selective university behave differently from a class of a thousand in Kenya, but not in every way. At first [[p:marcus-alvarez]], hated Moodle's default \"deferred feedback\", where he only learned what was wrong after submitting the whole quiz, and he did not trust a computer to mark him. Two changes turned the class round. Switching to *adaptive mode*, with immediate feedback and retries, was rated \"very useful\" by 86% of students. A *regrade request* route gave them a fair way to appeal, and often exposed bugs that could then be fixed for everyone. [[p:priya-raman]], handles those requests and reads the anonymous survey after every quiz. Students valued the weekly graded quizzes most, and liked the questions written later in the term best. The contract has since been extended to Calculus 1 and Linear Algebra ({{bryant2026}}; S. Borio, personal communication, October 2026)."
+        },
+        {
+          "id": "8a08b2",
+          "type": "quote",
+          "persona": "marcus-alvarez"
+        },
+        {
+          "id": "08b1a0",
+          "type": "subheading",
+          "text": "The IDEMS authors"
+        },
+        {
+          "id": "7c967e",
+          "type": "paragraph",
+          "text": "Both contracts are delivered by IDEMS staff, not by the African team. The team is small and unusual. Two are former secondary teachers with mathematics degrees: Santiago Borio and Michele Pancera, who learned STACK as Trieste's local author and joined IDEMS in 2025 ({{stern2025p}}). The third, Georg Osang, has a mathematics PhD in a field far from differential equations ({{borio2026b}}). None of them is a specialist in most of what they author. They work closely with lecturers who write the specifications, and an AI assistant helps with syntax, reviewing and checking that every requested change has been made ({{borio2026a}}; [[case:ai-authoring|case study 3]]). One contract also asks them to train the client's own staff to author ({{borio2026b}}). [[p:tomas-ferreyra]], captures the job: client deadlines in the morning, open question banks for African universities in the evening."
+        },
+        {
+          "id": "ddae0c",
+          "type": "quote",
+          "persona": "tomas-ferreyra"
+        },
+        {
+          "id": "3bf0d4",
+          "type": "personas",
+          "ids": [
+            "luca-ferrara",
+            "paolo-benedetti",
+            "daniel-brooks",
+            "marcus-alvarez",
+            "priya-raman",
+            "tomas-ferreyra"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "the-same-need-a-different-role",
+      "heading": "The same need, a different role",
+      "blocks": [
+        {
+          "id": "f4c922",
+          "type": "paragraph",
+          "text": "It would be easy to assume that a 1,000-student course in Kenya and a 150-student course in the US need different things. IDEMS' experience suggests otherwise. STACK plays a very different *role* in each. In Kenya it makes regular feedback possible where nobody else can give it. In the US there are teaching assistants and tutors, so people are not the bottleneck. Yet in both places students value the same thing: low-stakes mastery practice, with many attempts, new variants and feedback each time. Formative questions that build mastery are the best place to start almost everywhere ({{borio2026b}}). Juma, now a PhD student at Trieste, is comparing how STACK has been integrated at Trieste, MMUST and Maseno ({{lewanski2026}})."
+        },
+        {
+          "id": "e1154d",
+          "type": "paragraph",
+          "text": "The real difference is what each setting can afford. When IDEMS wrote questions as unpaid impact work, quality had to give way to quantity: many questions, little time for feedback. Paid work allows the three-round process Chris Sangwin recommends, where a question is written, used, analysed from real responses and then improved ({{lawi2023}}; {{borio2026b}}). Because most partners agree to open licences, questions written for one university can be adapted for another, so the commercial work raises the standard IDEMS can offer its African partners too ({{borio2026b}})."
+        },
+        {
+          "id": "3e992c",
+          "type": "paragraph",
+          "text": "The contracts are also changing IDEMS itself. The STACK professionals network has 20 to 30 active members, and every one of them is based at a single institution except IDEMS. IDEMS is becoming something different: a cross-institution team of assessment specialists who work alongside in-house authors rather than replacing them, paid through small internal grants that partner universities subcontract to it. For the first time, STACK authoring is covering the salaries of the people who do it ({{borio2026b}})."
+        }
+      ]
+    },
+    {
+      "id": "what-comes-next",
+      "heading": "What comes next",
+      "blocks": [
+        {
+          "id": "d9420d",
+          "type": "paragraph",
+          "text": "INNODEMS plans a regional support hub to mentor similar teams in other countries ({{juma2025}}), more work with TVET colleges and polytechnics, and expansion into French-speaking, southern and conflict-affected Africa. MMUST's African STACK Centre and the 2027 meeting in Ghana will test whether the community can carry itself. Commercially, IDEMS is extending its contracts to new courses and exploring a role as a shared assessment service that universities can draw on without each building their own ({{borio2026b}}). Two threads grow directly out of this story. Interactive textbooks reach students who never log in to Moodle ([[case:textbooks|case study 2]]). AI tools could make question writing approachable for many more authors ([[case:ai-authoring|case study 3]])."
+        }
+      ]
+    },
+    {
+      "id": "the-social-the-technical-and-the-innovat",
+      "heading": "The social, the technical and the innovation",
+      "blocks": [
+        {
+          "id": "d081ea",
+          "type": "sti",
+          "intro": "IDEMS describes its work as socio-technical innovation: change that only happens when new technology and new ways of working with people move together ({{stern2025o}}). Read that way, this case study has three layers.",
+          "social": [
+            {
+              "title": "Champions who own the work.",
+              "text": "Mike Obiero, George Lawi, Idrissa Said Amour and Abdu Mohammed Seid drove adoption in their own institutions. IDEMS' role moved from doing the work to backing them."
+            },
+            {
+              "title": "Lowering the cost of saying yes.",
+              "text": "\"Teach as normal\" asked lecturers to change nothing except who marks the continuous assessment. Results then won over sceptics like Nafula."
+            },
+            {
+              "title": "Layered mentoring.",
+              "text": "IDEMS staff trained postgraduates, who supported interns, who now mentor the next cohort and train lecturers. It was slow and costly at first, and then grew faster than outside experts could have."
+            },
+            {
+              "title": "A community with rotating ownership.",
+              "text": "Conferences moved between hosts, the Kenya Mathematical Society took ownership, and a leadership team and an African STACK Centre followed."
+            },
+            {
+              "title": "Trust and fairness.",
+              "text": "Cheating as \"help\", data costs, uneven adoption between parallel groups, and US students' distrust of automatic marking are all social problems, met with low stakes, regrade routes and listening."
+            },
+            {
+              "title": "A new kind of team.",
+              "text": "Cross-institution assessment specialists, working to lecturers' specifications, on open licences where partners agree."
+            }
+          ],
+          "technical": [
+            {
+              "title": "STACK itself.",
+              "text": "Randomised questions, answers checked by a computer algebra system, and feedback trees that respond to specific mistakes."
+            },
+            {
+              "title": "The mastery and test quiz model,",
+              "text": "later extended into the five-quiz model of diagnostic, content, mastery, test and extension quizzes ({{juma2024}})."
+            },
+            {
+              "title": "Hosting as a service.",
+              "text": "IDEMS servers for universities with no Moodle, free STACK servers for Ethiopia, and unlimited access for Dar es Salaam."
+            },
+            {
+              "title": "Open question banks",
+              "text": "in seven areas of undergraduate mathematics, with trackers and review tools, hosted free by IDEMS."
+            },
+            {
+              "title": "Integration and settings.",
+              "text": "A secure connection from Canvas to Moodle for the US partner, adaptive mode, regrade requests and analysis of student responses after each course."
+            },
+            {
+              "title": "Data for improvement.",
+              "text": "Juma et al.'s student categories, and analytics tools that let lecturers see what students actually do."
+            }
+          ],
+          "innovation": [
+            {
+              "title": "A scalable model, not a project.",
+              "text": "Open banks, a local professional team and a self-organising community together let assessment with feedback spread from one campus to more than 78 courses, mostly through peers rather than funding. IDEMS calls this \"viral scaling\" ({{borio2024a}})."
+            },
+            {
+              "title": "Impact work and paid work that feed each other.",
+              "text": "Experience from the lowest-resource settings made IDEMS credible to some of the highest. Paid work then funds the quality that flows back, openly, to African partners."
+            },
+            {
+              "title": "Assessment specialists as a shared resource.",
+              "text": "A team that works across institutions, complementing in-house authors, is a role most universities need but none can justify building alone."
+            },
+            {
+              "title": "Learning from what failed.",
+              "text": "Ethiopia showed that working at the institution level can stall. Reaching students and lecturers directly is the innovation that case study 2 takes up."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
