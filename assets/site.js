@@ -6,7 +6,9 @@
   const app = document.getElementById("app");
 
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-  const getJSON = path => fetch(ROOT + path).then(r => { if (!r.ok) throw new Error(`${path}: ${r.status}`); return r.json(); });
+  // "no-cache" makes the browser check for a newer version every time (GitHub Pages otherwise lets it reuse files for
+  // 10 minutes), so approved edits show up on the next reload; unchanged files cost only a tiny "not modified" reply.
+  const getJSON = path => fetch(ROOT + path, { cache: "no-cache" }).then(r => { if (!r.ok) throw new Error(`${path}: ${r.status}`); return r.json(); });
 
   // ---------- Load content ----------
   let site, cats, PERSONAS, caseDocs, REFS = {};
