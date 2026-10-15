@@ -44,6 +44,16 @@
   }
   function loadDraft() { try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch (_) { return null; } }
   function clearDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (_) {} }
+  // After a submission is sent, later submissions from the same page "follow" it: the GitHub Action adds them to the
+  // same pull request. The link remembers the issue number and which changes were already sent.
+  const LINK_KEY = "edit-link:" + location.pathname;
+  const loadLink = () => { try { return JSON.parse(localStorage.getItem(LINK_KEY) || "null"); } catch (_) { return null; } };
+  const saveLink = l => { try { localStorage.setItem(LINK_KEY, JSON.stringify(l)); } catch (_) {} };
+  const clearLink = () => { try { localStorage.removeItem(LINK_KEY); } catch (_) {} };
+  let link = null;
+  const strip = ({ where, type, name, ...op }) => op;
+  const opKey = (file, op) => JSON.stringify([file, strip(op)]);
+  const isSent = (file, op) => !!(link && link.sent && link.sent.includes(opKey(file, op)));
   const pick = (o, keys) => Object.fromEntries(keys.filter(k => o[k] !== undefined).map(k => [k, clone(o[k])]));
 
   // ---------- Paths ----------
@@ -385,11 +395,14 @@
   // ---------- Bar, review and submit ----------
   let bar;
   function count() { return allEdits().reduce((n, e) => n + e.ops.length, 0); }
+  function countNew() { return allEdits().reduce((n, e) => n + e.ops.filter(op => !isSent(e.file, op)).length, 0); }
   function updateBar() {
     if (!bar) return;
-    const n = count();
-    bar.querySelector(".ed-count").textContent = n ? `${n} change${n === 1 ? "" : "s"}` : "No changes yet";
-    bar.querySelector("[data-bar=review]").disabled = !n;
+    const n = count(), fresh = countNew();
+    bar.querySelector(".ed-count").textContent = !n ? "No changes yet"
+      : link ? (fresh ? `${fresh} new change${fresh === 1 ? "" : "s"} for #${link.issue}` : `All changes sent in #${link.issue}`)
+      : `${n} change${n === 1 ? "" : "s"}`;
+    bar.querySelector("[data-bar=review]").disabled = !fresh;
   }
   function showBar() {
     bar = document.createElement("div");
@@ -410,9 +423,10 @@
   function review() {
     const edits = allEdits(), dlg = document.createElement("dialog");
     dlg.className = "ed-review";
-    const items = edits.flatMap(e => e.ops.map(op => ({ op })));
+    const items = edits.flatMap(e => e.ops.map(op => ({ op, sent: isSent(e.file, op) })));
     dlg.innerHTML = `<h2>Review your changes</h2>
-      <ul class="ed-changes">${items.map((it, i) => `<li><span>${esc(describe(it.op))}</span><button type="button" data-undo="${i}">Undo</button></li>`).join("")}</ul>
+      ${link ? `<p class="ed-explain">These will be added to your earlier suggestion, <a href="https://github.com/${esc(A.site.repository)}/issues/${link.issue}" target="_blank" rel="noopener">#${link.issue}</a>.</p>` : ""}
+      <ul class="ed-changes">${items.map((it, i) => `<li${it.sent ? ' class="ed-sent"' : ""}><span>${esc(describe(it.op))}${it.sent ? ` <em>(already sent)</em>` : ""}</span>${it.sent ? "" : `<button type="button" data-undo="${i}">Undo</button>`}</li>`).join("")}</ul>
       <label class="ed-note">What did you change, and why? <span>(a short note for the reviewer)</span><textarea rows="3" placeholder="e.g. Corrected Faith's age and tightened the Kenya section"></textarea></label>
       <p class="ed-explain">Submitting opens GitHub in a new tab with your changes filled in. Click <b>Create</b> there to send them. You need to be logged in to GitHub.</p>
       <div class="ed-actions"><button type="button" data-r="back">Keep editing</button><button type="button" class="primary" data-r="submit">Submit for review</button></div>`;
@@ -428,28 +442,95 @@
     });
   }
 
-  function submit(dlg, note) {
+  // Must match fingerprint() in tools/apply-edit.js
+  async function fingerprint(v) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify(v ?? null)));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
+  }
+  // Operations as sent: the original value of an edited field is replaced by a short fingerprint, which is enough for
+  // the Action to detect clashes, and the whole thing is compressed so the GitHub link stays short.
+  async function packed(edits) {
+    const out = [];
+    for (const e of edits) {
+      const ops = [];
+      for (const op of e.ops.map(strip)) {
+        if ((op.op === "set" || op.op === "delete") && "old" in op) { const { old, ...rest } = op; ops.push({ ...rest, oldHash: await fingerprint(old) }); }
+        else ops.push(op);
+      }
+      out.push({ file: e.file, ops });
+    }
+    return out;
+  }
+  async function encode(payload) {
+    const json = JSON.stringify(payload);
+    if (typeof CompressionStream === "undefined") return "```json\n" + json + "\n```";
+    const stream = new Blob([json]).stream().pipeThrough(new CompressionStream("deflate-raw"));
+    const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+    let bin = ""; bytes.forEach(b => { bin += String.fromCharCode(b); });
+    return "```edit-v2\n" + btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") + "\n```";
+  }
+
+  async function submit(dlg, note) {
     const edits = allEdits();
     const pageTitle = doc ? doc.short : A.CAT ? A.CATEGORIES[A.CAT].label : "Home page";
-    const lines = edits.flatMap(e => e.ops.map(op => "- " + describe(op)));
-    const payload = { version: 1, editor, page: location.pathname, edits: edits.map(e => ({ file: e.file, ops: e.ops.map(({ where, type, name, ...op }) => op) })) };
-    const title = `[edit] ${pageTitle}: ${note ? note.slice(0, 70) : lines.length + " change" + (lines.length === 1 ? "" : "s")}`;
-    const full = `**Suggested changes to ${pageTitle}**\n\n${lines.join("\n")}\n\n**Note from the editor**\n\n${note || "_No note._"}\n\n<details><summary>Technical details for the robot (please do not edit)</summary>\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\`\n</details>\n`;
+    const fresh = edits.flatMap(e => e.ops.filter(op => !isSent(e.file, op)).map(op => "- " + describe(op)));
+    const sentBefore = edits.flatMap(e => e.ops.filter(op => isSent(e.file, op)).map(op => "- " + describe(op)));
+    // Always send every change made on this page so far: the Action skips the ones already applied.
+    const payload = { version: 2, editor, page: location.pathname, ...(link ? { follows: link.issue } : {}), edits: await packed(edits) };
+    const title = link ? `[edit] ${pageTitle}: update to #${link.issue}` : `[edit] ${pageTitle}: ${note ? note.slice(0, 70) : fresh.length + " change" + (fresh.length === 1 ? "" : "s")}`;
+    const full = (link ? `**More changes for #${link.issue}** (${pageTitle})\n\n` : `**Suggested changes to ${pageTitle}**\n\n`) +
+      `${fresh.join("\n")}\n\n${sentBefore.length ? `<sub>Also included, sent before: ${sentBefore.length} change(s).</sub>\n\n` : ""}**Note from the editor**\n\n${note || "_No note._"}\n\nPage: ${location.pathname}\n\n` +
+      `<details><summary>Technical details for the robot (please do not edit)</summary>\n\n${await encode(payload)}\n</details>\n`;
     const base = `https://github.com/${A.site.repository}/issues/new`;
     let url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(full)}`, pasted = false;
-    if (url.length > 7500) {
+    if (url.length > 6000) {
       // Too long for a link: copy the text and ask the editor to paste it.
       pasted = true;
       try { navigator.clipboard.writeText(full); } catch (_) {}
       url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent("Paste your changes here (Ctrl+V or ⌘V), replacing this line.")}`;
     }
+    const submittedAt = Date.now(), sentKeys = edits.flatMap(e => e.ops.map(op => opKey(e.file, op)));
     window.open(url, "_blank", "noopener");
     dlg.innerHTML = `<h2>Almost done</h2>
       <p>GitHub has opened in a new tab.${pasted ? " Your changes were too long to fill in automatically, so they have been <b>copied</b>: paste them into the description box." : ""} Click <b>Create</b> there to send your changes.</p>
-      <p>A reviewer will be notified, and the page updates once they approve. You can follow progress on the GitHub page.</p>
+      <p class="ed-explain">If GitHub showed an error while you were signing in, <button type="button" class="ed-link" data-r="again">open GitHub again</button>: you're signed in now, so it will work.</p>
       ${pasted ? `<details><summary>If pasting doesn't work, copy this text</summary><textarea rows="6" readonly>${esc(full)}</textarea></details>` : ""}
-      <div class="ed-actions"><button type="button" data-r="back">Keep editing</button><button type="button" class="primary" data-r="done">I've sent it: clear my changes</button></div>`;
-    dlg.querySelector("[data-r=done]").addEventListener("click", () => { clearDraft(); dlg.close(); stop(true); });
+      <p class="ed-explain">Once you've clicked Create, tell us below. If you keep editing, your next changes will be added to the same suggestion.</p>
+      <div class="ed-actions ed-actions-wrap"><button type="button" data-r="back">Not sent yet</button><button type="button" data-r="sentkeep">I've sent it: keep editing</button><button type="button" class="primary" data-r="done">I've sent it: I'm finished</button></div>`;
+    dlg.addEventListener("click", async e => {
+      const r = e.target.closest("[data-r]"); if (!r) return;
+      if (r.dataset.r === "again") { window.open(url, "_blank", "noopener"); return; }
+      if (r.dataset.r === "back") return dlg.close();
+      if (r.dataset.r === "done") { clearDraft(); clearLink(); dlg.close(); return stop(true); }
+      if (r.dataset.r === "sentkeep") {
+        if (!link) {
+          dlg.innerHTML = `<h2>Finding your suggestion on GitHub…</h2><p class="ed-explain">This takes a few seconds.</p>`;
+          const n = await findIssue(submittedAt);
+          if (!n) {
+            dlg.innerHTML = `<h2>Couldn't find it yet</h2><p>We couldn't find your suggestion on GitHub. If you did click Create, your next changes will be sent as a separate suggestion, which works too.</p><div class="ed-actions"><button type="button" class="primary" data-r="back">Keep editing</button></div>`;
+            return;
+          }
+          link = { issue: n, sent: [] };
+        }
+        link.sent = sentKeys;
+        saveLink(link); saveDraft();
+        dlg.close(); updateBar();
+      }
+    });
+  }
+  // The issue just created by this editor for this page (GitHub's public API; it may take a moment to appear).
+  async function findIssue(since) {
+    const api = `https://api.github.com/repos/${A.site.repository}/issues?creator=${encodeURIComponent(editor)}&state=open&sort=created&direction=desc&per_page=10`;
+    for (let i = 0; i < 8; i++) {
+      try {
+        const list = await (await fetch(api, { cache: "no-store" })).json();
+        const hit = Array.isArray(list) && list.find(x => !x.pull_request && /^\[edit\]/.test(x.title) && !/update to #\d+/.test(x.title)
+          && (x.body || "").includes(`Page: ${location.pathname}`) && Date.parse(x.created_at) > since - 120000);
+        if (hit) return hit.number;
+      } catch (_) {}
+      await new Promise(r => setTimeout(r, 4000));
+    }
+    return null;
   }
 
   // ---------- Who is editing? ----------
@@ -483,6 +564,7 @@
           <p>Enter your GitHub username. People who have access to this site's GitHub repository can suggest changes.</p>
           <form method="dialog"><label class="ed-note">GitHub username<input type="text" name="u" autocomplete="username" spellcheck="false" placeholder="e.g. jane-doe" value="${esc(remembered || "")}"></label>
           ${msg ? `<p class="ed-gate-msg">${msg}</p>` : ""}
+          <p class="ed-explain">Tip: <a href="https://github.com/login" target="_blank" rel="noopener">log in to GitHub</a> in this browser before you start, so sending your changes later is one click.</p>
           <p class="ed-explain">No GitHub account yet? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one for free</a>, then ask ${contact} to give you access.</p>
           <div class="ed-actions"><button type="button" data-g="cancel">Cancel</button><button type="submit" class="primary">Continue</button></div></form>`;
         const input = dlg.querySelector("input"); input.focus(); input.select();
@@ -545,6 +627,13 @@
       renderCase();
     } else enablePageText();
     if (draft && draft.personas) for (const [id, v] of Object.entries(draft.personas)) if (A.byId[id]) { personaOrig[id] = v.orig; Object.assign(A.byId[id], v.cur); }
+    link = loadLink();
+    if (link) {
+      try {
+        const st = await (await fetch(`https://api.github.com/repos/${A.site.repository}/issues/${link.issue}`, { cache: "no-store" })).json();
+        if (st.state === "closed") { clearLink(); link = null; if (!countNew()) { clearDraft(); location.reload(); return; } }
+      } catch (_) {}
+    }
     for (const t of [A.app, A.dialog]) { t.addEventListener("input", onInput); t.addEventListener("keydown", onKey); t.addEventListener("paste", onPaste); }
     A.app.addEventListener("click", onTool);
     A.app.addEventListener("change", onChange);

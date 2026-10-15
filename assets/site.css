@@ -203,3 +203,6 @@ li:hover > .ed-itools, .stat:hover > .ed-itools, tr:hover .ed-itools, th:hover >
 .ed-gate input { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; font: inherit; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
 .ed-gate-msg { color: #b45309; font-size: 14px; }
 .ed-gate a { color: var(--accent); }
+
+.ed-changes li.ed-sent { color: var(--muted); }
+.ed-actions-wrap { flex-wrap: wrap; }
