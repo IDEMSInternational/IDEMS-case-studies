@@ -3,7 +3,7 @@
   "short": "AI authoring",
   "title": "Product development: AI agents for writing STACK questions",
   "summary": "How IDEMS went from a personal chatbot to a multi-agent system that plans, writes and checks questions with a human author.",
-  "standfirst": "Every chapter of IDEMS' STACK story has run into the same limit: too few people who can write good questions. This case study follows how IDEMS went from one teacher's personal chatbot to a multi-agent system that plans, writes and checks questions with a human author, and how the same work is reshaping what IDEMS means by responsible AI: tools that help experts go further, and tools that help many more people become authors.",
+  "standfirst": "Change number 1. Every chapter of IDEMS' STACK story has run into the same limit: too few people who can write good questions. This case study follows how IDEMS went from one teacher's personal chatbot to a multi-agent system that plans, writes and checks questions with a human author, and how the same work is reshaping what IDEMS means by responsible AI: tools that help experts go further, and tools that help many more people become authors.",
   "note": "Personas are fictional composites. Select any persona to open the full profile. The system described is in active development, and its figures come from a case study dated September 2026.",
   "stats": [
     {
