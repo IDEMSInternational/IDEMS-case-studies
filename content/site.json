@@ -11,6 +11,6 @@
   "repository": "IDEMSInternational/IDEMS-case-studies",
   "editorsContact": "Santiago Borio",
   "editorsEmail": "smborio@idems.international",
-  "feedbackEndpoint": "",
-  "feedbackBot": ""
+  "feedbackEndpoint": "https://script.google.com/macros/s/AKfycby6qarJJ9Blv3P5t-0Zu-VsQ4BIGu2XjI92pM4-BB0ahNujUxpl3BYmoJ0c01GsFgWCMQ/exec",
+  "feedbackBot": "smborio"
 }

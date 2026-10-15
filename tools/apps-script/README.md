@@ -12,7 +12,7 @@ Anonymous issues will show as opened by this account. A separate free account (f
 
 Signed in as that account on GitHub: **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
 
-- **Resource owner:** IDEMSInternational, if available. If the organisation doesn't allow fine-grained tokens, use a **Tokens (classic)** token with the `public_repo` scope instead.
+- **Resource owner:** IDEMSInternational. Note: the IDEMSInternational organisation holds fine-grained tokens for admin approval (they show as "Pending" and the script fails with "something went wrong"). Without an admin, use a **Tokens (classic)** token with only the `public_repo` scope instead, which public repositories accept straight away (that is what is set up now).
 - **Repository access:** only `IDEMS-case-studies`.
 - **Permissions:** Issues: **Read and write**.
 - **Expiration:** pick a date and put a reminder in your calendar to renew it.
