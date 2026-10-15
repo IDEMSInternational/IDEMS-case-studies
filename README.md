@@ -73,14 +73,14 @@ Run `node tools/validate.js` before committing. It lists every problem, such as 
 Anyone with a GitHub account who is a collaborator on this repository can suggest changes directly on the site:
 
 1. Click **✎ Edit** (bottom right) on any page, or open a page with `?edit` at the end of its address.
-2. Click text to change it. On case-study pages, the buttons beside each block move it, add a paragraph or delete it. Pressing Enter in a paragraph splits it in two. In a persona's profile, Enter adds a list item, and Backspace in an empty item removes it. Citations and links show as grey chips that can be moved or deleted but not broken.
+2. Click text to change it. On case-study pages, the buttons beside each block (including blocks inside boxes) move it, add a paragraph or delete it, and pressing Enter in a paragraph splits it in two. The ＋ and × buttons add or remove timeline entries, table rows and columns, points in the closing section and key figures, and persona rows have a picker to add or remove personas. In a persona's profile, Enter adds a list item and Backspace in an empty item removes it. The introduction and notes on the home and category pages can be edited too. Citations and links show as grey chips that can be moved or deleted but not broken.
 3. Click **Review & submit**, check the list of changes, add a note and submit. GitHub opens with everything filled in; click **Create**.
 4. The **Apply website edit** Action (`tools/apply-edit.js`) applies the changes to the JSON, runs the validator and opens a pull request. Changes that clash with newer edits are not applied; they are listed in the pull request for a maintainer.
 5. A maintainer reviews and merges the pull request, and the site updates.
 
 Unsent changes are kept in the editor's browser until they are submitted. Edits are recorded against permanent block ids with the original text, so suggestions to different paragraphs never interfere with each other. Only issues opened by the repository owner, organisation members or collaborators are applied.
 
-Editing timelines, tables and the structure of boxes or the closing section (beyond their text) is not supported yet.
+New block types (tables, timelines, boxes) can't be created from the website yet; add those in the JSON.
 
 ## Status
 

@@ -105,19 +105,19 @@
     }).join("");
     return `<header class="top"><div class="wrap"><div class="eyebrow">${esc(site.organisation)} · ${esc(site.status)}</div><h1>${esc(site.title)}</h1></div></header>
       <main class="wrap"><div class="cat-list">${cards}</div>
-        <h2 class="section">${esc(site.personasHeading)}</h2><p class="note">${md(site.personasNote)}</p><div id="persona-browser"></div></main>
-      <footer class="site"><div class="wrap"><h2>${esc(site.creditsHeading)}</h2><p>${md(site.creditsNote)}</p>${creditsHTML()}</div></footer>`;
+        <h2 class="section">${esc(site.personasHeading)}</h2><p class="note" data-sf="personasNote">${md(site.personasNote)}</p><div id="persona-browser"></div></main>
+      <footer class="site"><div class="wrap"><h2>${esc(site.creditsHeading)}</h2><p data-sf="creditsNote">${md(site.creditsNote)}</p>${creditsHTML()}</div></footer>`;
   }
 
   function categoryHTML() {
     const c = CATEGORIES[CAT];
-    const head = `<header class="top"><div class="wrap"><div class="eyebrow">${esc(site.organisation)} · ${esc(c.label)} · ${esc(site.status)}</div><h1>${esc(c.label)}</h1>${c.lede ? `<p class="lede">${md(c.lede)}</p>` : ""}</div></header>`;
+    const head = `<header class="top"><div class="wrap"><div class="eyebrow">${esc(site.organisation)} · ${esc(c.label)} · ${esc(site.status)}</div><h1>${esc(c.label)}</h1>${c.lede ? `<p class="lede" data-cf="lede">${md(c.lede)}</p>` : ""}</div></header>`;
     if (c.comingSoon) return head + `<main class="wrap"><p class="coming-soon">${esc(site.comingSoon)}</p></main>`;
     const caseCards = casesIn(CAT).map((k, i) => `<a class="case-card" href="${caseHref(k)}"><span>Case study ${i + 1}</span><b>${esc(CASES[k].title)}</b><p>${esc(CASES[k].summary)}</p></a>`).join("");
     return head + `<main class="wrap"><h2 class="section">Case studies</h2><div class="case-list">${caseCards}</div>
-        <h2 class="section">${esc(site.personasHeading)}</h2><p class="note">${md(c.personasNote)}</p><div id="persona-browser" data-category="${CAT}"></div></main>
-      <footer class="site"><div class="wrap">${c.sources ? `<h2>Sources</h2><p>${md(c.sources)}</p>` : ""}
-        <h2>${esc(site.creditsHeading)}</h2><p>${md(c.creditsNote)}</p>${creditsHTML(CAT)}</div></footer>`;
+        <h2 class="section">${esc(site.personasHeading)}</h2><p class="note" data-cf="personasNote">${md(c.personasNote)}</p><div id="persona-browser" data-category="${CAT}"></div></main>
+      <footer class="site"><div class="wrap">${c.sources ? `<h2>Sources</h2><p data-cf="sources">${md(c.sources)}</p>` : ""}
+        <h2>${esc(site.creditsHeading)}</h2><p data-cf="creditsNote">${md(c.creditsNote)}</p>${creditsHTML(CAT)}</div></footer>`;
   }
 
   // Case-study blocks. Every rendered block carries data-block="<id>" so it can be traced back to the JSON.

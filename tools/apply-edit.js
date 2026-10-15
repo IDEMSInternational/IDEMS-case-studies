@@ -27,7 +27,8 @@ let payload;
 try { payload = JSON.parse(m[1]); } catch (e) { fail("The changes in this issue could not be read (they may have been edited by hand). Please submit them again from the website."); }
 if (payload.version !== 1 || !Array.isArray(payload.edits)) fail("These changes come from an older or unknown version of the editor. Please submit them again from the website.");
 
-const FILE_OK = /^content\/[a-z0-9-]+\/(personas|case-studies\/[a-z0-9-]+)\.json$/;
+const FILE_OK = /^content\/([a-z0-9-]+\/(personas|case-studies\/[a-z0-9-]+)|site|categories)\.json$/;
+const SITE_FIELDS = ["personasNote", "creditsNote"], CAT_FIELDS = ["lede", "personasNote", "sources", "creditsNote"];
 const applied = [], conflicts = [];
 
 function findBlock(doc, id) {
@@ -56,6 +57,13 @@ for (const edit of payload.edits) {
       if (!same(p[op.field], op.old)) { conflict(op, "someone else changed this field in the meantime", p[op.field]); continue; }
       p[op.field] = op.new; ok(op); continue;
     }
+    if (op.target === "site" || op.target === "category") {
+      const obj = op.target === "site" ? (!Array.isArray(data) && data) : Array.isArray(data) && data.find(c => c.id === op.category);
+      const allowed = op.target === "site" ? SITE_FIELDS : CAT_FIELDS;
+      if (!obj || !allowed.includes(op.field)) { conflict(op, "this text cannot be edited"); continue; }
+      if (!same(obj[op.field], op.old)) { conflict(op, "someone else changed this text in the meantime", obj[op.field]); continue; }
+      obj[op.field] = op.new; ok(op); continue;
+    }
     if (!data.sections) { conflict(op, "unexpected change for this file"); continue; }
     if (op.target === "doc") {
       if (!["title", "standfirst", "note", "stats"].includes(op.field)) { conflict(op, "this field cannot be edited"); continue; }
@@ -81,9 +89,17 @@ for (const edit of payload.edits) {
       if (!same(f.b, op.old)) { conflict(op, "someone else changed this block after you decided to delete it", f.b); continue; }
       f.list.splice(f.list.indexOf(f.b), 1); ok(op); continue;
     }
+    // Lists of blocks: a section, or the inside of a box (op.parent)
+    const listFor = op => {
+      const s = data.sections.find(x => x.id === op.section); if (!s) return null;
+      if (!op.parent) return s.blocks;
+      const box = s.blocks.find(b => b.id === op.parent);
+      return box && box.type === "box" ? box.blocks : null;
+    };
     if (op.op === "order") {
-      const s = data.sections.find(x => x.id === op.section);
-      if (!s) { conflict(op, "this section no longer exists"); continue; }
+      const list = listFor(op);
+      if (!list) { conflict(op, "this section or box no longer exists"); continue; }
+      const s = { blocks: list };
       const present = s.blocks.map(b => b.id).filter(id => op.old.includes(id));
       if (!same([...present].sort(), [...op.old].sort()) || !same([...op.new].sort(), [...op.old].sort())) { conflict(op, "the blocks in this section changed in the meantime, so the new order could not be applied"); continue; }
       const pos = s.blocks.map((b, i) => op.old.includes(b.id) ? i : -1).filter(i => i >= 0);
@@ -92,8 +108,9 @@ for (const edit of payload.edits) {
       ok(op); continue;
     }
     if (op.op === "insert") {
-      const s = data.sections.find(x => x.id === op.section);
-      if (!s) { conflict(op, "this section no longer exists"); continue; }
+      const list = listFor(op);
+      if (!list) { conflict(op, "this section or box no longer exists"); continue; }
+      const s = { blocks: list };
       const b = op.block || {};
       if (b.type !== "paragraph" || typeof b.text !== "string") { conflict(op, "only new paragraphs can be added from the website"); continue; }
       const ids = usedIds(data);
@@ -110,6 +127,7 @@ for (const edit of payload.edits) {
 
 // Plain-language list of what happened, for the pull request and the issue.
 const what = op => op.target === "persona" ? `persona \`${op.persona}\`: ${op.field}` :
+  op.target === "site" ? `home page: ${op.field}` : op.target === "category" ? `${op.category} page: ${op.field}` :
   op.target === "doc" ? `case study ${op.field}` : op.target === "section" ? `section heading “${snippet(op.old)}”` :
   op.op === "set" ? `block \`${op.block}\` (${op.field})` : op.op === "delete" ? `deleted block \`${op.block}\`` :
   op.op === "insert" ? `new paragraph after \`${op.after || "start of section"}\`` : op.op === "order" ? `order of blocks in section \`${op.section}\`` : op.op;

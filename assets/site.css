@@ -184,3 +184,16 @@ dialog.ed-review::backdrop { background: rgba(20, 18, 15, .45); }
 .ed-explain { color: var(--muted); font-size: 14px; }
 .ed-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
 @media print { .edit-fab, .ed-bar { display: none; } }
+/* Add/remove controls for entries, rows, points and figures; persona row picker */
+.ed-itools { display: inline-flex; gap: 3px; margin-left: 6px; vertical-align: middle; opacity: .25; transition: opacity .15s; }
+li:hover > .ed-itools, .stat:hover > .ed-itools, tr:hover .ed-itools, th:hover > .ed-itools, .ed-itools:focus-within { opacity: 1; }
+.ed-itools button, .ed-addfirst, .ed-px { font: 600 12px Inter, system-ui, sans-serif; line-height: 1; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 6px; padding: 3px 6px; cursor: pointer; }
+.ed-itools button:hover, .ed-px:hover { border-color: var(--accent); color: var(--accent); }
+.stat { position: relative; }
+.stat > .ed-itools { position: absolute; top: 6px; right: 6px; margin: 0; }
+.ed-table td.ed-rowtools, .ed-table th.ed-rowtools { width: 1%; white-space: nowrap; border-bottom-color: transparent; }
+.ed-addfirst { margin: 4px 0 8px; }
+.ed-pwrap { position: relative; display: block; }
+.ed-pwrap .pcard { height: 100%; box-sizing: border-box; }
+.ed-px { position: absolute; top: -8px; right: -8px; border-radius: 999px; padding: 3px 7px; box-shadow: var(--shadow); }
+.ed-padd { align-self: center; font: 14px Inter, system-ui, sans-serif; padding: 10px; border: 1px dashed var(--line); border-radius: 12px; background: var(--surface); color: var(--muted); }
