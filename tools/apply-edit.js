@@ -17,11 +17,13 @@ const snippet = v => { const s = typeof v === "string" ? v : JSON.stringify(v); 
 
 function fail(msg) { comment(`⚠️ ${msg}`); console.log(msg); process.exit(0); }
 
-// Only people with access to the repository can submit edits; the site is public. The check uses the account that
-// actually created the issue, whatever username was typed on the website.
+// Only people added directly as collaborators on the repository can submit edits; the site is public. The check uses
+// the account that actually created the issue, whatever username was typed on the website.
 const siteJson = JSON.parse(fs.readFileSync(path.join(ROOT, "content/site.json"), "utf8"));
 const contact = (siteJson.editorsContact || "the site maintainer") + (siteJson.editorsEmail ? ` (${siteJson.editorsEmail})` : "");
-if (!["OWNER", "MEMBER", "COLLABORATOR"].includes(issue.author_association))
+const collaborators = DRY ? (process.env.DRY_COLLABORATORS || "").split(",") :
+  run("gh", ["api", "--paginate", `repos/${repo}/collaborators?affiliation=direct&per_page=100`, "--jq", ".[].login"]).split(/\r?\n/);
+if (!collaborators.some(l => l && l.toLowerCase() === issue.user.login.toLowerCase()))
   fail(`Thanks for the suggestion! @${issue.user.login} doesn't have access to this repository yet, so these changes were not applied. Please contact ${contact} and ask to be added, then submit your changes again from the website (they are still saved in your browser).`);
 
 const m = (issue.body || "").match(/```json\s*\n([\s\S]*?)\n```/);

@@ -1,5 +1,5 @@
-// Publishes who may edit from the website: everyone with access to this repository (collaborators, and organisation
-// members with access). Usernames are stored only as SHA-256 hashes of the lower-cased name, so the list cannot be read
+// Publishes who may edit from the website: the people added directly as collaborators on this repository
+// (Settings → Collaborators). Organisation-wide access does not count. Usernames are stored only as SHA-256 hashes of the lower-cased name, so the list cannot be read
 // from the public site; the editor hashes the name someone types and looks for it.
 // Run by .github/workflows/sync-editors.yml (every 30 minutes, and on demand). Commits only when the list changes.
 const fs = require("fs");
@@ -11,7 +11,7 @@ const ROOT = path.join(__dirname, "..");
 const repo = process.env.GITHUB_REPOSITORY;
 const run = (cmd, args) => execFileSync(cmd, args, { cwd: ROOT, encoding: "utf8" });
 
-const logins = run("gh", ["api", "--paginate", `repos/${repo}/collaborators?per_page=100`, "--jq", ".[].login"]).split("\n").filter(Boolean);
+const logins = run("gh", ["api", "--paginate", `repos/${repo}/collaborators?affiliation=direct&per_page=100`, "--jq", ".[].login"]).split("\n").filter(Boolean);
 if (!logins.length) { console.log("No collaborators returned; leaving the list unchanged."); process.exit(0); }
 const hashes = [...new Set(logins.map(l => crypto.createHash("sha256").update(l.toLowerCase()).digest("hex")))].sort();
 
