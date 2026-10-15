@@ -453,38 +453,44 @@
   }
 
   // ---------- Who is editing? ----------
-  // Asks for the editor's GitHub username and checks it against content/editors.json. This is a convenience
-  // check: the real check happens when the change is submitted, against the account that creates the GitHub issue.
+  // Asks for the editor's GitHub username and checks that the account has access to the repository, using
+  // access/editors.json: hashes of the collaborators' usernames, refreshed by a GitHub Action every 30 minutes.
+  // This is a convenience check: the real check happens when the change is submitted, against the account that
+  // creates the GitHub issue.
   const USER_KEY = "editor-github";
   let editor = null, starting = false;
   async function loadEditors() {
-    try { const r = await fetch(A.ROOT + "content/editors.json?t=" + Date.now()); return (await r.json()).editors || []; }
+    try { const r = await fetch(A.ROOT + "access/editors.json?t=" + Date.now()); return new Set((await r.json()).hashes || []); }
     catch (_) { return null; }
   }
-  const findEditor = (list, name) => list.find(e => e.github.toLowerCase() === String(name).toLowerCase());
+  async function hashName(name) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(name).toLowerCase()));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  const isEditor = async (set, name) => set.has(await hashName(name));
   function gate() {
     return new Promise(async resolve => {
       const list = await loadEditors();
       if (!list) { alert("The list of editors could not be loaded. Please check your connection and try again."); return resolve(null); }
       let remembered = null; try { remembered = localStorage.getItem(USER_KEY); } catch (_) {}
-      if (remembered && findEditor(list, remembered)) return resolve(findEditor(list, remembered).github);
+      if (remembered && await isEditor(list, remembered)) return resolve(remembered);
       const em = A.site.editorsEmail;
       const contact = esc(A.site.editorsContact || "the site maintainer") + (em ? ` (<a href="mailto:${esc(em)}">${esc(em)}</a>)` : "");
       const dlg = document.createElement("dialog");
       dlg.className = "ed-review ed-gate";
       const ask = (msg = "") => {
         dlg.innerHTML = `<h2>Who's editing?</h2>
-          <p>Enter your GitHub username. Only approved editors can suggest changes to this site.</p>
+          <p>Enter your GitHub username. People who have access to this site's GitHub repository can suggest changes.</p>
           <form method="dialog"><label class="ed-note">GitHub username<input type="text" name="u" autocomplete="username" spellcheck="false" placeholder="e.g. jane-doe" value="${esc(remembered || "")}"></label>
           ${msg ? `<p class="ed-gate-msg">${msg}</p>` : ""}
-          <p class="ed-explain">No GitHub account yet? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one for free</a>, then ask ${contact} to add you as an editor.</p>
+          <p class="ed-explain">No GitHub account yet? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one for free</a>, then ask ${contact} to give you access.</p>
           <div class="ed-actions"><button type="button" data-g="cancel">Cancel</button><button type="submit" class="primary">Continue</button></div></form>`;
         const input = dlg.querySelector("input"); input.focus(); input.select();
       };
       const refuse = name => {
         dlg.innerHTML = `<h2>You can't edit yet</h2>
-          <p>The GitHub account <b>@${esc(name)}</b> isn't on the list of editors for this site.</p>
-          <p>Please contact <b>${contact}</b> and give them your GitHub username, <b>${esc(name)}</b>, so they can add you. Once you've been added, click Edit again.</p>
+          <p>The GitHub account <b>@${esc(name)}</b> doesn't have access to this site's GitHub repository yet.</p>
+          <p>Please contact <b>${contact}</b> and give them your GitHub username, <b>${esc(name)}</b>, so they can add you to the repository. Once you've been added, click Edit again. (If you were added in the last half hour, it may take a little longer to take effect.)</p>
           <div class="ed-actions"><button type="button" data-g="again">Use a different username</button><button type="button" class="primary" data-g="cancel">Close</button></div>`;
       };
       dlg.addEventListener("click", e => {
@@ -496,8 +502,7 @@
         e.preventDefault();
         const name = dlg.querySelector("input").value.trim().replace(/^@/, "");
         if (!name) return ask("Please enter your GitHub username.");
-        const found = findEditor(list, name);
-        if (found) { try { localStorage.setItem(USER_KEY, found.github); } catch (_) {} dlg.close(); return resolve(found.github); }
+        if (await isEditor(list, name)) { try { localStorage.setItem(USER_KEY, name); } catch (_) {} dlg.close(); return resolve(name); }
         // Catch typos: check that the account exists (GitHub's public API; if it can't be reached, skip this check).
         try {
           const r = await fetch("https://api.github.com/users/" + encodeURIComponent(name));

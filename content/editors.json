@@ -1,6 +1,0 @@
-{
-  "note": "GitHub usernames of the people allowed to suggest edits from the website. Add a person by adding a line below.",
-  "editors": [
-    { "github": "smborio", "name": "Santiago Borio" }
-  ]
-}

@@ -12,7 +12,7 @@ All content is data: everything you read on the site lives in JSON files in `con
 | `content/categories.json` | The categories in order: label, colour, page text (lede, notes, sources), persona sets and the case studies in reading order |
 | `content/<category>/personas.json` | That category's personas |
 | `content/<category>/case-studies/<id>.json` | One case study: title, standfirst, note, stats and sections made of blocks |
-| `content/editors.json` | GitHub usernames of the people allowed to suggest edits from the website |
+| `access/editors.json` | Generated: hashes of the usernames of everyone with access to the repository, used by the editor's sign-in check |
 | `content/references.json` | Every source once, with its fields (authors, year, title, URL…); the site formats them in APA |
 | `index.html`, `<category>/index.html`, `<category>/<case>.html` | Page shells: `<body data-page="home|category|case" …>` |
 | `assets/site.js` | Renders every page from the JSON: navigation, persona browser and dialog, case studies, citations and reference lists |
@@ -71,15 +71,15 @@ Run `node tools/validate.js` before committing. It lists every problem, such as 
 
 ## Editing from the website
 
-Approved editors can suggest changes directly on the site. Editors are listed by GitHub username in `content/editors.json`; to add someone, add a line there (for example by editing the file on GitHub). They don't need to be collaborators on the repository.
+Anyone with access to this repository (collaborators, and organisation members with access) can suggest changes directly on the site. To give someone access, add them under the repository's **Settings → Collaborators and teams**; the **Read** role is enough. The **Update website editors** Action refreshes `access/editors.json` (SHA-256 hashes of the usernames, so the list can't be read from the site) every 30 minutes; run it from the Actions tab to make a new collaborator able to edit straight away.
 
-1. Click **✎ Edit** (bottom right) on any page, or open a page with `?edit` at the end of its address. The first time, the site asks for the editor's GitHub username and checks it against the list; anyone not on it is asked to contact the person named in `editorsContact` in `content/site.json`. The username is remembered in that browser.
+1. Click **✎ Edit** (bottom right) on any page, or open a page with `?edit` at the end of its address. The first time, the site asks for the editor's GitHub username and checks that it has access; anyone without access is asked to contact the person named in `editorsContact` (and `editorsEmail`) in `content/site.json`. The username is remembered in that browser.
 2. Click text to change it. On case-study pages, the buttons beside each block (including blocks inside boxes) move it, add a paragraph or delete it, and pressing Enter in a paragraph splits it in two. The ＋ and × buttons add or remove timeline entries, table rows and columns, points in the closing section and key figures, and persona rows have a picker to add or remove personas. In a persona's profile, Enter adds a list item and Backspace in an empty item removes it. The introduction and notes on the home and category pages can be edited too. Citations and links show as grey chips that can be moved or deleted but not broken.
 3. Click **Review & submit**, check the list of changes, add a note and submit. GitHub opens with everything filled in; click **Create**.
 4. The **Apply website edit** Action (`tools/apply-edit.js`) applies the changes to the JSON, runs the validator and opens a pull request. Changes that clash with newer edits are not applied; they are listed in the pull request for a maintainer.
 5. A maintainer reviews and merges the pull request, and the site updates.
 
-Unsent changes are kept in the editor's browser until they are submitted. Edits are recorded against permanent block ids with the original text, so suggestions to different paragraphs never interfere with each other. The username typed on the website is only a convenience check: the Action applies an issue only if the GitHub account that created it is in `content/editors.json`.
+Unsent changes are kept in the editor's browser until they are submitted. Edits are recorded against permanent block ids with the original text, so suggestions to different paragraphs never interfere with each other. The username typed on the website is only a convenience check: the Action applies an issue only if the GitHub account that created it has access to the repository.
 
 New block types (tables, timelines, boxes) can't be created from the website yet; add those in the JSON.
 
