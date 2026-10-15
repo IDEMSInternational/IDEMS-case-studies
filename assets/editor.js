@@ -468,7 +468,8 @@
       if (!list) { alert("The list of editors could not be loaded. Please check your connection and try again."); return resolve(null); }
       let remembered = null; try { remembered = localStorage.getItem(USER_KEY); } catch (_) {}
       if (remembered && findEditor(list, remembered)) return resolve(findEditor(list, remembered).github);
-      const contact = esc(A.site.editorsContact || "the site maintainer");
+      const em = A.site.editorsEmail;
+      const contact = esc(A.site.editorsContact || "the site maintainer") + (em ? ` (<a href="mailto:${esc(em)}">${esc(em)}</a>)` : "");
       const dlg = document.createElement("dialog");
       dlg.className = "ed-review ed-gate";
       const ask = (msg = "") => {
