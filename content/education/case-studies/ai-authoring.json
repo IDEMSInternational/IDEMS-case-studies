@@ -35,7 +35,7 @@
         {
           "id": "fd215c",
           "type": "paragraph",
-          "text": "Writing a STACK question is not one hard skill but many fairly simple ones done together. An author needs some HTML, some Maxima (STACK's computer algebra language), an understanding of how STACK checks answers and branches to different feedback, sensible randomisation and, above all, the teaching judgement to write good feedback. Few people have all of these. Santiago Borio, who has written STACK questions for IDEMS since 2019, reckons a quick question takes him two hours and an extremely complex one can take two weeks ({{borio2024c}}; {{borio2024a}})."
+          "text": "Writing a STACK question is not one hard skill but many fairly simple ones done together. An author needs some HTML, some Maxima (STACK's computer algebra language), an understanding of how STACK checks answers and branches to different feedback, sensible randomisation and, above all, the teaching judgement to write good feedback. Few people have all of these. Santiago Borio, who has written STACK questions for IDEMS since 2019, reckons a quick question takes him two hours and an extremely complex one can take two weeks ({{borio2024c}}; {{borio2024a}}). [TEST 1]"
         },
         {
           "id": "774244",
