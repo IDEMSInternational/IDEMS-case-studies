@@ -142,3 +142,45 @@ footer.site li { margin: 4px 0; break-inside: avoid; }
   .controls, .theme-btn { display: none; }
   .card, .cat-card, .case-card { break-inside: avoid; box-shadow: none; }
 }
+
+/* ---------- Edit mode (assets/editor.js) ---------- */
+.edit-fab { position: fixed; right: 18px; bottom: 18px; z-index: 50; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; font: 600 14px Inter, system-ui, sans-serif; box-shadow: var(--shadow); cursor: pointer; }
+.edit-fab:hover { border-color: var(--accent); color: var(--accent); }
+body.editing { padding-bottom: 90px; }
+.ed-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--surface); border-top: 2px solid var(--accent); box-shadow: 0 -4px 20px rgba(0,0,0,.08); }
+.ed-bar-in { max-width: 1100px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; font: 14px Inter, system-ui, sans-serif; }
+.ed-bar .ed-count { color: var(--accent); font-weight: 600; }
+.ed-bar .ed-hint { color: var(--muted); flex: 1 1 260px; }
+.ed-bar button, .ed-review button, .ed-tools button { font: 600 13px Inter, system-ui, sans-serif; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+.ed-bar button.primary, .ed-review button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.ed-bar button:disabled { opacity: .5; cursor: default; }
+.editing .ed { outline: 1px dashed transparent; outline-offset: 3px; border-radius: 4px; transition: outline-color .15s, background .15s; }
+.editing .ed:hover { outline-color: var(--line); }
+.editing .ed:focus { outline: 2px solid var(--accent); background: var(--accent-soft); }
+.editing .ed-changed { background: rgba(250, 204, 21, .22); }
+.editing .ed:empty::before { content: "Type here…"; color: var(--muted); }
+.chip { display: inline-block; padding: 0 6px; margin: 0 1px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--line); font-size: .86em; line-height: 1.5; cursor: default; user-select: all; }
+.ed-section { position: relative; }
+.ed-block { position: relative; border-left: 3px solid transparent; padding-left: 10px; margin-left: -13px; }
+.ed-block:hover, .ed-block:focus-within { border-left-color: var(--line); }
+.ed-block.ed-new { border-left-color: #16a34a; }
+.ed-block.ed-deleted > :not(.ed-tools) { opacity: .35; text-decoration: line-through; pointer-events: none; }
+.ed-tools { position: absolute; top: -16px; right: 0; z-index: 5; display: flex; gap: 6px; padding: 3px; border-radius: 10px; background: var(--bg); visibility: hidden; }
+.ed-tools button { padding: 3px 9px; font-size: 12px; }
+.ed-block:hover > .ed-tools, .ed-block:focus-within > .ed-tools, .ed-deleted > .ed-tools, .ed-section:hover > .ed-tools-sec { visibility: visible; }
+.ed-tools-sec { top: 8px; right: 0; }
+.ed-footnote { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 40px; }
+.pf-editing [data-pf] { min-width: 1em; }
+.pf-edit-note { font-size: 13px; color: var(--accent); margin: 6px 0 0; }
+dialog.ed-review { border: none; border-radius: 14px; padding: 24px 26px; max-width: 620px; width: calc(100% - 32px); background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgba(0,0,0,.25); font: 15px/1.5 Inter, system-ui, sans-serif; }
+dialog.ed-review::backdrop { background: rgba(20, 18, 15, .45); }
+.ed-review h2 { font-family: Fraunces, Georgia, serif; margin: 0 0 12px; }
+.ed-changes { list-style: none; padding: 0; margin: 0 0 16px; max-height: 40vh; overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+.ed-changes li { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.ed-changes li:last-child { border-bottom: none; }
+.ed-note { display: block; font-weight: 600; margin-bottom: 12px; }
+.ed-note span { font-weight: 400; color: var(--muted); }
+.ed-review textarea { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
+.ed-explain { color: var(--muted); font-size: 14px; }
+.ed-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+@media print { .edit-fab, .ed-bar { display: none; } }

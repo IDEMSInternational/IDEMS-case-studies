@@ -1,0 +1,23 @@
+name: Apply website edit
+on:
+  issues:
+    types: [opened]
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+concurrency:
+  group: apply-edit
+  cancel-in-progress: false
+jobs:
+  apply:
+    if: startsWith(github.event.issue.title, '[edit]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node tools/apply-edit.js
+        env:
+          GH_TOKEN: ${{ github.token }}

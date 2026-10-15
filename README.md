@@ -17,6 +17,8 @@ All content is data: everything you read on the site lives in JSON files in `con
 | `assets/site.js` | Renders every page from the JSON: navigation, persona browser and dialog, case studies, citations and reference lists |
 | `assets/site.css`, `assets/case.css` | Shared styles; `case.css` adds article typography for case-study pages |
 | `images/<persona-id>.jpg` | One photo per persona |
+| `assets/editor.js` | The in-page editor, loaded when someone clicks Edit |
+| `tools/apply-edit.js` | Applies an edit submitted from the website and opens a pull request |
 | `tools/validate.js` | Checks the content for broken links, unknown references, missing photos and duplicate ids; runs on every push and pull request |
 
 ### Personas
@@ -65,6 +67,20 @@ Run `node tools/validate.js` before committing. It lists every problem, such as 
 1. In `content/categories.json`, remove `comingSoon` from the category and add its `sets`, `caseStudies` and page text.
 2. Create `content/<category>/personas.json` and `content/<category>/case-studies/<id>.json`, and add the photos to `images/`.
 3. Add a shell page for each case study at `<category>/<id>.html`, copying an Education one and changing `data-category` and `data-case`.
+
+## Editing from the website
+
+Anyone with a GitHub account who is a collaborator on this repository can suggest changes directly on the site:
+
+1. Click **✎ Edit** (bottom right) on any page, or open a page with `?edit` at the end of its address.
+2. Click text to change it. On case-study pages, the buttons beside each block move it, add a paragraph or delete it. Pressing Enter in a paragraph splits it in two. In a persona's profile, Enter adds a list item, and Backspace in an empty item removes it. Citations and links show as grey chips that can be moved or deleted but not broken.
+3. Click **Review & submit**, check the list of changes, add a note and submit. GitHub opens with everything filled in; click **Create**.
+4. The **Apply website edit** Action (`tools/apply-edit.js`) applies the changes to the JSON, runs the validator and opens a pull request. Changes that clash with newer edits are not applied; they are listed in the pull request for a maintainer.
+5. A maintainer reviews and merges the pull request, and the site updates.
+
+Unsent changes are kept in the editor's browser until they are submitted. Edits are recorded against permanent block ids with the original text, so suggestions to different paragraphs never interfere with each other. Only issues opened by the repository owner, organisation members or collaborators are applied.
+
+Editing timelines, tables and the structure of boxes or the closing section (beyond their text) is not supported yet.
 
 ## Status
 

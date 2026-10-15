@@ -38,7 +38,7 @@
   const casesIn = cat => (CATEGORIES[cat].caseStudies || []).filter(k => CASES[k]);
   const personasIn = cat => PERSONAS.filter(p => p.category === cat);
   const color = p => (SETS[p.set] || CATEGORIES[p.category]).color;
-  const list = items => `<ul>${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>`;
+  const list = (items, field) => `<ul>${items.map((i, n) => `<li data-pf="${field}|${n}">${esc(i)}</li>`).join("")}</ul>`;
   const firstName = p => p.name.replace(/^(Dr|Prof|Mr|Mrs|Ms)\.\s*/, "").split(" ")[0];
 
   // ---------- Inline text markup ----------
@@ -46,7 +46,9 @@
   // [[case:case-id|text]], {{ref-key}} for (Authors, year) and {{ref-key|n}} for Authors (year).
   const cited = [];
   const TOKEN = /\{\{([a-z0-9]+)(\|n)?\}\}|\[\[(p|case):([a-z0-9-]+)(?:\|([^\]]+))?\]\]|\[([^\]]+)\]\((https?:[^)\s]+)\)|\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`/g;
-  function md(s) {
+  // In edit mode, links and citations become non-editable "chips" that carry their original markup.
+  const chip = (token, html) => `<span class="chip" contenteditable="false" data-token="${esc(token)}">${html}</span>`;
+  function md(s, edit) {
     s = String(s ?? "");
     const re = new RegExp(TOKEN.source, "g"); // fresh copy: md() recurses into link and emphasis text
     let out = "", last = 0, m;
@@ -56,18 +58,19 @@
       const [, key, narrative, kind, id, label, ltext, url, bold, em, code] = m;
       if (key) {
         const r = REFS[key];
-        if (!r) { out += `<mark title="Unknown reference">${esc(key)}</mark>`; continue; }
-        if (!cited.includes(key)) cited.push(key);
-        const a = md(r.inText);
-        out += `<a class="cref" href="#ref-${key}">${narrative ? `${a} (${esc(r.year)})` : `${a}, ${esc(r.year)}`}</a>`;
+        if (!r) { out += edit ? chip(m[0], esc(key)) : `<mark title="Unknown reference">${esc(key)}</mark>`; continue; }
+        if (!cited.includes(key) && !edit) cited.push(key);
+        const a = md(r.inText), shown = narrative ? `${a} (${esc(r.year)})` : `${a}, ${esc(r.year)}`;
+        out += edit ? chip(m[0], shown) : `<a class="cref" href="#ref-${key}">${shown}</a>`;
       } else if (kind === "p") {
-        const p = byId[id];
-        out += p ? `<a href="${personaHref(p)}">${label ? md(label) : esc(`${p.name}, ${p.tagline}`)}</a>` : `<mark title="Unknown persona">${esc(id)}</mark>`;
+        const p = byId[id], shown = p ? (label ? md(label) : esc(`${p.name}, ${p.tagline}`)) : esc(id);
+        out += edit ? chip(m[0], shown) : p ? `<a href="${personaHref(p)}">${shown}</a>` : `<mark title="Unknown persona">${esc(id)}</mark>`;
       } else if (kind === "case") {
-        out += CASES[id] ? `<a href="${caseHref(id)}">${md(label || CASES[id].short)}</a>` : esc(label || id);
-      } else if (ltext) out += `<a href="${esc(url)}" target="_blank" rel="noopener">${md(ltext)}</a>`;
-      else if (bold) out += `<strong>${md(bold)}</strong>`;
-      else if (em) out += `<em>${md(em)}</em>`;
+        const shown = md(label || (CASES[id] ? CASES[id].short : id));
+        out += edit ? chip(m[0], shown) : CASES[id] ? `<a href="${caseHref(id)}">${shown}</a>` : shown;
+      } else if (ltext) out += edit ? chip(m[0], md(ltext)) : `<a href="${esc(url)}" target="_blank" rel="noopener">${md(ltext)}</a>`;
+      else if (bold) out += `<strong>${md(bold, edit)}</strong>`;
+      else if (em) out += `<em>${md(em, edit)}</em>`;
       else if (code) out += `<code>${esc(code)}</code>`;
     }
     return out + esc(s.slice(last));
@@ -262,26 +265,26 @@
     dlg.innerHTML = `<div class="pf">
       <aside class="pf-side">
         <img src="${img(p)}" alt="Placeholder photo for ${esc(p.name)}" style="object-position:${p.pos}">
-        <blockquote class="pf-quote">“${esc(p.quote)}”</blockquote>
+        <blockquote class="pf-quote">“<span data-pf="quote">${esc(p.quote)}</span>”</blockquote>
         <details class="prompt"><summary>Image-generation prompt</summary><p>${esc(p.prompt)}</p></details>
         <div class="credit">Placeholder photo: <a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.title)}</a> by ${esc(c.author)}, ${esc(c.licence)}, via Wikimedia Commons (cropped).</div>
       </aside>
       <section class="pf-main">
         <div class="pf-head"><div>
-            <h2 id="dlg-title">${esc(p.name)}</h2>
-            <p class="pf-tagline">${esc(p.tagline)} · ${p.age} · ${esc(p.where)}</p>
+            <h2 id="dlg-title" data-pf="name">${esc(p.name)}</h2>
+            <p class="pf-tagline"><span data-pf="tagline">${esc(p.tagline)}</span> · <span data-pf="age">${p.age}</span> · <span data-pf="where">${esc(p.where)}</span></p>
             <div class="tags">${tagsHTML(p, true)}</div>
             ${appears ? `<p class="appears">Appears in: ${appears}</p>` : ""}
           </div><button class="close" aria-label="Close" data-close autofocus>×</button></div>
         <div class="sections">
-          <div class="sec"><h3>Background</h3>${list(p.background)}</div>
-          <div class="sec"><h3>What ${p.pronoun === "she" ? "she’s" : p.pronoun === "he" ? "he’s" : "they’re"} looking for</h3>${list(p.looking)}</div>
-          <div class="sec"><h3>Hopes &amp; dreams</h3>${list(p.hopes)}</div>
-          <div class="sec"><h3>Worries &amp; fears</h3>${list(p.worries)}</div>
-          <div class="sec wide"><h3>Their data and expertise</h3>${list(p.data)}</div>
-          <div class="sec wide"><h3>A day in the life of ${esc(firstName(p))}</h3>${list(p.day)}</div>
+          <div class="sec"><h3>Background</h3>${list(p.background, "background")}</div>
+          <div class="sec"><h3>What ${p.pronoun === "she" ? "she’s" : p.pronoun === "he" ? "he’s" : "they’re"} looking for</h3>${list(p.looking, "looking")}</div>
+          <div class="sec"><h3>Hopes &amp; dreams</h3>${list(p.hopes, "hopes")}</div>
+          <div class="sec"><h3>Worries &amp; fears</h3>${list(p.worries, "worries")}</div>
+          <div class="sec wide"><h3>Their data and expertise</h3>${list(p.data, "data")}</div>
+          <div class="sec wide"><h3>A day in the life of ${esc(firstName(p))}</h3>${list(p.day, "day")}</div>
         </div>
-        <p class="grounded"><strong>Grounded in:</strong> ${esc(p.grounded)}</p>
+        <p class="grounded"><strong>Grounded in:</strong> <span data-pf="grounded">${esc(p.grounded)}</span></p>
         <div class="pf-nav">
           <button data-step="-1" ${i <= 0 ? "disabled" : ""}>← Previous</button>
           <button data-step="1" ${i < 0 || i >= order.length - 1 ? "disabled" : ""}>Next →</button>
@@ -291,6 +294,7 @@
     dlg.dataset.id = id;
     if (!dlg.open) dlg.showModal();
     dlg.querySelector(".pf-main").scrollTop = 0;
+    document.dispatchEvent(new CustomEvent("persona-opened", { detail: { id, dialog: dlg } }));
   }
   const step = d => { const next = order[order.findIndex(x => x.id === dlg.dataset.id) + d]; if (next) open(next.id); };
 
@@ -312,6 +316,23 @@
     if (e.key === "ArrowRight") step(1);
     if (e.key === "ArrowLeft") step(-1);
   });
+
+  // ---------- Edit mode (assets/editor.js is loaded on demand) ----------
+  window.SiteAPI = { ROOT, site, cats, CATEGORIES, CASES, SETS, PERSONAS, byId, REFS, page, CAT, CASE, md, esc, pcard, personaHref, color, open, dialog: dlg, app };
+  const editBtn = document.createElement("button");
+  editBtn.className = "edit-fab";
+  editBtn.type = "button";
+  editBtn.textContent = "✎ Edit";
+  editBtn.title = "Suggest changes to this page";
+  editBtn.addEventListener("click", () => {
+    if (window.SiteEditor) return window.SiteEditor.start();
+    const sc = document.createElement("script");
+    sc.src = ROOT + "assets/editor.js";
+    sc.onload = () => window.SiteEditor.start();
+    document.body.appendChild(sc);
+  });
+  document.body.appendChild(editBtn);
+  if (new URLSearchParams(location.search).has("edit")) editBtn.click(); // links ending in ?edit open in edit mode
 
   const hashId = decodeURIComponent(location.hash.slice(1));
   if (byId[hashId]) open(hashId);
