@@ -18,8 +18,11 @@ All content is data: everything you read on the site lives in JSON files in `con
 | `assets/site.js` | Renders every page from the JSON: navigation, persona browser and dialog, case studies, citations and reference lists |
 | `assets/site.css`, `assets/case.css` | Shared styles; `case.css` adds article typography for case-study pages |
 | `images/<persona-id>.jpg` | One photo per persona |
-| `assets/editor.js` | The in-page editor, loaded when someone clicks Edit |
+| `assets/editor.js` | The entry dialog and the in-page editor for contributors |
+| `assets/feedback.js` | Feedback mode for everyone else, and the contributors' view of open feedback |
 | `tools/apply-edit.js` | Applies an edit submitted from the website and opens a pull request |
+| `tools/feedback.js` | Labels feedback issues and folds updates into the person's earlier issue |
+| `tools/apps-script/` | The Google Apps Script that creates issues for anonymous feedback, with setup instructions |
 | `tools/validate.js` | Checks the content for broken links, unknown references, missing photos and duplicate ids; runs on every push and pull request |
 
 ### Personas
@@ -68,6 +71,18 @@ Run `node tools/validate.js` before committing. It lists every problem, such as 
 1. In `content/categories.json`, remove `comingSoon` from the category and add its `sets`, `caseStudies` and page text.
 2. Create `content/<category>/personas.json` and `content/<category>/case-studies/<id>.json`, and add the photos to `images/`.
 3. Add a shell page for each case study at `<category>/<id>.html`, copying an Education one and changing `data-category` and `data-case`.
+
+## Feedback and comments from the website
+
+Every page has a **💬 Feedback and comments** button (bottom right; a link ending in `?feedback` or `?edit` opens it straight away). It asks people to continue **with their GitHub account** or **without an account**:
+
+- **Contributors** (the repository's direct collaborators) go into edit mode, described below.
+- **Everyone else** goes into feedback mode (`assets/feedback.js`). They point at any part of the page (a section, a paragraph, a list, a table, a persona profile field) and click 💬, or select some words and click "Comment on selection". Comments appear under the part they refer to, with the selected words highlighted, and can be edited or deleted at any time.
+- **Sending** creates a GitHub issue titled `[feedback] …`, never a pull request. Sending again adds to the same issue: GitHub users go through a pre-filled GitHub page, and the **Handle website feedback** Action (`tools/feedback.js`) copies updates into their earlier issue and closes the update; anonymous feedback goes through a Google Apps Script web app (`tools/apps-script/`, set up following its README, then `feedbackEndpoint` and `feedbackBot` in `content/site.json`), which creates the issue and adds later comments to it.
+- **Coming back:** comments are kept in the browser. GitHub users are offered their earlier open feedback on the page; anonymous people get a **private link** (`…#fb=<issue>-<key>`) to continue from any device.
+- **Contributors** can click **💬 Show feedback** in the edit bar to see the open feedback on that page. It is hidden by default.
+
+Each feedback issue holds the person's full, current set of comments (in a compressed block at the end), so the site can show and restore them; the readable part lists what is new, changed or withdrawn.
 
 ## Editing from the website
 

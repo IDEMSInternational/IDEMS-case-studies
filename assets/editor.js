@@ -144,6 +144,7 @@
         ${s.blocks.map(b => blockHTML(b)).join("")}</section>`).join("")}
       <p class="ed-footnote">References and persona cards update automatically once your changes are approved.</p>`;
     A.app.querySelector("main").innerHTML = html;
+    if (window.SiteFeedback) window.SiteFeedback.refresh();
     A.app.querySelectorAll(".ed-deleted [contenteditable], .ed-deleted button:not([data-act=restore]), .ed-deleted select").forEach(el => {
       if (el.hasAttribute("contenteditable")) el.setAttribute("contenteditable", "false"); else el.disabled = true;
     });
@@ -409,13 +410,14 @@
     bar.className = "ed-bar";
     bar.innerHTML = `<div class="ed-bar-in"><b>Editing</b><span class="ed-who">as @${esc(editor)} · <button type="button" class="ed-link" data-bar="signout">not you?</button></span><span class="ed-count"></span>
       <span class="ed-hint">${doc ? "Click any text to change it. Use the buttons beside a block to move, add or delete it, and ＋ / × to add or remove entries." : "Click the highlighted text to change it, or open a persona to edit their profile."}</span>
-      <button type="button" data-bar="cancel">Stop editing</button><button type="button" class="primary" data-bar="review">Review &amp; submit</button></div>`;
+      <button type="button" data-bar="feedback" aria-pressed="false">💬 Show feedback</button><button type="button" data-bar="cancel">Stop editing</button><button type="button" class="primary" data-bar="review">Review &amp; submit</button></div>`;
     document.body.appendChild(bar);
     bar.addEventListener("click", e => {
       const b = e.target.closest("[data-bar]"); if (!b) return;
       if (b.dataset.bar === "review") review();
       if (b.dataset.bar === "cancel") stop();
       if (b.dataset.bar === "signout") signOut();
+      if (b.dataset.bar === "feedback") loadFeedback().then(F => { const on = F.toggleOpenFeedback(); b.setAttribute("aria-pressed", on); b.textContent = on ? "💬 Hide feedback" : "💬 Show feedback"; });
     });
     updateBar();
   }
@@ -435,9 +437,9 @@
     dlg.addEventListener("close", () => dlg.remove());
     dlg.addEventListener("click", e => {
       const u = e.target.closest("[data-undo]");
-      if (u) { revert(items[+u.dataset.undo].op); dlg.close(); updateBar(); if (count()) review(); return; }
+      if (u) { revert(items[+u.dataset.undo].op); (dlg.close(), dlg.remove()); updateBar(); if (count()) review(); return; }
       const r = e.target.closest("[data-r]"); if (!r) return;
-      if (r.dataset.r === "back") dlg.close();
+      if (r.dataset.r === "back") (dlg.close(), dlg.remove());
       if (r.dataset.r === "submit") submit(dlg, dlg.querySelector("textarea").value.trim());
     });
   }
@@ -500,8 +502,8 @@
     dlg.addEventListener("click", async e => {
       const r = e.target.closest("[data-r]"); if (!r) return;
       if (r.dataset.r === "again") { window.open(url, "_blank", "noopener"); return; }
-      if (r.dataset.r === "back") return dlg.close();
-      if (r.dataset.r === "done") { clearDraft(); clearLink(); dlg.close(); return stop(true); }
+      if (r.dataset.r === "back") return (dlg.close(), dlg.remove());
+      if (r.dataset.r === "done") { clearDraft(); clearLink(); (dlg.close(), dlg.remove()); return stop(true); }
       if (r.dataset.r === "sentkeep") {
         if (!link) {
           dlg.innerHTML = `<h2>Finding your suggestion on GitHub…</h2><p class="ed-explain">This takes a few seconds.</p>`;
@@ -514,7 +516,7 @@
         }
         link.sent = sentKeys;
         saveLink(link); saveDraft();
-        dlg.close(); updateBar();
+        (dlg.close(), dlg.remove()); updateBar();
       }
     });
   }
@@ -549,48 +551,60 @@
     return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
   }
   const isEditor = async (set, name) => set.has(await hashName(name));
+  // The entry dialog. Contributors (direct collaborators) go into edit mode; everyone else, with a GitHub account or
+  // anonymously, goes into feedback mode (assets/feedback.js).
+  const ID_KEY = "fb-identity";
   function gate() {
     return new Promise(async resolve => {
       const list = await loadEditors();
-      if (!list) { alert("The list of editors could not be loaded. Please check your connection and try again."); return resolve(null); }
-      let remembered = null; try { remembered = localStorage.getItem(USER_KEY); } catch (_) {}
-      if (remembered && await isEditor(list, remembered)) return resolve(remembered);
-      const em = A.site.editorsEmail;
-      const contact = esc(A.site.editorsContact || "the site maintainer") + (em ? ` (<a href="mailto:${esc(em)}">${esc(em)}</a>)` : "");
+      if (!list) { alert("This could not be loaded. Please check your connection and try again."); return resolve(null); }
+      // Private link to continue anonymous feedback: #fb=<issue>-<key>
+      const pl = location.hash.match(/^#fb=(\d+)-([0-9a-f]+)$/);
+      if (pl) return resolve({ mode: "feedback", via: "anon", recover: { issue: +pl[1], key: pl[2] } });
+      let remembered = null, rememberedId = null;
+      try { remembered = localStorage.getItem(USER_KEY); rememberedId = JSON.parse(localStorage.getItem(ID_KEY) || "null"); } catch (_) {}
+      if (remembered && await isEditor(list, remembered)) return resolve({ mode: "edit", user: remembered });
+      if (rememberedId && (rememberedId.via === "github" || A.site.feedbackEndpoint)) return resolve({ mode: "feedback", ...rememberedId });
+      const endpoint = A.site.feedbackEndpoint;
       const dlg = document.createElement("dialog");
       dlg.className = "ed-review ed-gate";
       const ask = (msg = "") => {
-        dlg.innerHTML = `<h2>Who's editing?</h2>
-          <p>Enter your GitHub username. People who have access to this site's GitHub repository can suggest changes.</p>
-          <form method="dialog"><label class="ed-note">GitHub username<input type="text" name="u" autocomplete="username" spellcheck="false" placeholder="e.g. jane-doe" value="${esc(remembered || "")}"></label>
-          ${msg ? `<p class="ed-gate-msg">${msg}</p>` : ""}
-          <p class="ed-explain">Tip: <a href="https://github.com/login" target="_blank" rel="noopener">log in to GitHub</a> in this browser before you start, so sending your changes later is one click.</p>
-          <p class="ed-explain">No GitHub account yet? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one for free</a>, then ask ${contact} to give you access.</p>
-          <div class="ed-actions"><button type="button" data-g="cancel">Cancel</button><button type="submit" class="primary">Continue</button></div></form>`;
-        const input = dlg.querySelector("input"); input.focus(); input.select();
+        dlg.innerHTML = `<h2>Feedback and comments</h2>
+          <p>Comment on any part of this page: a section, a single item or a few selected words. People on the team can also edit the page directly.</p>
+          <form method="dialog" class="fb-choice"><h3>With your GitHub account</h3>
+            <label class="ed-note">GitHub username<input type="text" name="u" autocomplete="username" spellcheck="false" placeholder="e.g. jane-doe" value="${esc(remembered || (rememberedId && rememberedId.user) || "")}"></label>
+            ${msg ? `<p class="ed-gate-msg">${msg}</p>` : ""}
+            <p class="ed-explain">Tip: <a href="https://github.com/login" target="_blank" rel="noopener">log in to GitHub</a> in this browser first, so sending is one click. No account? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one for free</a>.</p>
+            <div class="ed-actions"><button type="submit" class="primary">Continue with GitHub</button></div></form>
+          <div class="fb-choice"><h3>Without an account</h3>
+            ${endpoint ? `<label class="ed-note">Your name <span>(optional)</span><input type="text" name="n" autocomplete="name" placeholder="Leave empty to stay anonymous"></label>
+              <div class="ed-actions"><button type="button" data-g="anon">Continue anonymously</button></div>`
+              : `<p class="ed-explain">Anonymous feedback is coming soon. For now, please use a GitHub account.</p>`}</div>
+          <p class="ed-explain">Feedback is published on this site's public GitHub repository.</p>
+          <div class="ed-actions"><button type="button" data-g="cancel">Cancel</button></div>`;
+        const input = dlg.querySelector("input[name=u]"); input.focus(); input.select();
       };
-      const refuse = name => {
-        dlg.innerHTML = `<h2>You can't edit yet</h2>
-          <p>The GitHub account <b>@${esc(name)}</b> doesn't have access to this site's GitHub repository yet.</p>
-          <p>Please contact <b>${contact}</b> and give them your GitHub username, <b>${esc(name)}</b>, so they can add you to the repository. Once you've been added, click Edit again. (If you were added in the last half hour, it may take a little longer to take effect.)</p>
-          <div class="ed-actions"><button type="button" data-g="again">Use a different username</button><button type="button" class="primary" data-g="cancel">Close</button></div>`;
-      };
+      const remember = id => { try { localStorage.setItem(ID_KEY, JSON.stringify(id)); } catch (_) {} };
       dlg.addEventListener("click", e => {
         const b = e.target.closest("[data-g]"); if (!b) return;
-        if (b.dataset.g === "cancel") { dlg.close(); resolve(null); }
-        if (b.dataset.g === "again") ask();
+        if (b.dataset.g === "cancel") { (dlg.close(), dlg.remove()); resolve(null); }
+        if (b.dataset.g === "anon") {
+          const id = { via: "anon", name: (dlg.querySelector("input[name=n]").value || "").trim().slice(0, 80) };
+          remember(id); (dlg.close(), dlg.remove()); resolve({ mode: "feedback", ...id });
+        }
       });
       dlg.addEventListener("submit", async e => {
         e.preventDefault();
-        const name = dlg.querySelector("input").value.trim().replace(/^@/, "");
+        const name = dlg.querySelector("input[name=u]").value.trim().replace(/^@/, "");
         if (!name) return ask("Please enter your GitHub username.");
-        if (await isEditor(list, name)) { try { localStorage.setItem(USER_KEY, name); } catch (_) {} dlg.close(); return resolve(name); }
+        if (await isEditor(list, name)) { try { localStorage.setItem(USER_KEY, name); } catch (_) {} (dlg.close(), dlg.remove()); return resolve({ mode: "edit", user: name }); }
         // Catch typos: check that the account exists (GitHub's public API; if it can't be reached, skip this check).
         try {
           const r = await fetch("https://api.github.com/users/" + encodeURIComponent(name));
           if (r.status === 404) return ask(`There's no GitHub account called “${esc(name)}”. Please check the spelling.`);
         } catch (_) {}
-        refuse(name);
+        const id = { via: "github", user: name };
+        remember(id); (dlg.close(), dlg.remove()); resolve({ mode: "feedback", ...id });
       });
       dlg.addEventListener("cancel", () => resolve(null));
       dlg.addEventListener("close", () => dlg.remove());
@@ -599,15 +613,21 @@
       ask();
     });
   }
-  function signOut() { try { localStorage.removeItem(USER_KEY); } catch (_) {} stop(true); }
+  function signOut() { try { localStorage.removeItem(USER_KEY); localStorage.removeItem(ID_KEY); } catch (_) {} stop(true); }
+  function loadFeedback() {
+    if (window.SiteFeedback) return Promise.resolve(window.SiteFeedback);
+    return new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = A.ROOT + "assets/feedback.js"; sc.onload = () => ok(window.SiteFeedback); sc.onerror = no; document.body.appendChild(sc); });
+  }
 
   // ---------- Start and stop ----------
   async function start() {
     if (editing || starting) return;
     starting = true;
-    editor = await gate();
+    const who = await gate();
     starting = false;
-    if (!editor) return;
+    if (!who) return;
+    if (who.mode === "feedback") { (await loadFeedback()).start(who); return; }
+    editor = who.user;
     editing = true;
     document.body.classList.add("editing");
     document.querySelector(".edit-fab").hidden = true;

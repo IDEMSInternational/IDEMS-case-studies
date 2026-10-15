@@ -165,8 +165,8 @@
   function caseHTML() {
     const d = CASES[CASE], all = casesIn(CAT), idx = all.indexOf(CASE), c = CATEGORIES[CAT];
     const hero = `<header class="hero"><div class="eyebrow">Case study ${idx + 1} of ${all.length} · ${esc(site.status)}</div>
-      <h1>${md(d.title)}</h1><p class="standfirst">${md(d.standfirst)}</p>${d.note ? `<p class="note">${md(d.note)}</p>` : ""}</header>`;
-    const stats = `<div class="stats">${d.stats.map(s => `<div class="stat"><b>${esc(s.value)}</b><span>${md(s.label)}</span></div>`).join("")}</div>`;
+      <h1 data-doc="title">${md(d.title)}</h1><p class="standfirst" data-doc="standfirst">${md(d.standfirst)}</p>${d.note ? `<p class="note" data-doc="note">${md(d.note)}</p>` : ""}</header>`;
+    const stats = `<div class="stats" data-doc="stats">${d.stats.map(s => `<div class="stat"><b>${esc(s.value)}</b><span>${md(s.label)}</span></div>`).join("")}</div>`;
     const sections = d.sections.map(s => `<h2 id="${s.id}" data-section="${s.id}">${md(s.heading)}</h2>${s.blocks.map(blockHTML).join("")}`).join("\n");
     const next = `<div class="next">${all.filter(k => k !== CASE).map(k => {
       const j = all.indexOf(k), before = j < idx;
@@ -324,8 +324,8 @@
   const editBtn = document.createElement("button");
   editBtn.className = "edit-fab";
   editBtn.type = "button";
-  editBtn.textContent = "✎ Edit";
-  editBtn.title = "Suggest changes to this page";
+  editBtn.textContent = "💬 Feedback and comments";
+  editBtn.title = "Comment on this page, or suggest changes if you are on the team";
   editBtn.addEventListener("click", () => {
     if (window.SiteEditor) return window.SiteEditor.start();
     const sc = document.createElement("script");
@@ -334,9 +334,11 @@
     document.body.appendChild(sc);
   });
   document.body.appendChild(editBtn);
-  if (new URLSearchParams(location.search).has("edit")) editBtn.click(); // links ending in ?edit open in edit mode
+  // Links ending in ?edit (or ?feedback) open the panel straight away; #fb=<issue>-<key> is a private link to
+  // continue anonymous feedback.
+  if (new URLSearchParams(location.search).has("edit") || new URLSearchParams(location.search).has("feedback") || location.hash.startsWith("#fb=")) editBtn.click();
 
   const hashId = decodeURIComponent(location.hash.slice(1));
   if (byId[hashId]) open(hashId);
-  else if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+  else if (location.hash && !location.hash.startsWith("#fb=")) document.getElementById(location.hash.slice(1))?.scrollIntoView();
 })();
