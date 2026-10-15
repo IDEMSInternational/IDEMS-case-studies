@@ -16,6 +16,16 @@ function load(rel) {
 const site = load("content/site.json");
 const cats = load("content/categories.json") || [];
 const refs = load("content/references.json") || [];
+const editorsFile = load("content/editors.json");
+if (editorsFile) {
+  const seen = new Set();
+  if (!Array.isArray(editorsFile.editors)) problem("content/editors.json", '"editors" should be a list');
+  else for (const e of editorsFile.editors) {
+    if (!e.github || !/^[A-Za-z0-9-]+$/.test(e.github)) problem("content/editors.json", `"${e.github}" is not a valid GitHub username`);
+    else if (seen.has(e.github.toLowerCase())) problem("content/editors.json", `"${e.github}" is listed twice`);
+    seen.add(String(e.github).toLowerCase());
+  }
+}
 
 const BLOCK_TYPES = ["paragraph", "subheading", "quote", "personas", "list", "timeline", "table", "box", "sti"];
 const REF_FIELDS = {

@@ -17,9 +17,12 @@ const snippet = v => { const s = typeof v === "string" ? v : JSON.stringify(v); 
 
 function fail(msg) { comment(`⚠️ ${msg}`); console.log(msg); process.exit(0); }
 
-// Only people with access to the repository can submit edits (the site is public).
-if (!["OWNER", "MEMBER", "COLLABORATOR"].includes(issue.author_association))
-  fail(`Thanks for the suggestion! Only collaborators on this repository can submit edits from the website, so this one was not applied automatically. A maintainer can add you as a collaborator.`);
+// Only approved editors (content/editors.json) can submit edits; the site is public. The check uses the account that
+// actually created the issue, whatever username was typed on the website.
+const editors = JSON.parse(fs.readFileSync(path.join(ROOT, "content/editors.json"), "utf8")).editors || [];
+const contact = JSON.parse(fs.readFileSync(path.join(ROOT, "content/site.json"), "utf8")).editorsContact || "the site maintainer";
+if (!editors.some(e => e.github.toLowerCase() === issue.user.login.toLowerCase()))
+  fail(`Thanks for the suggestion! @${issue.user.login} isn't on the list of editors yet, so these changes were not applied. Please contact ${contact} and ask to be added, then submit your changes again from the website (they are still saved in your browser).`);
 
 const m = (issue.body || "").match(/```json\s*\n([\s\S]*?)\n```/);
 if (!m) fail("I couldn't find the changes in this issue. Please submit them again from the website using the Edit button.");

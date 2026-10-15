@@ -394,7 +394,7 @@
   function showBar() {
     bar = document.createElement("div");
     bar.className = "ed-bar";
-    bar.innerHTML = `<div class="ed-bar-in"><b>Editing</b><span class="ed-count"></span>
+    bar.innerHTML = `<div class="ed-bar-in"><b>Editing</b><span class="ed-who">as @${esc(editor)} · <button type="button" class="ed-link" data-bar="signout">not you?</button></span><span class="ed-count"></span>
       <span class="ed-hint">${doc ? "Click any text to change it. Use the buttons beside a block to move, add or delete it, and ＋ / × to add or remove entries." : "Click the highlighted text to change it, or open a persona to edit their profile."}</span>
       <button type="button" data-bar="cancel">Stop editing</button><button type="button" class="primary" data-bar="review">Review &amp; submit</button></div>`;
     document.body.appendChild(bar);
@@ -402,6 +402,7 @@
       const b = e.target.closest("[data-bar]"); if (!b) return;
       if (b.dataset.bar === "review") review();
       if (b.dataset.bar === "cancel") stop();
+      if (b.dataset.bar === "signout") signOut();
     });
     updateBar();
   }
@@ -431,7 +432,7 @@
     const edits = allEdits();
     const pageTitle = doc ? doc.short : A.CAT ? A.CATEGORIES[A.CAT].label : "Home page";
     const lines = edits.flatMap(e => e.ops.map(op => "- " + describe(op)));
-    const payload = { version: 1, page: location.pathname, edits: edits.map(e => ({ file: e.file, ops: e.ops.map(({ where, type, name, ...op }) => op) })) };
+    const payload = { version: 1, editor, page: location.pathname, edits: edits.map(e => ({ file: e.file, ops: e.ops.map(({ where, type, name, ...op }) => op) })) };
     const title = `[edit] ${pageTitle}: ${note ? note.slice(0, 70) : lines.length + " change" + (lines.length === 1 ? "" : "s")}`;
     const full = `**Suggested changes to ${pageTitle}**\n\n${lines.join("\n")}\n\n**Note from the editor**\n\n${note || "_No note._"}\n\n<details><summary>Technical details for the robot (please do not edit)</summary>\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\`\n</details>\n`;
     const base = `https://github.com/${A.site.repository}/issues/new`;
@@ -451,9 +452,74 @@
     dlg.querySelector("[data-r=done]").addEventListener("click", () => { clearDraft(); dlg.close(); stop(true); });
   }
 
+  // ---------- Who is editing? ----------
+  // Asks for the editor's GitHub username and checks it against content/editors.json. This is a convenience
+  // check: the real check happens when the change is submitted, against the account that creates the GitHub issue.
+  const USER_KEY = "editor-github";
+  let editor = null, starting = false;
+  async function loadEditors() {
+    try { const r = await fetch(A.ROOT + "content/editors.json?t=" + Date.now()); return (await r.json()).editors || []; }
+    catch (_) { return null; }
+  }
+  const findEditor = (list, name) => list.find(e => e.github.toLowerCase() === String(name).toLowerCase());
+  function gate() {
+    return new Promise(async resolve => {
+      const list = await loadEditors();
+      if (!list) { alert("The list of editors could not be loaded. Please check your connection and try again."); return resolve(null); }
+      let remembered = null; try { remembered = localStorage.getItem(USER_KEY); } catch (_) {}
+      if (remembered && findEditor(list, remembered)) return resolve(findEditor(list, remembered).github);
+      const contact = esc(A.site.editorsContact || "the site maintainer");
+      const dlg = document.createElement("dialog");
+      dlg.className = "ed-review ed-gate";
+      const ask = (msg = "") => {
+        dlg.innerHTML = `<h2>Who's editing?</h2>
+          <p>Enter your GitHub username. Only approved editors can suggest changes to this site.</p>
+          <form method="dialog"><label class="ed-note">GitHub username<input type="text" name="u" autocomplete="username" spellcheck="false" placeholder="e.g. jane-doe" value="${esc(remembered || "")}"></label>
+          ${msg ? `<p class="ed-gate-msg">${msg}</p>` : ""}
+          <p class="ed-explain">No GitHub account yet? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one for free</a>, then ask ${contact} to add you as an editor.</p>
+          <div class="ed-actions"><button type="button" data-g="cancel">Cancel</button><button type="submit" class="primary">Continue</button></div></form>`;
+        const input = dlg.querySelector("input"); input.focus(); input.select();
+      };
+      const refuse = name => {
+        dlg.innerHTML = `<h2>You can't edit yet</h2>
+          <p>The GitHub account <b>@${esc(name)}</b> isn't on the list of editors for this site.</p>
+          <p>Please contact <b>${contact}</b> and give them your GitHub username, <b>${esc(name)}</b>, so they can add you. Once you've been added, click Edit again.</p>
+          <div class="ed-actions"><button type="button" data-g="again">Use a different username</button><button type="button" class="primary" data-g="cancel">Close</button></div>`;
+      };
+      dlg.addEventListener("click", e => {
+        const b = e.target.closest("[data-g]"); if (!b) return;
+        if (b.dataset.g === "cancel") { dlg.close(); resolve(null); }
+        if (b.dataset.g === "again") ask();
+      });
+      dlg.addEventListener("submit", async e => {
+        e.preventDefault();
+        const name = dlg.querySelector("input").value.trim().replace(/^@/, "");
+        if (!name) return ask("Please enter your GitHub username.");
+        const found = findEditor(list, name);
+        if (found) { try { localStorage.setItem(USER_KEY, found.github); } catch (_) {} dlg.close(); return resolve(found.github); }
+        // Catch typos: check that the account exists (GitHub's public API; if it can't be reached, skip this check).
+        try {
+          const r = await fetch("https://api.github.com/users/" + encodeURIComponent(name));
+          if (r.status === 404) return ask(`There's no GitHub account called “${esc(name)}”. Please check the spelling.`);
+        } catch (_) {}
+        refuse(name);
+      });
+      dlg.addEventListener("cancel", () => resolve(null));
+      dlg.addEventListener("close", () => dlg.remove());
+      document.body.appendChild(dlg);
+      dlg.showModal();
+      ask();
+    });
+  }
+  function signOut() { try { localStorage.removeItem(USER_KEY); } catch (_) {} stop(true); }
+
   // ---------- Start and stop ----------
-  function start() {
-    if (editing) return;
+  async function start() {
+    if (editing || starting) return;
+    starting = true;
+    editor = await gate();
+    starting = false;
+    if (!editor) return;
     editing = true;
     document.body.classList.add("editing");
     document.querySelector(".edit-fab").hidden = true;

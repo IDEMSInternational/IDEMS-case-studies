@@ -197,3 +197,9 @@ li:hover > .ed-itools, .stat:hover > .ed-itools, tr:hover .ed-itools, th:hover >
 .ed-pwrap .pcard { height: 100%; box-sizing: border-box; }
 .ed-px { position: absolute; top: -8px; right: -8px; border-radius: 999px; padding: 3px 7px; box-shadow: var(--shadow); }
 .ed-padd { align-self: center; font: 14px Inter, system-ui, sans-serif; padding: 10px; border: 1px dashed var(--line); border-radius: 12px; background: var(--surface); color: var(--muted); }
+
+.ed-bar .ed-who { color: var(--muted); }
+.ed-link { background: none !important; border: none !important; padding: 0 !important; color: var(--accent) !important; text-decoration: underline; cursor: pointer; font: inherit !important; }
+.ed-gate input { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; font: inherit; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
+.ed-gate-msg { color: #b45309; font-size: 14px; }
+.ed-gate a { color: var(--accent); }
