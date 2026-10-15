@@ -405,19 +405,25 @@
       : `${n} change${n === 1 ? "" : "s"}`;
     bar.querySelector("[data-bar=review]").disabled = !fresh;
   }
+  function fbShown(n) {
+    const b = bar.querySelector("[data-bar=feedback]");
+    b.setAttribute("aria-pressed", n > 0); b.textContent = n ? `💬 Feedback & edits (${n})` : "💬 Feedback & edits";
+    bar.querySelector("[data-bar=fbhide]").hidden = !n;
+  }
   function showBar() {
     bar = document.createElement("div");
     bar.className = "ed-bar";
     bar.innerHTML = `<div class="ed-bar-in"><b>Editing</b><span class="ed-who">as @${esc(editor)} · <button type="button" class="ed-link" data-bar="signout">not you?</button></span><span class="ed-count"></span>
       <span class="ed-hint">${doc ? "Click any text to change it. Use the buttons beside a block to move, add or delete it, and ＋ / × to add or remove entries." : "Click the highlighted text to change it, or open a persona to edit their profile."}</span>
-      <button type="button" data-bar="feedback" aria-pressed="false">💬 Show feedback</button><button type="button" data-bar="cancel">Stop editing</button><button type="button" class="primary" data-bar="review">Review &amp; submit</button></div>`;
+      <button type="button" data-bar="feedback" aria-pressed="false">💬 Feedback &amp; edits</button><button type="button" data-bar="fbhide" hidden>Hide</button><button type="button" data-bar="cancel">Stop editing</button><button type="button" class="primary" data-bar="review">Review &amp; submit</button></div>`;
     document.body.appendChild(bar);
     bar.addEventListener("click", e => {
       const b = e.target.closest("[data-bar]"); if (!b) return;
       if (b.dataset.bar === "review") review();
       if (b.dataset.bar === "cancel") stop();
       if (b.dataset.bar === "signout") signOut();
-      if (b.dataset.bar === "feedback") loadFeedback().then(F => { const on = F.toggleOpenFeedback(); b.setAttribute("aria-pressed", on); b.textContent = on ? "💬 Hide feedback" : "💬 Show feedback"; });
+      if (b.dataset.bar === "feedback") loadFeedback().then(F => F.chooseOpenFeedback()).then(fbShown);
+      if (b.dataset.bar === "fbhide") loadFeedback().then(F => { F.hideOpenFeedback(); fbShown(0); });
     });
     updateBar();
   }

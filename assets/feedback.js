@@ -20,7 +20,7 @@
   let active = false;       // feedback mode on
   let comments = [];        // this person's comments on this page
   let thread = null;        // { issue, key?, sent: { id: comment as last sent } }
-  let reviewOn = false, reviewItems = null; // contributors: open feedback from everyone
+  let reviewOn = false, reviewItems = null; // contributors: the open feedback they picked to see
   const draftKey = () => `fb:${PAGE}:${me.via === "anon" ? "anon" : me.user.toLowerCase()}`;
   const save = () => { try { localStorage.setItem(draftKey(), JSON.stringify({ comments, thread })); } catch (_) {} };
   const load = () => { try { return JSON.parse(localStorage.getItem(draftKey()) || "null"); } catch (_) { return null; } };
@@ -134,7 +134,29 @@
   // ---------- Cards ----------
   const snap = c => JSON.stringify([c.target, c.quote || null, c.text]);
   function stateOf(c) { if (!thread || !thread.sent[c.id]) return "not sent yet"; return snap(thread.sent[c.id]) === snap(c) ? "sent" : "changed, not sent yet"; }
+  const fieldName = f => ({ text: "", heading: "heading", title: "title", standfirst: "introduction", note: "note", stats: "key figures", items: "entries", rows: "rows", head: "column headings",
+    cite: "attribution", ids: "personas shown" })[f] ?? (PF[f] || PAGEF[f] || f);
+  function editCard(c) {
+    const ch = c.change, link = `<a href="${esc(c.url)}" target="_blank" rel="noopener">pull request #${c.issue}</a>`;
+    let body;
+    if (ch.deleted) body = `<p class="fb-text">Proposes deleting this ${esc(TYPE[ch.type] || "block")}.</p>`;
+    else if (ch.inserted !== undefined) body = `<p class="fb-text">Proposes a new paragraph ${ch.atStart ? "at the start of this section" : "after this"}:</p><p class="fb-text fb-new">${esc(plain(ch.inserted))}</p>`;
+    else if (ch.reordered) body = `<p class="fb-text">Proposes a new order for the ${ch.reordered} blocks here.</p>`;
+    else if (typeof ch.new === "string" && (typeof ch.old === "string" || ch.old == null)) {
+      const label = fieldName(ch.field);
+      body = `${label ? `<p class="fb-label">${esc(label)}</p>` : ""}<p class="fb-text fb-new">${esc(plain(ch.new)) || "<i>(empty)</i>"}</p>
+        ${ch.old ? `<details class="fb-was"><summary>Current text</summary><p class="fb-text">${esc(plain(ch.old))}</p></details>` : ""}`;
+    } else {
+      const a = Array.isArray(ch.old) ? ch.old : [], b = Array.isArray(ch.new) ? ch.new : [];
+      const n = Array.isArray(ch.old) || Array.isArray(ch.new) ? [
+        [b.slice(0, a.length).filter((x, i) => JSON.stringify(x) !== JSON.stringify(a[i])).length, "changed"],
+        [Math.max(0, b.length - a.length), "added"], [Math.max(0, a.length - b.length), "removed"]].filter(([k]) => k).map(([k, w]) => `${k} ${w}`).join(", ") : "";
+      body = `<p class="fb-text">Proposes changes to the ${esc(fieldName(ch.field) || "text")}${n ? ` (entries: ${n})` : ""}. See the ${link} for the details.</p>`;
+    }
+    return `<div class="fb-card fb-edit" data-cid="${esc(c.id)}"><div class="fb-head">✏️ Proposed edit · ${esc(c.author)} · ${link}</div>${body}</div>`;
+  }
   function card(c, own) {
+    if (c.change) return editCard(c);
     const head = own ? `💬 Your comment <span class="fb-state">· ${stateOf(c)}</span>` : `💬 ${esc(c.author)} · <a href="${esc(c.url)}" target="_blank" rel="noopener">#${c.issue}</a>`;
     return `<div class="fb-card${own ? "" : " fb-other"}" data-cid="${c.id}"><div class="fb-head">${head}</div>
       ${c.quote ? `<blockquote class="fb-quote">“${esc(c.quote.exact)}”</blockquote>` : ""}<p class="fb-text">${esc(c.text)}</p>
@@ -422,27 +444,147 @@
     refresh();
   }
 
-  // ---------- Contributors: show open feedback ----------
-  async function loadOpen() {
+  // ---------- Contributors: show open feedback and proposed edits ----------
+  // The lists come from two requests; a thread's details are only fetched once it is picked, because GitHub allows
+  // visitors who aren't signed in only a few requests an hour. Proposed edits are read from the pull request's files
+  // (raw files are not counted), so they include later additions and anything a reviewer changed.
+  let shown = new Set();    // picked: "fb-<issue>" or "pr-<pull request>"
+  const states = {};        // picked key -> its cards, once fetched
+  const pageTitle = () => A.CASE ? A.CASES[A.CASE].short : A.CAT ? A.CATEGORIES[A.CAT].label : "Home page";
+  async function listFeedback() {
     const q = encodeURIComponent(`repo:${REPO} is:issue is:open in:title "[feedback]"`);
-    const res = await ghJSON(`https://api.github.com/search/issues?q=${q}&per_page=50`).catch(() => ({ items: [] }));
-    const items = (res.items || []).filter(it => !/update to #\d+/.test(it.title) && (it.body || "").includes(`Page: ${PAGE}`));
-    const out = [];
-    for (const it of items) {
-      const { state } = await latestState(it.number).catch(() => ({ state: null }));
-      if (!state) continue;
-      const author = state.from.via === "anon" ? (state.from.name ? `${state.from.name} (anonymous)` : "anonymous") : `@${state.from.user}`;
-      state.comments.forEach(c => out.push({ ...c, id: `${it.number}-${c.id}`, issue: it.number, url: it.html_url, author }));
+    const res = await ghJSON(`https://api.github.com/search/issues?q=${q}&per_page=100&sort=updated&order=desc`);
+    return (res.items || []).filter(it => !/update to #\d+/.test(it.title) && (it.body || "").includes(`Page: ${PAGE}`)).map(it => ({
+      key: `fb-${it.number}`, kind: "feedback", number: it.number, url: it.html_url, updated: it.updated_at,
+      title: it.title.replace(/^\[feedback\]\s*/, "").replace(/^[^:]*:\s*/, ""),
+      author: ((it.body || "").match(/^From: (.+)$/m) || [])[1] || `@${it.user.login}`,
+    }));
+  }
+  async function listEdits() {
+    const prs = await ghJSON(`${API}/pulls?state=open&per_page=100&sort=updated&direction=desc`);
+    return prs.filter(pr => /^edit\/issue-\d+$/.test(pr.head.ref) && pr.title.startsWith(`${pageTitle()}:`)).map(pr => ({
+      key: `pr-${pr.number}`, kind: "edit", number: pr.number, url: pr.html_url, updated: pr.updated_at, head: pr.head.sha, base: pr.base.ref,
+      title: pr.title.slice(pageTitle().length + 1).trim(),
+      author: `@${((pr.body || "").match(/by @([A-Za-z0-9-]+)/) || [])[1] || pr.user.login}`,
+    }));
+  }
+  async function feedbackCards(it) {
+    const { state } = await latestState(it.number);
+    const author = !state ? it.author : state.from.via === "anon" ? (state.from.name ? `${state.from.name} (anonymous)` : "anonymous") : `@${state.from.user}`;
+    return state ? state.comments.map(c => ({ ...c, id: `${it.number}-${c.id}`, issue: it.number, url: it.url, author })) : [];
+  }
+  // What a proposed edit changes on this page: compare its files with where its branch started.
+  const raw = (sha, file) => fetch(`https://raw.githubusercontent.com/${REPO}/${sha}/${file}`, { cache: "force-cache" }).then(r => r.ok ? r.json() : null);
+  function diff(file, a, b) {
+    const out = [], add = (target, change) => out.push({ target, change });
+    const differs = (x, y) => JSON.stringify(x ?? null) !== JSON.stringify(y ?? null);
+    const fields = (x, y, skip = []) => [...new Set([...Object.keys(x || {}), ...Object.keys(y || {})])].filter(f => !skip.includes(f) && differs(x && x[f], y && y[f]));
+    if (/\/case-studies\//.test(file)) {
+      if (!A.CASE || !file.endsWith(`/${A.CASE}.json`)) return out;
+      for (const f of fields(a, b).filter(f => ["title", "standfirst", "note", "stats"].includes(f))) add(`doc:${f}`, { field: f, old: a[f], new: b[f] });
+      const lists = d => { const m = {}; for (const s of d.sections || []) { m[`sec:${s.id}`] = s.blocks; for (const x of s.blocks) if (x.blocks) m[`blk:${x.id}`] = x.blocks; } return m; };
+      const flat = d => { const m = {}; for (const s of d.sections || []) for (const x of s.blocks) for (const y of [x, ...(x.blocks || [])]) m[y.id] = y; return m; };
+      const secA = Object.fromEntries((a.sections || []).map(s => [s.id, s]));
+      for (const sb of b.sections || []) if (secA[sb.id] && differs(secA[sb.id].heading, sb.heading)) add(`sec:${sb.id}`, { field: "heading", old: secA[sb.id].heading, new: sb.heading });
+      const fa = flat(a), fb = flat(b), la = lists(a), lb = lists(b);
+      for (const id in fa) {
+        if (!fb[id]) { add(`blk:${id}`, { deleted: true, type: fa[id].type }); continue; }
+        for (const f of fields(fa[id], fb[id], ["id", "type", "blocks"])) add(`blk:${id}`, { field: f, old: fa[id][f], new: fb[id][f] });
+      }
+      for (const key in lb) {
+        const list = lb[key], before = la[key] || [];
+        list.forEach((x, i) => {
+          if (fa[x.id]) return;
+          let j = i - 1; while (j >= 0 && !fa[list[j].id]) j--;
+          add(j >= 0 ? `blk:${list[j].id}` : key, { inserted: x.text || "", atStart: j < 0 });
+        });
+        const was = before.map(x => x.id).filter(id => fb[id] && list.some(y => y.id === id)), now = list.map(x => x.id).filter(id => fa[id]);
+        if (differs(was, now)) add(key, { reordered: now.length });
+      }
+      return out;
+    }
+    if (/\/personas\.json$/.test(file)) {
+      const pa = Object.fromEntries((a || []).map(x => [x.id, x]));
+      for (const x of b || []) if (pa[x.id]) for (const f of fields(pa[x.id], x, ["id"])) add(`per:${x.id}:${f}`, { field: f, old: pa[x.id][f], new: x[f] });
+      return out;
+    }
+    if (/content\/site\.json$/.test(file)) { for (const f of fields(a, b)) add(`site:${f}`, { field: f, old: a[f], new: b[f] }); return out; }
+    if (/content\/categories\.json$/.test(file)) {
+      const ca = Object.fromEntries((a || []).map(x => [x.id, x]));
+      for (const x of b || []) if (ca[x.id]) for (const f of fields(ca[x.id], x, ["id"])) add(`cat:${x.id}:${f}`, { field: f, old: ca[x.id][f], new: x[f] });
+      return out;
     }
     return out;
   }
-  function toggleOpenFeedback() {
-    reviewOn = !reviewOn;
-    if (reviewOn && !reviewItems) loadOpen().then(items => { reviewItems = items; refresh(); if (!items.length) alert("There's no open feedback on this page."); });
-    else refresh();
-    return reviewOn;
+  async function editCards(it) {
+    const cmp = await ghJSON(`${API}/compare/${encodeURIComponent(it.base)}...${it.head}`);
+    const from = cmp.merge_base_commit.sha, files = (cmp.files || []).map(f => f.filename).filter(f => /^content\/.+\.json$/.test(f));
+    const changes = (await Promise.all(files.map(async f => { const [a, b] = await Promise.all([raw(from, f), raw(it.head, f)]); return a && b ? diff(f, a, b) : []; }))).flat();
+    return changes.map((c, i) => ({ ...c, id: `pr${it.number}-${i}`, issue: it.number, url: it.url, author: it.author }));
   }
+  async function cardsFor(it) {
+    if (!states[it.key]) states[it.key] = await (it.kind === "edit" ? editCards(it) : feedbackCards(it));
+    return states[it.key];
+  }
+  // Opens the picker; resolves to the number of threads shown.
+  function chooseOpenFeedback() {
+    return new Promise(resolve => {
+      const dlg = document.createElement("dialog");
+      const head = `<h2>Show open feedback and edits</h2>`;
+      const notice = msg => { dlg.innerHTML = `${head}<p class="ed-explain">${msg}</p><div class="ed-actions"><button type="button" class="primary" data-p="close">Close</button></div>`; };
+      dlg.className = "ed-review fb-pick";
+      dlg.innerHTML = `${head}<p class="ed-explain">Looking for open feedback and proposed edits on this page…</p>`;
+      document.body.appendChild(dlg); dlg.showModal();
+      let done = false;
+      const finish = () => { if (done) return; done = true; if (dlg.open) dlg.close(); dlg.remove(); resolve(shown.size); };
+      dlg.addEventListener("close", finish);
+      dlg.addEventListener("click", e => { if (e.target.closest("[data-p=close]")) finish(); });
+      const day = d => new Date(d).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+      Promise.allSettled([listFeedback(), listEdits()]).then(([f, e]) => {
+        if (f.status === "rejected" && e.status === "rejected") throw new Error("unreachable");
+        const list = [...(f.value || []), ...(e.value || [])].sort((x, y) => y.updated.localeCompare(x.updated));
+        const missing = f.status === "rejected" ? "feedback" : e.status === "rejected" ? "proposed edits" : "";
+        const partly = missing ? ` <b>Couldn't load the ${missing} just now; please try again in a few minutes.</b>` : "";
+        if (!list.length) return notice(`There's no open feedback and there are no proposed edits waiting for review on this page.${partly}`);
+        const nf = list.filter(x => x.kind === "feedback").length, ne = list.length - nf;
+        const counts = [nf && `${nf} open feedback thread${nf === 1 ? "" : "s"}`, ne && `${ne} proposed edit${ne === 1 ? "" : "s"} waiting for review`].filter(Boolean).join(" and ");
+        dlg.innerHTML = `${head}
+          <p class="ed-explain">${counts} on this page, most recent first. Pick the ones to show: they appear beside the parts of the page they're about.${partly}</p>
+          <div class="fb-pick-tools"><input type="search" placeholder="Filter by name, words, “feedback” or “edit”" aria-label="Filter"><button type="button" data-p="all">Select all listed</button><button type="button" data-p="none">Clear</button></div>
+          <ul class="ed-changes fb-pick-list">${list.map(it => { const tag = it.kind === "edit" ? "✏️ Proposed edit" : "💬 Feedback"; return `<li data-q="${esc((tag + " " + it.author + " " + it.title).toLowerCase())}"><label>
+            <input type="checkbox" value="${it.key}"${shown.has(it.key) ? " checked" : ""}>
+            <span><span class="fb-tag fb-tag-${it.kind}">${tag}</span> <b>${esc(it.author)}</b> · ${esc(cut(it.title, 90))}<br><small>${day(it.updated)} · <a href="${esc(it.url)}" target="_blank" rel="noopener">#${it.number}</a></small></span></label></li>`; }).join("")}</ul>
+          <div class="ed-actions"><button type="button" data-p="close">Cancel</button><button type="button" class="primary" data-p="show"></button></div>`;
+        const boxes = () => [...dlg.querySelectorAll(".fb-pick-list input")];
+        const count = () => { const n = boxes().filter(b => b.checked).length; dlg.querySelector("[data-p=show]").textContent = n ? `Show ${n}` : "Show none"; };
+        count();
+        dlg.querySelector("input[type=search]").addEventListener("input", e => {
+          const q = e.target.value.trim().toLowerCase();
+          dlg.querySelectorAll(".fb-pick-list li").forEach(li => { li.hidden = !!q && !li.dataset.q.includes(q); });
+        });
+        dlg.addEventListener("change", count);
+        dlg.addEventListener("click", async e => {
+          const b = e.target.closest("[data-p]"); if (!b) return;
+          if (b.dataset.p === "all" || b.dataset.p === "none") { boxes().forEach(x => { if (b.dataset.p === "none" || !x.closest("li").hidden) x.checked = b.dataset.p === "all"; }); count(); }
+          if (b.dataset.p !== "show") return;
+          const pick = list.filter(it => boxes().some(x => x.checked && x.value === it.key));
+          b.disabled = true; b.textContent = "Loading…";
+          const got = await Promise.all(pick.map(it => cardsFor(it).then(cs => [it, cs], () => [it, null])));
+          const failed = got.filter(([, cs]) => !cs).map(([it]) => `#${it.number}`);
+          shown = new Set(got.filter(([, cs]) => cs).map(([it]) => it.key));
+          reviewOn = shown.size > 0;
+          reviewItems = got.flatMap(([, cs]) => cs || []);
+          refresh();
+          const empty = got.filter(([it, cs]) => cs && it.kind === "edit" && !cs.some(c => elFor(c.target) || c.target.startsWith("per:"))).map(([it]) => `#${it.number}`);
+          if (empty.length) alert(`${empty.join(", ")} ${empty.length === 1 ? "changes" : "change"} nothing visible on this page as it is now (it may change things on another page, or have been changed by a reviewer). Open it on GitHub to see it.`);
+          if (failed.length) alert(`Couldn't load ${failed.join(", ")} from GitHub just now (it limits how often it can be asked). Try again in a few minutes.`);
+          finish();
+        });
+      }).catch(() => notice("Couldn't reach GitHub just now. It limits how often it can be asked when you aren't signed in, so please try again in a few minutes."));
+    });
+  }
+  function hideOpenFeedback() { shown = new Set(); reviewOn = false; reviewItems = null; refresh(); }
 
   document.addEventListener("persona-opened", () => { if (active || reviewOn) refresh(); });
-  window.SiteFeedback = { start, refresh, toggleOpenFeedback };
+  window.SiteFeedback = { start, refresh, chooseOpenFeedback, hideOpenFeedback };
 })();
