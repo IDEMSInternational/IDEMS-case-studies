@@ -143,17 +143,10 @@ footer.site li { margin: 4px 0; break-inside: avoid; }
   .card, .cat-card, .case-card { break-inside: avoid; box-shadow: none; }
 }
 
-/* ---------- Edit mode (assets/editor.js) ---------- */
-.edit-fab { position: fixed; right: 18px; bottom: 18px; z-index: 50; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; font: 600 14px Inter, system-ui, sans-serif; box-shadow: var(--shadow); cursor: pointer; }
-.edit-fab:hover { border-color: var(--accent); color: var(--accent); }
+/* ---------- Edit mode (assets/editor.js) ----------
+   The bar and dialogs come from the feedback tool (assets/feedback-tool/feedback.css). */
 body.editing { padding-bottom: 90px; }
-.ed-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--surface); border-top: 2px solid var(--accent); box-shadow: 0 -4px 20px rgba(0,0,0,.08); }
-.ed-bar-in { max-width: 1100px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; font: 14px Inter, system-ui, sans-serif; }
-.ed-bar .ed-count { color: var(--accent); font-weight: 600; }
-.ed-bar .ed-hint { color: var(--muted); flex: 1 1 200px; font-size: 13px; }
-.ed-bar button, .ed-review button, .ed-tools button { font: 600 13px Inter, system-ui, sans-serif; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
-.ed-bar button.primary, .ed-review button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
-.ed-bar button:disabled { opacity: .5; cursor: default; }
+.ed-tools button { font: 600 13px Inter, system-ui, sans-serif; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
 .editing .ed { outline: 1px dashed transparent; outline-offset: 3px; border-radius: 4px; transition: outline-color .15s, background .15s; }
 .editing .ed:hover { outline-color: var(--line); }
 .editing .ed:focus { outline: 2px solid var(--accent); background: var(--accent-soft); }
@@ -172,18 +165,6 @@ body.editing { padding-bottom: 90px; }
 .ed-footnote { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 40px; }
 .pf-editing [data-pf] { min-width: 1em; }
 .pf-edit-note { font-size: 13px; color: var(--accent); margin: 6px 0 0; }
-dialog.ed-review { border: none; border-radius: 14px; padding: 24px 26px; max-width: 620px; width: calc(100% - 32px); background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgba(0,0,0,.25); font: 15px/1.5 Inter, system-ui, sans-serif; }
-dialog.ed-review::backdrop { background: rgba(20, 18, 15, .45); }
-.ed-review h2 { font-family: Fraunces, Georgia, serif; margin: 0 0 12px; }
-.ed-changes { list-style: none; padding: 0; margin: 0 0 16px; max-height: 40vh; overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
-.ed-changes li { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--line); }
-.ed-changes li:last-child { border-bottom: none; }
-.ed-note { display: block; font-weight: 600; margin-bottom: 12px; }
-.ed-note span { font-weight: 400; color: var(--muted); }
-.ed-review textarea { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
-.ed-explain { color: var(--muted); font-size: 14px; }
-.ed-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
-@media print { .edit-fab, .ed-bar { display: none; } }
 /* Add/remove controls for entries, rows, points and figures; persona row picker */
 .ed-itools { display: inline-flex; gap: 3px; margin-left: 6px; vertical-align: middle; opacity: .25; transition: opacity .15s; }
 li:hover > .ed-itools, .stat:hover > .ed-itools, tr:hover .ed-itools, th:hover > .ed-itools, .ed-itools:focus-within { opacity: 1; }
@@ -197,56 +178,17 @@ li:hover > .ed-itools, .stat:hover > .ed-itools, tr:hover .ed-itools, th:hover >
 .ed-pwrap .pcard { height: 100%; box-sizing: border-box; }
 .ed-px { position: absolute; top: -8px; right: -8px; border-radius: 999px; padding: 3px 7px; box-shadow: var(--shadow); }
 .ed-padd { align-self: center; font: 14px Inter, system-ui, sans-serif; padding: 10px; border: 1px dashed var(--line); border-radius: 12px; background: var(--surface); color: var(--muted); }
+.fb-items li.ed-sent { color: var(--muted); }
 
-.ed-bar .ed-who { color: var(--muted); }
-.ed-link { background: none !important; border: none !important; padding: 0 !important; color: var(--accent) !important; text-decoration: underline; cursor: pointer; font: inherit !important; }
-.ed-gate input { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; font: inherit; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
-.ed-gate-msg { color: #b45309; font-size: 14px; }
-.ed-gate a { color: var(--accent); }
-
-.ed-changes li.ed-sent { color: var(--muted); }
-.ed-actions-wrap { flex-wrap: wrap; }
-
-/* ---------- Feedback mode (assets/feedback.js) ---------- */
-body.feedback-mode { padding-bottom: 90px; }
+/* ---------- Feedback tool (assets/feedback-tool/): this site's colours, fonts and targets ---------- */
+:root {
+  --fb-bg: var(--bg); --fb-surface: var(--surface); --fb-text: var(--text); --fb-muted: var(--muted); --fb-line: var(--line);
+  --fb-accent: var(--accent); --fb-shadow: var(--shadow);
+  --fb-font: Inter, system-ui, sans-serif; --fb-heading-font: Fraunces, Georgia, serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fb-comment-bg: #2a2414; } }
+:root[data-theme="dark"] { --fb-comment-bg: #2a2414; }
+/* The parts people can comment on (assets/site-feedback.js) */
 .feedback-mode [data-block]:hover, .feedback-mode [data-section]:hover, .feedback-mode [data-doc]:hover,
 .feedback-mode [data-pf]:hover, .feedback-mode [data-sf]:hover, .feedback-mode [data-cf]:hover { outline: 1px dashed var(--line); outline-offset: 4px; border-radius: 4px; }
 .feedback-mode .fb-stack [data-block]:hover { outline: none; }
-.fb-float { position: fixed; z-index: 70; font: 600 12.5px Inter, system-ui, sans-serif; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); border-radius: 999px; padding: 5px 11px; box-shadow: var(--shadow); cursor: pointer; }
-.fb-float:hover { background: var(--accent); color: var(--bg); }
-.fb-float-sel { background: var(--accent); color: var(--bg); }
-.fb-stack { margin: 6px 0 18px; display: grid; gap: 8px; font: 14.5px/1.5 Inter, system-ui, sans-serif; font-style: normal; }
-.fb-card { background: #fffbeb; border: 1px solid #f59e0b55; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 10px 14px; color: var(--text); }
-.fb-card.fb-other { background: var(--surface); border-color: var(--line); border-left-color: var(--accent); }
-.fb-head { font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
-.fb-head a { color: var(--accent); }
-.fb-state { font-weight: 400; }
-.fb-quote { margin: 4px 0 6px; padding: 2px 10px; border-left: 3px solid #f59e0b; color: var(--muted); font-style: italic; }
-.fb-text { margin: 0; white-space: pre-wrap; }
-.fb-card textarea { display: block; width: 100%; box-sizing: border-box; font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); margin: 4px 0 8px; }
-.fb-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
-.fb-actions button { font: 600 12.5px Inter, system-ui, sans-serif; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 8px; padding: 5px 11px; cursor: pointer; }
-.fb-actions button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
-::highlight(fb) { background-color: rgba(245, 158, 11, .35); }
-.fb-bar .fb-thread a, .fb-bar .fb-thread { color: var(--muted); }
-.fb-choice { border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin: 0 0 12px; }
-.fb-choice h3 { margin: 0 0 6px; font-size: 16px; }
-.ed-gate input[name=n] { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; font: inherit; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
-.fb-linkbox { display: flex; gap: 8px; }
-.fb-linkbox input { flex: 1; font: 13px ui-monospace, monospace; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fb-card:not(.fb-other) { background: #2a2414; } }
-:root[data-theme="dark"] .fb-card:not(.fb-other) { background: #2a2414; }
-.fb-pick-tools { display: flex; gap: 8px; margin: 0 0 10px; flex-wrap: wrap; }
-.fb-pick-tools input { flex: 1; min-width: 160px; font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
-.fb-pick-list li { padding: 0; }
-.fb-pick-list label { display: flex; gap: 10px; align-items: flex-start; padding: 8px 12px; cursor: pointer; width: 100%; }
-.fb-pick-list input { margin-top: 4px; }
-.fb-pick-list small { color: var(--muted); }
-.fb-tag { display: inline-block; font-size: 11.5px; font-weight: 600; border-radius: 999px; padding: 1px 8px; margin-right: 2px; background: #fef3c7; color: #92400e; }
-.fb-tag-edit { background: #dbeafe; color: #1e40af; }
-.fb-card.fb-edit { background: var(--surface); border-color: #3b82f655; border-left-color: #3b82f6; }
-.fb-label { margin: 0 0 2px; font-size: 12.5px; color: var(--muted); }
-.fb-new { background: #3b82f614; border-radius: 6px; padding: 4px 8px; }
-.fb-was { margin-top: 6px; font-size: 13.5px; color: var(--muted); }
-.fb-was summary { cursor: pointer; }
-@media print { .fb-float, .fb-stack { display: none; } }

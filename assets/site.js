@@ -1,5 +1,6 @@
 // Renders every page from the JSON files in content/. Each HTML page is a shell:
-// <body data-page="home|category|case" data-category="…" data-case="…"><div id="app"></div><script src="…/assets/site.js"></script>
+// <body data-page="home|category|case" data-category="…" data-case="…"><div id="app"></div>
+// <script src="…/assets/feedback-tool/tool.js"></script><script src="…/assets/site.js"></script>
 (async function () {
   const ROOT = new URL("../", document.currentScript.src).href;
   const { page, category: CAT, case: CASE } = document.body.dataset;
@@ -319,24 +320,14 @@
     if (e.key === "ArrowLeft") step(-1);
   });
 
-  // ---------- Edit mode (assets/editor.js is loaded on demand) ----------
+  // ---------- Feedback and edit mode ----------
+  // The feedback tool (assets/feedback-tool/) adds the 💬 button. This site's plug-in (assets/site-feedback.js) and
+  // editor (assets/editor.js) are loaded when needed, and use SiteAPI. If the tool didn't load, the page works without it.
   window.SiteAPI = { ROOT, site, cats, CATEGORIES, CASES, SETS, PERSONAS, byId, REFS, page, CAT, CASE, md, esc, pcard, personaHref, color, open, dialog: dlg, app };
-  const editBtn = document.createElement("button");
-  editBtn.className = "edit-fab";
-  editBtn.type = "button";
-  editBtn.textContent = "💬 Feedback and comments";
-  editBtn.title = "Comment on this page, or suggest changes if you are on the team";
-  editBtn.addEventListener("click", () => {
-    if (window.SiteEditor) return window.SiteEditor.start();
-    const sc = document.createElement("script");
-    sc.src = ROOT + "assets/editor.js";
-    sc.onload = () => window.SiteEditor.start();
-    document.body.appendChild(sc);
+  if (window.FeedbackTool) FeedbackTool.init({
+    repository: site.repository, feedbackEndpoint: site.feedbackEndpoint, feedbackBot: site.feedbackBot,
+    site: ROOT + "assets/site-feedback.js", editors: ROOT + "access/editors.json", editor: ROOT + "assets/editor.js",
   });
-  document.body.appendChild(editBtn);
-  // Links ending in ?edit (or ?feedback) open the panel straight away; #fb=<issue>-<key> is a private link to
-  // continue anonymous feedback.
-  if (new URLSearchParams(location.search).has("edit") || new URLSearchParams(location.search).has("feedback") || location.hash.startsWith("#fb=")) editBtn.click();
 
   const hashId = decodeURIComponent(location.hash.slice(1));
   if (byId[hashId]) open(hashId);

@@ -1,20 +1,23 @@
-// Feedback and comments. Loaded by assets/editor.js for people who are not contributors (with a GitHub account or
-// anonymously), and for contributors who want to see open feedback while editing.
-// A comment points at a "target" (a block, section, page field or persona field, by its permanent id) and may quote
-// some selected words. The whole set of a person's comments on a page is sent each time, as a GitHub issue
+// Feedback mode, and the contributors' view of open feedback. Loaded on demand by tool.js together with the site
+// plug-in, which says what can be commented on (see tool.js).
+// A comment points at a "target" (a key from the site plug-in, such as a block's permanent id) and may quote some
+// selected words. The whole set of a person's comments on a page is sent each time, as a GitHub issue
 // ("[feedback] …"); later sends are added to the same issue. GitHub users send through a pre-filled GitHub page;
-// anonymous people send through a Google Apps Script web app (content/site.json feedbackEndpoint).
-(function () {
-  const A = window.SiteAPI;
-  const { esc } = A;
-  const REPO = A.site.repository;
-  const API = `https://api.github.com/repos/${REPO}`;
+// anonymous people send through a web app (the feedbackEndpoint option, tools/apps-script/).
+FeedbackTool.register("feedback", function (site) {
+  const T = FeedbackTool;
+  const { esc, clone, ghJSON } = T;
+  const REPO = T.config.repository;
+  const API = T.api;
   const PAGE = location.pathname;
-  const clone = x => JSON.parse(JSON.stringify(x));
-  const plain = s => String(s ?? "").replace(/\{\{[^}]+\}\}/g, "").replace(/\[\[[a-z]+:[^|\]]+\|?([^\]]*)\]\]/g, "$1").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/[*`]/g, "").replace(/\s+/g, " ").trim();
+  const plain = site.plain || T.plain;
   const cut = (s, n) => (s = plain(s)).length > n ? s.slice(0, n - 1) + "…" : s;
   const newId = () => Math.random().toString(16).slice(2, 8);
-  const ghJSON = async url => { const r = await fetch(url, { cache: "no-store" }); if (!r.ok) throw new Error(r.status); return r.json(); };
+  const { keyOf, elFor, labelFor } = site;
+  const TARGETS = site.targets;
+  const typeName = t => (site.typeName && site.typeName(t)) || "block";
+  const fieldName = site.fieldName || (f => f);
+  const isOnPage = site.isOnPage || (key => !!elFor(key));
 
   let me = null;            // { via: "github", user } or { via: "anon", name }
   let active = false;       // feedback mode on
@@ -25,75 +28,25 @@
   const save = () => { try { localStorage.setItem(draftKey(), JSON.stringify({ comments, thread })); } catch (_) {} };
   const load = () => { try { return JSON.parse(localStorage.getItem(draftKey()) || "null"); } catch (_) { return null; } };
 
-  // ---------- Encoding (same scheme as edits, under its own tag) ----------
-  async function encode(obj) {
-    const json = JSON.stringify(obj);
-    const bytes = new Uint8Array(await new Response(new Blob([json]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer());
-    let bin = ""; bytes.forEach(b => { bin += String.fromCharCode(b); });
-    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  }
-  async function decode(b64) {
-    const bin = atob(b64.trim().replace(/-/g, "+").replace(/_/g, "/"));
-    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
-    return JSON.parse(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text());
-  }
   // The latest set of comments in a feedback issue: the last feedback-v1 block written by its author or by the robots.
   async function latestState(n) {
     const [iss, coms] = await Promise.all([ghJSON(`${API}/issues/${n}`), ghJSON(`${API}/issues/${n}/comments?per_page=100`)]);
-    const ok = new Set([iss.user.login, "github-actions[bot]", A.site.feedbackBot].filter(Boolean).map(x => x.toLowerCase()));
+    const ok = new Set([iss.user.login, "github-actions[bot]", T.config.feedbackBot].filter(Boolean).map(x => x.toLowerCase()));
     const texts = [iss.body, ...coms.filter(c => ok.has(c.user.login.toLowerCase())).map(c => c.body)];
     for (let i = texts.length - 1; i >= 0; i--) {
       const m = (texts[i] || "").match(/```feedback-v1\s*\n([\s\S]*?)\n```/);
-      if (m) { try { return { state: await decode(m[1]), issue: iss }; } catch (_) {} }
+      if (m) { try { return { state: await T.decompress(m[1]), issue: iss }; } catch (_) {} }
     }
     return { state: null, issue: iss };
   }
 
-  // ---------- Targets ----------
-  const TARGETS = "[data-block],[data-section],[data-doc],[data-pf],[data-sf],[data-cf]";
-  function keyOf(el) {
-    const d = el.dataset;
-    if (d.block) return `blk:${d.block}`;
-    if (d.section) return `sec:${d.section}`;
-    if (d.doc) return `doc:${d.doc}`;
-    if (d.pf) return `per:${A.dialog.dataset.id}:${d.pf}`;
-    if (d.sf) return `site:${d.sf}`;
-    if (d.cf) return `cat:${A.CAT}:${d.cf}`;
-  }
-  function elFor(key) {
-    const [kind, a, b] = key.split(":"), q = s => document.querySelector(s);
-    if (kind === "blk") return q(`[data-block="${a}"]`) || q(`.ed-block[data-bid="${a}"]`);
-    if (kind === "sec") return q(`[data-section="${a}"]`) || q(`[data-f="sec|${a}|heading"]`);
-    if (kind === "doc") return q(`[data-doc="${a}"]`) || (a === "stats" ? q(".stats") : q(`[data-f="doc|${a}"]`));
-    if (kind === "per") return A.dialog.open && A.dialog.dataset.id === a ? A.dialog.querySelector(`[data-pf="${b}"]`) : null;
-    if (kind === "site") return q(`[data-sf="${a}"]`);
-    if (kind === "cat") return q(`[data-cf="${b}"]`);
-    return null;
-  }
-  const TYPE = { paragraph: "paragraph", subheading: "subheading", quote: "quote", personas: "persona cards", list: "list", timeline: "timeline", table: "table", box: "box", sti: "social, technical and innovation section" };
-  const PF = { name: "name", tagline: "tagline", age: "age", where: "location", quote: "quote", grounded: "“grounded in”", background: "background", looking: "“what they’re looking for”", hopes: "hopes & dreams", worries: "worries & fears", data: "data and expertise", day: "day in the life" };
-  const PAGEF = { lede: "introduction", personasNote: "note above the personas", sources: "sources", creditsNote: "photo credits note" };
-  function labelFor(key) {
-    const [kind, a, b] = key.split(":");
-    if (kind === "blk") {
-      const d = A.CASES[A.CASE];
-      for (const s of (d && d.sections) || []) for (const blk of s.blocks) for (const x of [blk, ...(blk.blocks || [])])
-        if (x.id === a) return `${cut(s.heading, 60)} · ${TYPE[x.type] || "block"}${x.text ? `: “${cut(x.text, 50)}”` : ""}`;
-      return "a block";
-    }
-    if (kind === "sec") { const s = (A.CASES[A.CASE] || { sections: [] }).sections.find(x => x.id === a); return `section heading “${cut(s ? s.heading : a, 60)}”`; }
-    if (kind === "doc") return { title: "title", standfirst: "introduction", note: "note", stats: "key figures" }[a] || a;
-    if (kind === "per") { const p = A.byId[a], [f, i] = (b || "").split("|"); return `${p ? p.name : a} · ${PF[f] || f}${i !== undefined ? `, item ${+i + 1}` : ""}`; }
-    if (kind === "site") return `home page · ${PAGEF[a] || a}`;
-    if (kind === "cat") return `${A.CATEGORIES[a] ? A.CATEGORIES[a].label : a} page · ${PAGEF[b] || b}`;
-    return key;
-  }
+  // ---------- Where comments go ----------
   // Cards go after the target's block-level host, never inside a target (so they don't disturb its text).
   function hostOf(el) {
     let h = el;
     if (/^(SPAN|B|STRONG|I|EM|A|CITE|CODE)$/.test(h.tagName)) h = h.closest("p,h1,h2,h3,li,blockquote,div") || h;
     if (h.tagName === "LI") h = h.closest("ul,ol") || h;
-    return h.closest(".ed-block") || h;
+    return h;
   }
   function stackFor(el) {
     const host = hostOf(el);
@@ -134,12 +87,12 @@
   // ---------- Cards ----------
   const snap = c => JSON.stringify([c.target, c.quote || null, c.text]);
   function stateOf(c) { if (!thread || !thread.sent[c.id]) return "not sent yet"; return snap(thread.sent[c.id]) === snap(c) ? "sent" : "changed, not sent yet"; }
-  const fieldName = f => ({ text: "", heading: "heading", title: "title", standfirst: "introduction", note: "note", stats: "key figures", items: "entries", rows: "rows", head: "column headings",
-    cite: "attribution", ids: "personas shown" })[f] ?? (PF[f] || PAGEF[f] || f);
+  // A proposed edit, as described by the site plug-in: deleted, inserted (new text), reordered (number of blocks), or a
+  // field with its old and new value.
   function editCard(c) {
     const ch = c.change, link = `<a href="${esc(c.url)}" target="_blank" rel="noopener">pull request #${c.issue}</a>`;
     let body;
-    if (ch.deleted) body = `<p class="fb-text">Proposes deleting this ${esc(TYPE[ch.type] || "block")}.</p>`;
+    if (ch.deleted) body = `<p class="fb-text">Proposes deleting this ${esc(typeName(ch.type))}.</p>`;
     else if (ch.inserted !== undefined) body = `<p class="fb-text">Proposes a new paragraph ${ch.atStart ? "at the start of this section" : "after this"}:</p><p class="fb-text fb-new">${esc(plain(ch.inserted))}</p>`;
     else if (ch.reordered) body = `<p class="fb-text">Proposes a new order for the ${ch.reordered} blocks here.</p>`;
     else if (typeof ch.new === "string" && (typeof ch.old === "string" || ch.old == null)) {
@@ -206,7 +159,9 @@
     btn.style.left = `${Math.min(innerWidth - btn.offsetWidth - 8, Math.max(4, x))}px`;
   }
   function hideButtons() { if (hoverBtn) hoverBtn.hidden = true; if (selBtn) selBtn.hidden = true; }
-  const ignore = n => !n || n.closest(".fb-stack, .fb-float, .ed-bar, .edit-fab, .pf-nav, .close, dialog.ed-review");
+  // The tool's own controls, and the site's.
+  const OWN = ".fb-stack, .fb-float, .fb-bar, .fb-fab, dialog.fb-dialog" + (site.ignore ? `, ${site.ignore}` : "");
+  const ignore = n => !n || n.closest(OWN);
   function onOver(e) {
     if (!active || ignore(e.target)) return;
     const t = e.target.closest(TARGETS); if (!t || t === hoverTarget) return;
@@ -265,24 +220,24 @@
   function updateBar() {
     if (!bar) return;
     const n = pending(), total = comments.length;
-    bar.querySelector(".ed-count").textContent = !total && !n ? "No comments yet" : `${total} comment${total === 1 ? "" : "s"}${n ? ` · ${n} not sent` : " · all sent"}`;
+    bar.querySelector(".fb-count").textContent = !total && !n ? "No comments yet" : `${total} comment${total === 1 ? "" : "s"}${n ? ` · ${n} not sent` : " · all sent"}`;
     bar.querySelector("[data-fbbar=send]").disabled = !n;
     const t = bar.querySelector(".fb-thread");
-    t.innerHTML = thread ? `In <a href="https://github.com/${esc(REPO)}/issues/${thread.issue}" target="_blank" rel="noopener">#${thread.issue}</a>${thread.key ? ` · <button type="button" class="ed-link" data-fbbar="link">copy private link</button>` : ""}` : "";
+    t.innerHTML = thread ? `In <a href="${esc(T.issueURL(thread.issue))}" target="_blank" rel="noopener">#${thread.issue}</a>${thread.key ? ` · <button type="button" class="fb-link" data-fbbar="link">copy private link</button>` : ""}` : "";
   }
   function showBar() {
     bar = document.createElement("div");
-    bar.className = "ed-bar fb-bar";
-    bar.innerHTML = `<div class="ed-bar-in"><b>💬 Feedback</b><span class="ed-who">as ${whoLabel()} · <button type="button" class="ed-link" data-fbbar="signout">not you?</button></span>
-      <span class="ed-count"></span><span class="fb-thread"></span>
-      <span class="ed-hint">Point at any part of the page and click 💬, or select some words.</span>
+    bar.className = "fb-bar";
+    bar.innerHTML = `<div class="fb-bar-in"><b>💬 Feedback</b><span class="fb-who">as ${whoLabel()} · <button type="button" class="fb-link" data-fbbar="signout">not you?</button></span>
+      <span class="fb-count"></span><span class="fb-thread"></span>
+      <span class="fb-hint">Point at any part of the page and click 💬, or select some words.</span>
       <button type="button" data-fbbar="stop">Close</button><button type="button" class="primary" data-fbbar="send">Review &amp; send</button></div>`;
     document.body.appendChild(bar);
     bar.addEventListener("click", e => {
       const b = e.target.closest("[data-fbbar]"); if (!b) return;
       if (b.dataset.fbbar === "send") review();
       if (b.dataset.fbbar === "stop") { if (!pending() || confirm("Close feedback? Comments you haven't sent stay saved in this browser.")) location.reload(); }
-      if (b.dataset.fbbar === "signout") { try { localStorage.removeItem("fb-identity"); localStorage.removeItem("editor-github"); } catch (_) {} location.reload(); }
+      if (b.dataset.fbbar === "signout") T.signOut();
       if (b.dataset.fbbar === "link") copyLink(b);
     });
     updateBar();
@@ -295,7 +250,7 @@
 
   // ---------- Review and send ----------
   function bodyFor(note, payload64) {
-    const pageTitle = A.CASE ? A.CASES[A.CASE].short : A.CAT ? A.CATEGORIES[A.CAT].label : "Home page";
+    const pageTitle = site.pageTitle();
     const ch = changes();
     const item = (c, i) => `${i + 1}. **On ${c.where}**\n${c.quote ? `   > ${c.quote.exact}\n\n` : ""}   ${c.text.replace(/\n/g, "\n   ")}`;
     const parts = [thread ? `**More feedback for #${thread.issue}** (${pageTitle})` : `**Feedback on ${pageTitle}**`,
@@ -309,14 +264,14 @@
   }
   function review() {
     const ch = changes(), dlg = document.createElement("dialog");
-    dlg.className = "ed-review";
+    dlg.className = "fb-dialog";
     const li = (c, tag) => `<li><span><b>${tag}</b> on ${esc(c.where)}: “${esc(cut(c.text, 80))}”</span></li>`;
     dlg.innerHTML = `<h2>Send your feedback</h2>
-      ${thread ? `<p class="ed-explain">This will be added to your earlier feedback, <a href="https://github.com/${esc(REPO)}/issues/${thread.issue}" target="_blank" rel="noopener">#${thread.issue}</a>.</p>` : ""}
-      <ul class="ed-changes">${[...ch.added.map(c => li(c, "New")), ...ch.changed.map(c => li(c, "Changed")), ...ch.withdrawn.map(c => li(c, "Withdrawn"))].join("")}</ul>
-      <label class="ed-note">Anything else? <span>(optional)</span><textarea rows="2"></textarea></label>
-      <p class="ed-explain">${me.via === "anon" ? "Your feedback is sent straight away, and you get a private link to come back to it." : "Sending opens GitHub in a new tab with your feedback filled in. Click <b>Create</b> there."} Feedback is public on GitHub.</p>
-      <div class="ed-actions"><button type="button" data-r="back">Keep going</button><button type="button" class="primary" data-r="send">Send</button></div>`;
+      ${thread ? `<p class="fb-explain">This will be added to your earlier feedback, <a href="${esc(T.issueURL(thread.issue))}" target="_blank" rel="noopener">#${thread.issue}</a>.</p>` : ""}
+      <ul class="fb-items">${[...ch.added.map(c => li(c, "New")), ...ch.changed.map(c => li(c, "Changed")), ...ch.withdrawn.map(c => li(c, "Withdrawn"))].join("")}</ul>
+      <label class="fb-field">Anything else? <span>(optional)</span><textarea rows="2"></textarea></label>
+      <p class="fb-explain">${me.via === "anon" ? "Your feedback is sent straight away, and you get a private link to come back to it." : "Sending opens GitHub in a new tab with your feedback filled in. Click <b>Create</b> there."} Feedback is public on GitHub.</p>
+      <div class="fb-buttons"><button type="button" data-r="back">Keep going</button><button type="button" class="primary" data-r="send">Send</button></div>`;
     document.body.appendChild(dlg); dlg.showModal();
     dlg.addEventListener("close", () => dlg.remove());
     dlg.addEventListener("click", e => {
@@ -331,22 +286,22 @@
 
   async function sendAnon(dlg, note) {
     dlg.innerHTML = `<h2>Sending…</h2>`;
-    const { pageTitle, body } = bodyFor(note, await encode(payloadNow()));
+    const { pageTitle, body } = bodyFor(note, await T.compress(payloadNow()));
     const first = comments[0] ? cut(comments[0].text, 60) : "comments";
     const title = thread ? `[feedback] ${pageTitle}: update to #${thread.issue}` : `[feedback] ${pageTitle}: ${first}`;
     let res = null;
-    try { res = await (await fetch(A.site.feedbackEndpoint, { method: "POST", body: JSON.stringify({ title, body, ...(thread ? { follows: thread.issue, key: thread.key } : {}), website: "" }) })).json(); } catch (_) {}
+    try { res = await (await fetch(T.config.feedbackEndpoint, { method: "POST", body: JSON.stringify({ title, body, ...(thread ? { follows: thread.issue, key: thread.key } : {}), website: "" }) })).json(); } catch (_) {}
     if (!res || !res.issue) {
-      dlg.innerHTML = `<h2>That didn't work</h2><p>Your feedback couldn't be sent${res && res.error ? ` (${esc(res.error)})` : ""}. It's still saved in this browser; please try again later.</p><div class="ed-actions"><button type="button" class="primary" data-r="back">OK</button></div>`;
+      dlg.innerHTML = `<h2>That didn't work</h2><p>Your feedback couldn't be sent${res && res.error ? ` (${esc(res.error)})` : ""}. It's still saved in this browser; please try again later.</p><div class="fb-buttons"><button type="button" class="primary" data-r="back">OK</button></div>`;
       return;
     }
     if (!thread) thread = { issue: res.issue, key: res.key, sent: {} };
     markSent();
     dlg.innerHTML = `<h2>Thank you!</h2>
-      <p>Your feedback is <a href="https://github.com/${esc(REPO)}/issues/${thread.issue}" target="_blank" rel="noopener">#${thread.issue}</a>. If you add more comments, they'll be added to it.</p>
+      <p>Your feedback is <a href="${esc(T.issueURL(thread.issue))}" target="_blank" rel="noopener">#${thread.issue}</a>. If you add more comments, they'll be added to it.</p>
       <p><b>Your private link</b>: use it to come back to your feedback from any device. Keep it to yourself; anyone with it can add to your feedback.</p>
       <p class="fb-linkbox"><input type="text" readonly value="${esc(privateLink())}"><button type="button" data-r="copy">Copy</button></p>
-      <div class="ed-actions"><button type="button" data-r="back">Keep going</button><button type="button" class="primary" data-r="done">I'm finished</button></div>`;
+      <div class="fb-buttons"><button type="button" data-r="back">Keep going</button><button type="button" class="primary" data-r="done">I'm finished</button></div>`;
     dlg.addEventListener("click", e => {
       const r = e.target.closest("[data-r]"); if (!r) return;
       if (r.dataset.r === "copy") copyLink(r);
@@ -355,43 +310,30 @@
   }
 
   async function sendGitHub(dlg, note) {
-    const { pageTitle, body } = bodyFor(note, await encode(payloadNow()));
+    const { pageTitle, body } = bodyFor(note, await T.compress(payloadNow()));
     const first = comments[0] ? cut(comments[0].text, 60) : "comments";
     const title = thread ? `[feedback] ${pageTitle}: update to #${thread.issue}` : `[feedback] ${pageTitle}: ${first}`;
-    const base = `https://github.com/${REPO}/issues/new`;
-    let url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`, pasted = false;
-    if (url.length > 6000) { pasted = true; try { navigator.clipboard.writeText(body); } catch (_) {} url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent("Paste your feedback here (Ctrl+V or ⌘V), replacing this line.")}`; }
+    const { url, pasted } = T.newIssueLink(title, body, "Paste your feedback here (Ctrl+V or ⌘V), replacing this line.");
     const sentAt = Date.now();
     window.open(url, "_blank", "noopener");
     dlg.innerHTML = `<h2>Almost done</h2>
       <p>GitHub has opened in a new tab.${pasted ? " Your feedback was too long to fill in automatically, so it has been <b>copied</b>: paste it into the description box." : ""} Click <b>Create</b> there to send it.</p>
-      <p class="ed-explain">If GitHub showed an error while you were signing in, <button type="button" class="ed-link" data-r="again">open GitHub again</button>.</p>
+      <p class="fb-explain">If GitHub showed an error while you were signing in, <button type="button" class="fb-link" data-r="again">open GitHub again</button>.</p>
       ${pasted ? `<details><summary>If pasting doesn't work, copy this text</summary><textarea rows="6" readonly>${esc(body)}</textarea></details>` : ""}
-      <div class="ed-actions ed-actions-wrap"><button type="button" data-r="back">Not sent yet</button><button type="button" data-r="sentkeep">I've sent it: keep going</button><button type="button" class="primary" data-r="sentdone">I've sent it: I'm finished</button></div>`;
+      <div class="fb-buttons fb-buttons-wrap"><button type="button" data-r="back">Not sent yet</button><button type="button" data-r="sentkeep">I've sent it: keep going</button><button type="button" class="primary" data-r="sentdone">I've sent it: I'm finished</button></div>`;
     dlg.addEventListener("click", async e => {
       const r = e.target.closest("[data-r]"); if (!r) return;
       if (r.dataset.r === "again") return void window.open(url, "_blank", "noopener");
       if (r.dataset.r !== "sentkeep" && r.dataset.r !== "sentdone") return;
       if (!thread) {
-        dlg.innerHTML = `<h2>Finding your feedback on GitHub…</h2><p class="ed-explain">This takes a few seconds.</p>`;
-        const n = await findIssue(sentAt);
-        if (!n) { dlg.innerHTML = `<h2>Couldn't find it yet</h2><p>If you did click Create, your next comments will be sent as separate feedback, which works too.</p><div class="ed-actions"><button type="button" class="primary" data-r="back">OK</button></div>`; return; }
+        dlg.innerHTML = `<h2>Finding your feedback on GitHub…</h2><p class="fb-explain">This takes a few seconds.</p>`;
+        const n = await T.findIssue({ user: me.user, prefix: "[feedback]", since: sentAt });
+        if (!n) { dlg.innerHTML = `<h2>Couldn't find it yet</h2><p>If you did click Create, your next comments will be sent as separate feedback, which works too.</p><div class="fb-buttons"><button type="button" class="primary" data-r="back">OK</button></div>`; return; }
         thread = { issue: n, sent: {} };
       }
       markSent();
       if (r.dataset.r === "sentdone") location.reload(); else (dlg.close(), dlg.remove());
     });
-  }
-  async function findIssue(since) {
-    for (let i = 0; i < 8; i++) {
-      try {
-        const list = await ghJSON(`${API}/issues?creator=${encodeURIComponent(me.user)}&state=open&sort=created&direction=desc&per_page=10`);
-        const hit = list.find(x => !x.pull_request && /^\[feedback\]/.test(x.title) && !/update to #\d+/.test(x.title) && (x.body || "").includes(`Page: ${PAGE}`) && Date.parse(x.created_at) > since - 120000);
-        if (hit) return hit.number;
-      } catch (_) {}
-      await new Promise(r => setTimeout(r, 4000));
-    }
-    return null;
   }
 
   // ---------- Start ----------
@@ -409,7 +351,6 @@
     me = { via: who.via, ...(who.user ? { user: who.user } : {}), ...(who.via === "anon" ? { name: who.name || "" } : {}) };
     active = true;
     document.body.classList.add("feedback-mode");
-    const fab = document.querySelector(".edit-fab"); if (fab) fab.hidden = true;
     try {
       if (who.recover) {
         // Private link: continue that anonymous feedback here.
@@ -446,11 +387,9 @@
 
   // ---------- Contributors: show open feedback and proposed edits ----------
   // The lists come from two requests; a thread's details are only fetched once it is picked, because GitHub allows
-  // visitors who aren't signed in only a few requests an hour. Proposed edits are read from the pull request's files
-  // (raw files are not counted), so they include later additions and anything a reviewer changed.
-  let shown = new Set();    // picked: "fb-<issue>" or "pr-<pull request>"
+  // visitors who aren't signed in only a few requests an hour. Proposed edits come from the site plug-in.
+  let shown = new Set();    // picked: "fb-<issue>", or the key of a proposed edit
   const states = {};        // picked key -> its cards, once fetched
-  const pageTitle = () => A.CASE ? A.CASES[A.CASE].short : A.CAT ? A.CATEGORIES[A.CAT].label : "Home page";
   async function listFeedback() {
     const q = encodeURIComponent(`repo:${REPO} is:issue is:open in:title "[feedback]"`);
     const res = await ghJSON(`https://api.github.com/search/issues?q=${q}&per_page=100&sort=updated&order=desc`);
@@ -460,70 +399,14 @@
       author: ((it.body || "").match(/^From: (.+)$/m) || [])[1] || `@${it.user.login}`,
     }));
   }
-  async function listEdits() {
-    const prs = await ghJSON(`${API}/pulls?state=open&per_page=100&sort=updated&direction=desc`);
-    return prs.filter(pr => /^edit\/issue-\d+$/.test(pr.head.ref) && pr.title.startsWith(`${pageTitle()}:`)).map(pr => ({
-      key: `pr-${pr.number}`, kind: "edit", number: pr.number, url: pr.html_url, updated: pr.updated_at, head: pr.head.sha, base: pr.base.ref,
-      title: pr.title.slice(pageTitle().length + 1).trim(),
-      author: `@${((pr.body || "").match(/by @([A-Za-z0-9-]+)/) || [])[1] || pr.user.login}`,
-    }));
-  }
+  const listEdits = () => site.proposedEdits ? site.proposedEdits.list() : Promise.resolve([]);
   async function feedbackCards(it) {
     const { state } = await latestState(it.number);
     const author = !state ? it.author : state.from.via === "anon" ? (state.from.name ? `${state.from.name} (anonymous)` : "anonymous") : `@${state.from.user}`;
     return state ? state.comments.map(c => ({ ...c, id: `${it.number}-${c.id}`, issue: it.number, url: it.url, author })) : [];
   }
-  // What a proposed edit changes on this page: compare its files with where its branch started.
-  const raw = (sha, file) => fetch(`https://raw.githubusercontent.com/${REPO}/${sha}/${file}`, { cache: "force-cache" }).then(r => r.ok ? r.json() : null);
-  function diff(file, a, b) {
-    const out = [], add = (target, change) => out.push({ target, change });
-    const differs = (x, y) => JSON.stringify(x ?? null) !== JSON.stringify(y ?? null);
-    const fields = (x, y, skip = []) => [...new Set([...Object.keys(x || {}), ...Object.keys(y || {})])].filter(f => !skip.includes(f) && differs(x && x[f], y && y[f]));
-    if (/\/case-studies\//.test(file)) {
-      if (!A.CASE || !file.endsWith(`/${A.CASE}.json`)) return out;
-      for (const f of fields(a, b).filter(f => ["title", "standfirst", "note", "stats"].includes(f))) add(`doc:${f}`, { field: f, old: a[f], new: b[f] });
-      const lists = d => { const m = {}; for (const s of d.sections || []) { m[`sec:${s.id}`] = s.blocks; for (const x of s.blocks) if (x.blocks) m[`blk:${x.id}`] = x.blocks; } return m; };
-      const flat = d => { const m = {}; for (const s of d.sections || []) for (const x of s.blocks) for (const y of [x, ...(x.blocks || [])]) m[y.id] = y; return m; };
-      const secA = Object.fromEntries((a.sections || []).map(s => [s.id, s]));
-      for (const sb of b.sections || []) if (secA[sb.id] && differs(secA[sb.id].heading, sb.heading)) add(`sec:${sb.id}`, { field: "heading", old: secA[sb.id].heading, new: sb.heading });
-      const fa = flat(a), fb = flat(b), la = lists(a), lb = lists(b);
-      for (const id in fa) {
-        if (!fb[id]) { add(`blk:${id}`, { deleted: true, type: fa[id].type }); continue; }
-        for (const f of fields(fa[id], fb[id], ["id", "type", "blocks"])) add(`blk:${id}`, { field: f, old: fa[id][f], new: fb[id][f] });
-      }
-      for (const key in lb) {
-        const list = lb[key], before = la[key] || [];
-        list.forEach((x, i) => {
-          if (fa[x.id]) return;
-          let j = i - 1; while (j >= 0 && !fa[list[j].id]) j--;
-          add(j >= 0 ? `blk:${list[j].id}` : key, { inserted: x.text || "", atStart: j < 0 });
-        });
-        const was = before.map(x => x.id).filter(id => fb[id] && list.some(y => y.id === id)), now = list.map(x => x.id).filter(id => fa[id]);
-        if (differs(was, now)) add(key, { reordered: now.length });
-      }
-      return out;
-    }
-    if (/\/personas\.json$/.test(file)) {
-      const pa = Object.fromEntries((a || []).map(x => [x.id, x]));
-      for (const x of b || []) if (pa[x.id]) for (const f of fields(pa[x.id], x, ["id"])) add(`per:${x.id}:${f}`, { field: f, old: pa[x.id][f], new: x[f] });
-      return out;
-    }
-    if (/content\/site\.json$/.test(file)) { for (const f of fields(a, b)) add(`site:${f}`, { field: f, old: a[f], new: b[f] }); return out; }
-    if (/content\/categories\.json$/.test(file)) {
-      const ca = Object.fromEntries((a || []).map(x => [x.id, x]));
-      for (const x of b || []) if (ca[x.id]) for (const f of fields(ca[x.id], x, ["id"])) add(`cat:${x.id}:${f}`, { field: f, old: ca[x.id][f], new: x[f] });
-      return out;
-    }
-    return out;
-  }
-  async function editCards(it) {
-    const cmp = await ghJSON(`${API}/compare/${encodeURIComponent(it.base)}...${it.head}`);
-    const from = cmp.merge_base_commit.sha, files = (cmp.files || []).map(f => f.filename).filter(f => /^content\/.+\.json$/.test(f));
-    const changes = (await Promise.all(files.map(async f => { const [a, b] = await Promise.all([raw(from, f), raw(it.head, f)]); return a && b ? diff(f, a, b) : []; }))).flat();
-    return changes.map((c, i) => ({ ...c, id: `pr${it.number}-${i}`, issue: it.number, url: it.url, author: it.author }));
-  }
   async function cardsFor(it) {
-    if (!states[it.key]) states[it.key] = await (it.kind === "edit" ? editCards(it) : feedbackCards(it));
+    if (!states[it.key]) states[it.key] = await (it.kind === "edit" ? site.proposedEdits.cards(it) : feedbackCards(it));
     return states[it.key];
   }
   // Opens the picker; resolves to the number of threads shown.
@@ -531,9 +414,9 @@
     return new Promise(resolve => {
       const dlg = document.createElement("dialog");
       const head = `<h2>Show open feedback and edits</h2>`;
-      const notice = msg => { dlg.innerHTML = `${head}<p class="ed-explain">${msg}</p><div class="ed-actions"><button type="button" class="primary" data-p="close">Close</button></div>`; };
-      dlg.className = "ed-review fb-pick";
-      dlg.innerHTML = `${head}<p class="ed-explain">Looking for open feedback and proposed edits on this page…</p>`;
+      const notice = msg => { dlg.innerHTML = `${head}<p class="fb-explain">${msg}</p><div class="fb-buttons"><button type="button" class="primary" data-p="close">Close</button></div>`; };
+      dlg.className = "fb-dialog fb-pick";
+      dlg.innerHTML = `${head}<p class="fb-explain">Looking for open feedback and proposed edits on this page…</p>`;
       document.body.appendChild(dlg); dlg.showModal();
       let done = false;
       const finish = () => { if (done) return; done = true; if (dlg.open) dlg.close(); dlg.remove(); resolve(shown.size); };
@@ -549,12 +432,12 @@
         const nf = list.filter(x => x.kind === "feedback").length, ne = list.length - nf;
         const counts = [nf && `${nf} open feedback thread${nf === 1 ? "" : "s"}`, ne && `${ne} proposed edit${ne === 1 ? "" : "s"} waiting for review`].filter(Boolean).join(" and ");
         dlg.innerHTML = `${head}
-          <p class="ed-explain">${counts} on this page, most recent first. Pick the ones to show: they appear beside the parts of the page they're about.${partly}</p>
+          <p class="fb-explain">${counts} on this page, most recent first. Pick the ones to show: they appear beside the parts of the page they're about.${partly}</p>
           <div class="fb-pick-tools"><input type="search" placeholder="Filter by name, words, “feedback” or “edit”" aria-label="Filter"><button type="button" data-p="all">Select all listed</button><button type="button" data-p="none">Clear</button></div>
-          <ul class="ed-changes fb-pick-list">${list.map(it => { const tag = it.kind === "edit" ? "✏️ Proposed edit" : "💬 Feedback"; return `<li data-q="${esc((tag + " " + it.author + " " + it.title).toLowerCase())}"><label>
+          <ul class="fb-items fb-pick-list">${list.map(it => { const tag = it.kind === "edit" ? "✏️ Proposed edit" : "💬 Feedback"; return `<li data-q="${esc((tag + " " + it.author + " " + it.title).toLowerCase())}"><label>
             <input type="checkbox" value="${it.key}"${shown.has(it.key) ? " checked" : ""}>
             <span><span class="fb-tag fb-tag-${it.kind}">${tag}</span> <b>${esc(it.author)}</b> · ${esc(cut(it.title, 90))}<br><small>${day(it.updated)} · <a href="${esc(it.url)}" target="_blank" rel="noopener">#${it.number}</a></small></span></label></li>`; }).join("")}</ul>
-          <div class="ed-actions"><button type="button" data-p="close">Cancel</button><button type="button" class="primary" data-p="show"></button></div>`;
+          <div class="fb-buttons"><button type="button" data-p="close">Cancel</button><button type="button" class="primary" data-p="show"></button></div>`;
         const boxes = () => [...dlg.querySelectorAll(".fb-pick-list input")];
         const count = () => { const n = boxes().filter(b => b.checked).length; dlg.querySelector("[data-p=show]").textContent = n ? `Show ${n}` : "Show none"; };
         count();
@@ -575,7 +458,7 @@
           reviewOn = shown.size > 0;
           reviewItems = got.flatMap(([, cs]) => cs || []);
           refresh();
-          const empty = got.filter(([it, cs]) => cs && it.kind === "edit" && !cs.some(c => elFor(c.target) || c.target.startsWith("per:"))).map(([it]) => `#${it.number}`);
+          const empty = got.filter(([it, cs]) => cs && it.kind === "edit" && !cs.some(c => isOnPage(c.target))).map(([it]) => `#${it.number}`);
           if (empty.length) alert(`${empty.join(", ")} ${empty.length === 1 ? "changes" : "change"} nothing visible on this page as it is now (it may change things on another page, or have been changed by a reviewer). Open it on GitHub to see it.`);
           if (failed.length) alert(`Couldn't load ${failed.join(", ")} from GitHub just now (it limits how often it can be asked). Try again in a few minutes.`);
           finish();
@@ -585,6 +468,5 @@
   }
   function hideOpenFeedback() { shown = new Set(); reviewOn = false; reviewItems = null; refresh(); }
 
-  document.addEventListener("persona-opened", () => { if (active || reviewOn) refresh(); });
-  window.SiteFeedback = { start, refresh, chooseOpenFeedback, hideOpenFeedback };
-})();
+  return { start, refresh, chooseOpenFeedback, hideOpenFeedback };
+});

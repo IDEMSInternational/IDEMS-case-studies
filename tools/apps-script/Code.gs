@@ -1,14 +1,17 @@
 // Google Apps Script web app that turns anonymous feedback from the website into GitHub issues.
 // Setup: see tools/apps-script/README.md. Script property GITHUB_TOKEN must hold a GitHub token that can create
-// issues and comments on the repository below.
+// issues and comments on the repository: script property GITHUB_REPOSITORY ("owner/name"), or DEFAULT_REPO below.
+// Use one deployment per repository.
 //
 // Request (POST, JSON text): { title, body, follows?, key?, website }
 //   - new feedback: creates an issue labelled "feedback" and returns { issue, key }. The key lets the same person add
 //     to that issue later (it is the secret part of their private link); only its hash is stored here.
 //   - follows + key: adds the body as a comment on that issue and returns { issue }.
+// Keys are stored per repository ("key:<owner/name>:<issue>"), so a key only works on the issue it was made for, even
+// if GITHUB_REPOSITORY changes. Keys stored before that ("key:<issue>") were all made for DEFAULT_REPO.
 // "website" is a honeypot field that real visitors never fill in.
 
-const REPO = "IDEMSInternational/IDEMS-case-studies";
+const DEFAULT_REPO = "IDEMSInternational/IDEMS-case-studies";
 const MAX_BODY = 60000;
 const MAX_PER_10_MIN = 30;
 
@@ -20,18 +23,20 @@ function doPost(e) {
     if (req.body.length > MAX_BODY) return reply({ error: "feedback too long" });
     if (!withinRateLimit()) return reply({ error: "too many submissions just now, please try again in a few minutes" });
     const props = PropertiesService.getScriptProperties();
+    const repo = props.getProperty("GITHUB_REPOSITORY") || DEFAULT_REPO;
+    const keyName = n => `key:${repo}:${n}`;
 
     if (req.follows) {
       const n = Number(req.follows);
-      const stored = props.getProperty("key:" + n);
+      const stored = props.getProperty(keyName(n)) || (repo === DEFAULT_REPO ? props.getProperty("key:" + n) : null);
       if (!stored || !req.key || stored !== hash(String(req.key))) return reply({ error: "this private link is not valid" });
-      github("post", `/repos/${REPO}/issues/${n}/comments`, { body: req.body });
+      github("post", `/repos/${repo}/issues/${n}/comments`, { body: req.body });
       return reply({ issue: n });
     }
 
-    const issue = github("post", `/repos/${REPO}/issues`, { title: req.title.slice(0, 200), body: req.body, labels: ["feedback"] });
+    const issue = github("post", `/repos/${repo}/issues`, { title: req.title.slice(0, 200), body: req.body, labels: ["feedback"] });
     const key = Utilities.getUuid().replace(/-/g, "") + Utilities.getUuid().replace(/-/g, "").slice(0, 8);
-    props.setProperty("key:" + issue.number, hash(key));
+    props.setProperty(keyName(issue.number), hash(key));
     return reply({ issue: issue.number, key: key });
   } catch (err) {
     return reply({ error: "something went wrong" });
