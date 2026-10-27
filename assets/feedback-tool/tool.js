@@ -11,7 +11,14 @@
 //     feedbackBot:      optional: the GitHub account that web app posts as
 //     site:             URL of the site plug-in (below)
 //     editors, editor:  optional, together: URL of the hashed usernames of contributors (tools/sync-editors.js), and
-//                       URL of the site's editor, started for contributors instead of feedback mode
+//                       URL of the site's editor, started for contributors instead of feedback mode. Without them,
+//                       everyone gets feedback mode and nothing mentions editing.
+//     showOpenFeedback: optional: true adds a button to the feedback bar that shows everyone else's open feedback on
+//                       the page (contributors can always see it from the editor)
+//     markers:          optional: true shows a 💬 beside every part that can be commented on, for touch screens;
+//                       "touch" shows them only on devices whose main pointer is a finger. Markers go in the right
+//                       margin, or inside a part's top right corner where there's no margin; the page has the class
+//                       fb-with-markers meanwhile, so a site can make room for them
 //   })
 //
 // Plug-ins are loaded when first needed and register themselves with FeedbackTool.register(name, plugin).
@@ -154,13 +161,14 @@
     return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
   }
   const isEditor = async (set, name) => set.has(await hashName(name));
+  const canEdit = () => !!(config.editors && config.editor);
   function gate() {
     return new Promise(async resolve => {
       // Private link to continue anonymous feedback: #fb=<issue>-<key>
       const pl = location.hash.match(/^#fb=(\d+)-([0-9a-f]+)$/);
       if (pl) return resolve({ mode: "feedback", via: "anon", recover: { issue: +pl[1], key: pl[2] } });
       // If the list of contributors can't be loaded, nobody can edit just now, but everyone can still leave feedback.
-      const list = config.editors ? await loadEditors() : new Set(), unchecked = !list, editors = list || new Set();
+      const list = canEdit() ? await loadEditors() : new Set(), unchecked = !list, editors = list || new Set();
       let remembered = null, rememberedId = null;
       try { remembered = localStorage.getItem(USER_KEY); rememberedId = JSON.parse(localStorage.getItem(ID_KEY) || "null"); } catch (_) {}
       if (remembered && await isEditor(editors, remembered)) return resolve({ mode: "edit", user: remembered });
@@ -171,7 +179,7 @@
       dlg.className = "fb-dialog fb-gate";
       const ask = (msg = "") => {
         dlg.innerHTML = `<h2>Feedback and comments</h2>
-          <p>Comment on any part of this page: a section, a single item or a few selected words. People on the team can also edit the page directly.</p>${unchecked ? `
+          <p>Comment on any part of this page: a section, a single item or a few selected words.${canEdit() ? " People on the team can also edit the page directly." : ""}</p>${unchecked ? `
           <p class="fb-gate-msg">Editing isn't available just now, because the list of people who can edit couldn't be loaded. You can still leave feedback.</p>` : ""}
           <form method="dialog" class="fb-choice"><h3>With your GitHub account</h3>
             <label class="fb-field">GitHub username<input type="text" name="u" autocomplete="username" spellcheck="false" placeholder="e.g. jane-doe" value="${esc(remembered || (rememberedId && rememberedId.user) || "")}"></label>
@@ -241,7 +249,7 @@
     fab.className = "fb-fab";
     fab.type = "button";
     fab.textContent = "💬 Feedback and comments";
-    fab.title = "Comment on this page, or suggest changes if you are on the team";
+    fab.title = canEdit() ? "Comment on this page, or suggest changes if you are on the team" : "Comment on this page";
     fab.addEventListener("click", open);
     document.body.appendChild(fab);
     // Links ending in ?edit (or ?feedback) open it straight away; #fb=<issue>-<key> is a private link to continue
