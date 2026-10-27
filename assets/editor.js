@@ -14,7 +14,7 @@
   // ---------- State ----------
   const caseFile = A.page === "case" ? `content/${A.CAT}/case-studies/${A.CASE}.json` : null;
   const personaFile = cat => `content/${cat}/personas.json`;
-  const DRAFT_KEY = "edit-draft:" + location.pathname;
+  const DRAFT_KEY = T.pageStorageKey("edit-draft:");   // the same at every address of the page
   const SITE_FIELDS = ["personasNote", "creditsNote"];                       // editable on the home page
   const CAT_FIELDS = ["lede", "personasNote", "sources", "creditsNote"];     // editable on a category page
   let editing = false;
@@ -48,7 +48,7 @@
   function clearDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (_) {} }
   // After a submission is sent, later submissions from the same page "follow" it: the GitHub Action adds them to the
   // same pull request. The link remembers the issue number and which changes were already sent.
-  const LINK_KEY = "edit-link:" + location.pathname;
+  const LINK_KEY = T.pageStorageKey("edit-link:");
   const loadLink = () => { try { return JSON.parse(localStorage.getItem(LINK_KEY) || "null"); } catch (_) { return null; } };
   const saveLink = l => { try { localStorage.setItem(LINK_KEY, JSON.stringify(l)); } catch (_) {} };
   const clearLink = () => { try { localStorage.removeItem(LINK_KEY); } catch (_) {} };
@@ -418,7 +418,9 @@
     bar = document.createElement("div");
     bar.className = "fb-bar";
     bar.innerHTML = `<div class="fb-bar-in"><b>Editing</b><span class="fb-who">as @${esc(editor)} · <button type="button" class="fb-link" data-bar="signout">not you?</button></span><span class="fb-count"></span>
-      <span class="fb-hint">${doc ? "Click any text to change it. Use the buttons beside a block to move, add or delete it, and ＋ / × to add or remove entries." : "Click the highlighted text to change it, or open a persona to edit their profile."}</span>
+      <span class="fb-hint">${doc ? "Click any text to change it. Use the buttons beside a block to move, add or delete it, and ＋ / × to add or remove entries."
+        : document.querySelector("[data-f]") || A.PERSONAS.length ? "Click the highlighted text to change it, or open a persona to edit their profile."
+        : "Nothing on this page can be edited from the website yet. Use 💬 Feedback &amp; edits to see what people have said about it."}</span>
       <button type="button" data-bar="feedback" aria-pressed="false">💬 Feedback &amp; edits</button><button type="button" data-bar="fbhide" hidden>Hide</button><button type="button" data-bar="cancel">Stop editing</button><button type="button" class="primary" data-bar="review">Review &amp; submit</button></div>`;
     document.body.appendChild(bar);
     bar.addEventListener("click", e => {
@@ -484,10 +486,10 @@
     const fresh = edits.flatMap(e => e.ops.filter(op => !isSent(e.file, op)).map(op => "- " + describe(op)));
     const sentBefore = edits.flatMap(e => e.ops.filter(op => isSent(e.file, op)).map(op => "- " + describe(op)));
     // Always send every change made on this page so far: the Action skips the ones already applied.
-    const payload = { version: 2, editor, page: location.pathname, ...(link ? { follows: link.issue } : {}), edits: await packed(edits) };
+    const payload = { version: 2, editor, page: T.pagePath(), ...(link ? { follows: link.issue } : {}), edits: await packed(edits) };
     const title = link ? `[edit] ${pageTitle}: update to #${link.issue}` : `[edit] ${pageTitle}: ${note ? note.slice(0, 70) : fresh.length + " change" + (fresh.length === 1 ? "" : "s")}`;
     const full = (link ? `**More changes for #${link.issue}** (${pageTitle})\n\n` : `**Suggested changes to ${pageTitle}**\n\n`) +
-      `${fresh.join("\n")}\n\n${sentBefore.length ? `<sub>Also included, sent before: ${sentBefore.length} change(s).</sub>\n\n` : ""}**Note from the editor**\n\n${note || "_No note._"}\n\nPage: ${location.pathname}\n\n` +
+      `${fresh.join("\n")}\n\n${sentBefore.length ? `<sub>Also included, sent before: ${sentBefore.length} change(s).</sub>\n\n` : ""}**Note from the editor**\n\n${note || "_No note._"}\n\n${T.pageLine()}\n\n` +
       `<details><summary>Technical details for the robot (please do not edit)</summary>\n\n${await encode(payload)}\n</details>\n`;
     const { url, pasted } = T.newIssueLink(title, full, "Paste your changes here (Ctrl+V or ⌘V), replacing this line.");
     const submittedAt = Date.now(), sentKeys = edits.flatMap(e => e.ops.map(op => opKey(e.file, op)));

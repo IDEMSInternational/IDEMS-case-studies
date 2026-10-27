@@ -2,7 +2,8 @@
 // called, and how proposed edits (pull requests opened by tools/apply-edit.js) map onto the page.
 // Loaded on demand by the tool. Parts of a page carry permanent ids from the JSON content: data-block, data-section and
 // data-doc on case studies, data-pf in a persona's profile, and data-sf and data-cf for page text on the home and
-// category pages. Edit mode (assets/editor.js) marks its parts of the page the same way.
+// category pages; data-cat marks the heading of a category page that is still a placeholder, so people can comment on
+// the page as a whole. Edit mode (assets/editor.js) marks its parts of the page the same way.
 (function () {
   const A = window.SiteAPI, T = window.FeedbackTool;
   const REPO = T.config.repository, API = T.api;
@@ -10,7 +11,7 @@
   const cut = (s, n) => (s = plain(s)).length > n ? s.slice(0, n - 1) + "…" : s;
 
   // ---------- Targets ----------
-  const TARGETS = "[data-block],[data-section],[data-doc],[data-pf],[data-sf],[data-cf]";
+  const TARGETS = "[data-block],[data-section],[data-doc],[data-pf],[data-sf],[data-cf],[data-cat]";
   function keyOf(el) {
     const d = el.dataset;
     if (d.block) return `blk:${d.block}`;
@@ -19,6 +20,7 @@
     if (d.pf) return `per:${A.dialog.dataset.id}:${d.pf}`;
     if (d.sf) return `site:${d.sf}`;
     if (d.cf) return `cat:${A.CAT}:${d.cf}`;
+    if (d.cat) return `cat:${d.cat}`;
   }
   function elFor(key) {
     const [kind, a, b] = key.split(":"), q = s => document.querySelector(s);
@@ -27,7 +29,7 @@
     if (kind === "doc") return q(`[data-doc="${a}"]`);
     if (kind === "per") return A.dialog.open && A.dialog.dataset.id === a ? A.dialog.querySelector(`[data-pf="${b}"]`) : null;
     if (kind === "site") return q(`[data-sf="${a}"]`);
-    if (kind === "cat") return q(`[data-cf="${b}"]`);
+    if (kind === "cat") return b === undefined ? q(`[data-cat="${a}"]`) : q(`[data-cf="${b}"]`);
     return null;
   }
   // Persona fields belong to the page even while the profile dialog is closed.
@@ -47,7 +49,7 @@
     if (kind === "doc") return { title: "title", standfirst: "introduction", note: "note", stats: "key figures" }[a] || a;
     if (kind === "per") { const p = A.byId[a], [f, i] = (b || "").split("|"); return `${p ? p.name : a} · ${PF[f] || f}${i !== undefined ? `, item ${+i + 1}` : ""}`; }
     if (kind === "site") return `home page · ${PAGEF[a] || a}`;
-    if (kind === "cat") return `${A.CATEGORIES[a] ? A.CATEGORIES[a].label : a} page · ${PAGEF[b] || b}`;
+    if (kind === "cat") return `${A.CATEGORIES[a] ? A.CATEGORIES[a].label : a} page${b === undefined ? "" : ` · ${PAGEF[b] || b}`}`;
     return key;
   }
   const pageTitle = () => A.CASE ? A.CASES[A.CASE].short : A.CAT ? A.CATEGORIES[A.CAT].label : "Home page";
@@ -55,14 +57,16 @@
     cite: "attribution", ids: "personas shown" })[f] ?? (PF[f] || PAGEF[f] || f);
 
   // ---------- Proposed edits ----------
-  // Open pull requests made from the website (branch edit/issue-<n>, titled "<page title>: …"). What they change is
-  // read from the pull request's files (raw files are not counted against GitHub's limit), so it includes later
-  // additions and anything a reviewer changed.
+  // Open pull requests made from the website (branch edit/issue-<n>), for this page: the "Page:" line that
+  // tools/apply-edit.js copies from the edit's issue, or, for pull requests without one, a title starting with the
+  // page's title. What they change is read from the pull request's files (raw files are not counted against GitHub's
+  // limit), so it includes later additions and anything a reviewer changed.
+  const forThisPage = pr => T.pageOf(pr.body) !== null ? T.onThisPage(pr.body) : pr.title.startsWith(`${pageTitle()}:`);
   async function listEdits() {
     const prs = await T.ghJSON(`${API}/pulls?state=open&per_page=100&sort=updated&direction=desc`);
-    return prs.filter(pr => /^edit\/issue-\d+$/.test(pr.head.ref) && pr.title.startsWith(`${pageTitle()}:`)).map(pr => ({
+    return prs.filter(pr => /^edit\/issue-\d+$/.test(pr.head.ref) && forThisPage(pr)).map(pr => ({
       key: `pr-${pr.number}`, kind: "edit", number: pr.number, url: pr.html_url, updated: pr.updated_at, head: pr.head.sha, base: pr.base.ref,
-      title: pr.title.slice(pageTitle().length + 1).trim(),
+      title: pr.title.startsWith(`${pageTitle()}:`) ? pr.title.slice(pageTitle().length + 1).trim() : pr.title.replace(/^[^:]*:\s*/, ""),
       author: `@${((pr.body || "").match(/by @([A-Za-z0-9-]+)/) || [])[1] || pr.user.login}`,
     }));
   }
