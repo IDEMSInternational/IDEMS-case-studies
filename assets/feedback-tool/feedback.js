@@ -9,7 +9,6 @@ FeedbackTool.register("feedback", function (site) {
   const { esc, clone, ghJSON } = T;
   const REPO = T.config.repository;
   const API = T.api;
-  const PAGE = location.pathname;
   const plain = site.plain || T.plain;
   const cut = (s, n) => (s = plain(s)).length > n ? s.slice(0, n - 1) + "…" : s;
   const newId = () => Math.random().toString(16).slice(2, 8);
@@ -24,7 +23,7 @@ FeedbackTool.register("feedback", function (site) {
   let comments = [];        // this person's comments on this page
   let thread = null;        // { issue, key?, sent: { id: comment as last sent } }
   let reviewOn = false, reviewItems = null; // contributors: the open feedback they picked to see
-  const draftKey = () => `fb:${PAGE}:${me.via === "anon" ? "anon" : me.user.toLowerCase()}`;
+  const draftKey = () => T.pageStorageKey("fb:", `:${me.via === "anon" ? "anon" : me.user.toLowerCase()}`);
   const save = () => { try { localStorage.setItem(draftKey(), JSON.stringify({ comments, thread })); } catch (_) {} };
   const load = () => { try { return JSON.parse(localStorage.getItem(draftKey()) || "null"); } catch (_) { return null; } };
 
@@ -259,7 +258,7 @@ FeedbackTool.register("feedback", function (site) {
     if (ch.changed.length) parts.push(`**Changed**\n\n${ch.changed.map(item).join("\n\n")}`);
     if (ch.withdrawn.length) parts.push(`**Withdrawn**\n\n${ch.withdrawn.map((c, i) => `${i + 1}. ~~On ${c.where}: ${cut(c.text, 80)}~~`).join("\n")}`);
     if (note) parts.push(`**Note**\n\n${note}`);
-    parts.push(`Page: ${PAGE}`, `<details><summary>Technical details for the robot (please do not edit)</summary>\n\n\`\`\`feedback-v1\n${payload64}\n\`\`\`\n</details>`);
+    parts.push(T.pageLine(), `<details><summary>Technical details for the robot (please do not edit)</summary>\n\n\`\`\`feedback-v1\n${payload64}\n\`\`\`\n</details>`);
     return { pageTitle, body: parts.join("\n\n") + "\n" };
   }
   function review() {
@@ -280,7 +279,7 @@ FeedbackTool.register("feedback", function (site) {
       if (r.dataset.r === "send") (me.via === "anon" ? sendAnon : sendGitHub)(dlg, dlg.querySelector("textarea").value.trim());
     });
   }
-  const payloadNow = () => ({ version: 1, kind: "feedback", page: PAGE, from: me.via === "anon" ? { via: "anon", name: me.name || "" } : { via: "github", user: me.user },
+  const payloadNow = () => ({ version: 1, kind: "feedback", page: T.pagePath(), from: me.via === "anon" ? { via: "anon", name: me.name || "" } : { via: "github", user: me.user },
     ...(thread ? { follows: thread.issue } : {}), comments: comments.map(clone) });
   const markSent = () => { thread.sent = Object.fromEntries(comments.map(c => [c.id, clone(c)])); save(); refresh(); };
 
@@ -366,7 +365,7 @@ FeedbackTool.register("feedback", function (site) {
         } else if (me.via === "github") {
           // Offer to continue earlier open feedback on this page.
           const list = await ghJSON(`${API}/issues?creator=${encodeURIComponent(me.user)}&state=open&per_page=30`).catch(() => []);
-          const prev = list.find(x => !x.pull_request && /^\[feedback\]/.test(x.title) && !/update to #\d+/.test(x.title) && (x.body || "").includes(`Page: ${PAGE}`));
+          const prev = list.find(x => !x.pull_request && /^\[feedback\]/.test(x.title) && !/update to #\d+/.test(x.title) && T.onThisPage(x.body));
           if (prev && confirm(`You left feedback on this page before (#${prev.number}). Continue with it?`)) {
             const mine = comments.filter(c => !(thread && thread.sent[c.id]));
             await adopt(prev.number);
@@ -393,7 +392,7 @@ FeedbackTool.register("feedback", function (site) {
   async function listFeedback() {
     const q = encodeURIComponent(`repo:${REPO} is:issue is:open in:title "[feedback]"`);
     const res = await ghJSON(`https://api.github.com/search/issues?q=${q}&per_page=100&sort=updated&order=desc`);
-    return (res.items || []).filter(it => !/update to #\d+/.test(it.title) && (it.body || "").includes(`Page: ${PAGE}`)).map(it => ({
+    return (res.items || []).filter(it => !/update to #\d+/.test(it.title) && T.onThisPage(it.body)).map(it => ({
       key: `fb-${it.number}`, kind: "feedback", number: it.number, url: it.html_url, updated: it.updated_at,
       title: it.title.replace(/^\[feedback\]\s*/, "").replace(/^[^:]*:\s*/, ""),
       author: ((it.body || "").match(/^From: (.+)$/m) || [])[1] || `@${it.user.login}`,

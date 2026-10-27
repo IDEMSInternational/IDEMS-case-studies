@@ -114,7 +114,7 @@
 
   function categoryHTML() {
     const c = CATEGORIES[CAT];
-    const head = `<header class="top"><div class="wrap"><div class="eyebrow">${esc(site.organisation)} · ${esc(c.label)} · ${esc(site.status)}</div><h1>${esc(c.label)}</h1>${c.lede ? `<p class="lede" data-cf="lede">${md(c.lede)}</p>` : ""}</div></header>`;
+    const head = `<header class="top"><div class="wrap"><div class="eyebrow">${esc(site.organisation)} · ${esc(c.label)} · ${esc(site.status)}</div><h1${c.comingSoon ? ` data-cat="${esc(c.id)}"` : ""}>${esc(c.label)}</h1>${c.lede ? `<p class="lede" data-cf="lede">${md(c.lede)}</p>` : ""}</div></header>`;
     if (c.comingSoon) return head + `<main class="wrap"><p class="coming-soon">${esc(site.comingSoon)}</p></main>`;
     const caseCards = casesIn(CAT).map((k, i) => `<a class="case-card" href="${caseHref(k)}"><span>Case study ${i + 1}</span><b>${esc(CASES[k].title)}</b><p>${esc(CASES[k].summary)}</p></a>`).join("");
     return head + `<main class="wrap"><h2 class="section">Case studies</h2><div class="case-list">${caseCards}</div>
@@ -255,7 +255,7 @@
   }
 
   // ---------- Profile dialog ----------
-  if (!PERSONAS.length) return;
+  // Made on every page, including placeholder pages without personas, because the feedback tool and editor use it.
   const dlg = document.createElement("dialog");
   dlg.id = "persona-dlg";
   dlg.setAttribute("aria-labelledby", "dlg-title");
@@ -325,7 +325,7 @@
   // editor (assets/editor.js) are loaded when needed, and use SiteAPI. If the tool didn't load, the page works without it.
   window.SiteAPI = { ROOT, site, cats, CATEGORIES, CASES, SETS, PERSONAS, byId, REFS, page, CAT, CASE, md, esc, pcard, personaHref, color, open, dialog: dlg, app };
   if (window.FeedbackTool) FeedbackTool.init({
-    repository: site.repository, feedbackEndpoint: site.feedbackEndpoint, feedbackBot: site.feedbackBot,
+    repository: site.repository, root: ROOT, feedbackEndpoint: site.feedbackEndpoint, feedbackBot: site.feedbackBot,
     site: ROOT + "assets/site-feedback.js", editors: ROOT + "access/editors.json", editor: ROOT + "assets/editor.js",
   });
 

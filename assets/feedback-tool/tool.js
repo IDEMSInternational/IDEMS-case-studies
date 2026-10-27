@@ -5,6 +5,8 @@
 //
 //   FeedbackTool.init({
 //     repository:       "owner/name" of the public GitHub repository that receives feedback as issues
+//     root:             optional: URL of the site's home page folder, so pages are recognised whatever their address
+//                       (default: the domain's root)
 //     feedbackEndpoint: optional: web app that creates issues for anonymous feedback (tools/apps-script/)
 //     feedbackBot:      optional: the GitHub account that web app posts as
 //     site:             URL of the site plug-in (below)
@@ -80,6 +82,48 @@
     if (url.length > 6000) { pasted = true; try { navigator.clipboard.writeText(body); } catch (_) {} url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(placeholder)}`; }
     return { url, pasted };
   }
+  // ---------- Which page? ----------
+  // A page's key is the same at every address of the page: its path relative to the site's home (the root option),
+  // without "index.html", ".html" or a trailing slash, e.g. "education/textbooks"; the home page's key is "".
+  let siteBase = "/";   // path of the site's home folder
+  const relative = p => (p.startsWith(siteBase) ? p.slice(siteBase.length) : p).replace(/^\//, "");
+  const pageKey = p => relative(p).replace(/(^|\/)index\.html$/, "$1").replace(/\.html$/, "").replace(/\/$/, "");
+  const here = () => pageKey(location.pathname);
+  // This page's path relative to the site's home, as written in issues ("education/index.html").
+  const pagePath = () => { const p = relative(location.pathname); return !p || p.endsWith("/") ? p + "index.html" : p; };
+
+  // Issues (and the pull requests made from them) name their page in a "Page:" line: its relative path, linked to the
+  // page, e.g. "Page: [education/index.html](https://…/education/)".
+  const pageLine = () => `Page: [${pagePath()}](${location.origin}${location.pathname})`;
+  // The page an issue's or pull request's text names (its last "Page:" line), or null.
+  function pageOf(text) {
+    const lines = [...String(text || "").matchAll(/^Page: *(?:\[([^\]\n]+)\]\([^)\n]*\)|(\S+)) *$/gm)];
+    return lines.length ? lines[lines.length - 1][1] || lines[lines.length - 1][2] : null;
+  }
+  // Older issues give the page's absolute path on the host they were written on ("Page: /IDEMS-case-studies/education/"
+  // on GitHub Pages, "Page: /education/" on a local server). Those also count when they end with this page's key, so
+  // they are found on either host. The home page has to match exactly, or a host's folder would count as every page.
+  function onThisPage(text) {
+    const p = pageOf(text); if (p === null) return false;
+    const key = pageKey(p), mine = here();
+    return key === mine || (p.startsWith("/") && mine !== "" && key.endsWith("/" + mine));
+  }
+
+  // The localStorage key for unsent work on this page, the same at every address of the page:
+  // `${prefix}page:${key}${suffix}`. Work saved before used the address instead (`${prefix}/…${suffix}`); it is moved
+  // to the new key the first time that is asked for (the entry for this exact address first, then any other).
+  function pageStorageKey(prefix, suffix = "") {
+    const key = `${prefix}page:${here()}${suffix}`;
+    try {
+      if (localStorage.getItem(key) === null) {
+        const exact = `${prefix}${location.pathname}${suffix}`, old = localStorage.getItem(exact) !== null ? exact :
+          Object.keys(localStorage).find(k => k.startsWith(prefix + "/") && k.endsWith(suffix) && pageKey(k.slice(prefix.length, k.length - suffix.length)) === here());
+        if (old) { localStorage.setItem(key, localStorage.getItem(old)); localStorage.removeItem(old); }
+      }
+    } catch (_) {}
+    return key;
+  }
+
   // The issue `user` has just created for this page, with a title starting with `prefix` (GitHub's public API; it
   // may take a moment to appear).
   async function findIssue({ user, prefix, since }) {
@@ -87,7 +131,7 @@
       try {
         const list = await ghJSON(`${apiBase}/issues?creator=${encodeURIComponent(user)}&state=open&sort=created&direction=desc&per_page=10`);
         const hit = list.find(x => !x.pull_request && x.title.startsWith(prefix) && !/update to #\d+/.test(x.title)
-          && (x.body || "").includes(`Page: ${location.pathname}`) && Date.parse(x.created_at) > since - 120000);
+          && onThisPage(x.body) && Date.parse(x.created_at) > since - 120000);
         if (hit) return hit.number;
       } catch (_) {}
       await new Promise(r => setTimeout(r, 4000));
@@ -192,6 +236,7 @@
   function init(options) {
     config = options;
     apiBase = `https://api.github.com/repos/${config.repository}`;
+    siteBase = new URL(".", new URL(config.root || "/", location.href)).pathname;
     fab = document.createElement("button");
     fab.className = "fb-fab";
     fab.type = "button";
@@ -208,6 +253,6 @@
   window.FeedbackTool = {
     init, register, feedback, refresh, signOut, loadError,
     get config() { return config; }, get api() { return apiBase; },
-    esc, clone, plain, compress, decompress, ghJSON, issueURL, newIssueLink, findIssue,
+    esc, clone, plain, compress, decompress, ghJSON, issueURL, newIssueLink, findIssue, pagePath, pageLine, pageOf, onThisPage, pageStorageKey,
   };
 })();

@@ -83,7 +83,7 @@ Every page has a **💬 Feedback and comments** button (bottom right; a link end
 - **Coming back:** comments are kept in the browser. GitHub users are offered their earlier open feedback on the page; anonymous people get a **private link** (`…#fb=<issue>-<key>`) to continue from any device.
 - **Contributors** can click **💬 Feedback & edits** in the edit bar to choose what to see on that page: it lists the open feedback threads and the proposed edits waiting for review (open pull requests from the website), most recent first, with a filter. Only the ones they tick are shown: feedback as comments, proposed edits as cards showing the new text (with the current text underneath), next to the parts of the page they change. Proposed edits are read from the pull request itself, so they include later additions and any changes a reviewer made. Nothing is shown by default.
 
-Each feedback issue holds the person's full, current set of comments (in a compressed block at the end), so the site can show and restore them; the readable part lists what is new, changed or withdrawn.
+Each feedback issue holds the person's full, current set of comments (in a compressed block at the end), so the site can show and restore them; the readable part lists what is new, changed or withdrawn. A `Page:` line in each issue and pull request tells the site which page it belongs to.
 
 ## Editing from the website
 

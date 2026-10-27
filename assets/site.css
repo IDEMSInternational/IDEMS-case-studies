@@ -190,5 +190,5 @@ li:hover > .ed-itools, .stat:hover > .ed-itools, tr:hover .ed-itools, th:hover >
 :root[data-theme="dark"] { --fb-comment-bg: #2a2414; }
 /* The parts people can comment on (assets/site-feedback.js) */
 .feedback-mode [data-block]:hover, .feedback-mode [data-section]:hover, .feedback-mode [data-doc]:hover,
-.feedback-mode [data-pf]:hover, .feedback-mode [data-sf]:hover, .feedback-mode [data-cf]:hover { outline: 1px dashed var(--line); outline-offset: 4px; border-radius: 4px; }
+.feedback-mode [data-pf]:hover, .feedback-mode [data-sf]:hover, .feedback-mode [data-cf]:hover, .feedback-mode [data-cat]:hover { outline: 1px dashed var(--line); outline-offset: 4px; border-radius: 4px; }
 .feedback-mode .fb-stack [data-block]:hover { outline: none; }
