@@ -14,11 +14,12 @@
 //                       URL of the site's editor, started for contributors instead of feedback mode. Without them,
 //                       everyone gets feedback mode and nothing mentions editing.
 //     showOpenFeedback: optional: true adds a button to the feedback bar that shows everyone else's open feedback on
-//                       the page (contributors can always see it from the editor)
+//                       the page (feedback only: contributors see proposed edits from the editor)
 //     markers:          optional: true shows a 💬 beside every part that can be commented on, for touch screens;
-//                       "touch" shows them only on devices whose main pointer is a finger. Markers go in the right
-//                       margin, or inside a part's top right corner where there's no margin; the page has the class
-//                       fb-with-markers meanwhile, so a site can make room for them
+//                       "touch" shows them on any device with a touch screen, and follows changes (a tablet being
+//                       docked, say). Markers go just right of each part; on narrow screens the page gets a right
+//                       margin for them (class fb-with-markers), and where there's still no room they go inside the
+//                       part's top right corner
 //   })
 //
 // Plug-ins are loaded when first needed and register themselves with FeedbackTool.register(name, plugin).

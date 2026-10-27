@@ -17,7 +17,10 @@ FeedbackTool.register("feedback", function (site) {
   const typeName = t => (site.typeName && site.typeName(t)) || "block";
   const fieldName = site.fieldName || (f => f);
   const isOnPage = site.isOnPage || (key => !!elFor(key));
-  const markersOn = T.config.markers === true || (T.config.markers === "touch" && matchMedia("(pointer: coarse)").matches);
+  // markers: true, or "touch" for any device with a touch screen (also a touch-screen laptop), following changes
+  // such as a tablet being docked.
+  const touchQuery = T.config.markers === "touch" ? matchMedia("(any-pointer: coarse)") : null;
+  let markersOn = T.config.markers === true || !!(touchQuery && touchQuery.matches);
   const othersOn = !!T.config.showOpenFeedback;
 
   let me = null;            // { via: "github", user } or { via: "anon", name }
@@ -199,9 +202,15 @@ FeedbackTool.register("feedback", function (site) {
   // A 💬 beside every part that can be commented on, for touch screens, where pointing and selecting work poorly.
   // They sit in a layer of their own (on the page, or in the dialog the part is in), placed from each part's box, so
   // the page's content is untouched. They are placed again whenever the layout may have changed.
-  const SIZE = 28, labels = new Map(), scrollers = new WeakMap();
+  // Each marker is a 28px circle in a 40px button, so it is easy to tap.
+  const SIZE = 28, PAD = 6, HIT = SIZE + 2 * PAD, labels = new Map(), scrollers = new WeakMap();
   let frame = 0;
-  function scheduleMarkers() { if (markersOn && !frame) frame = requestAnimationFrame(placeMarkers); }
+  function scheduleMarkers() { if (T.config.markers && !frame) frame = requestAnimationFrame(placeMarkers); }
+  function markersChanged() {
+    document.body.classList.toggle("fb-with-markers", active && markersOn);
+    const h = bar && bar.querySelector(".fb-hint"); if (h) h.textContent = hint();
+    scheduleMarkers();
+  }
   // The nearest ancestor that clips its content (a scrolling panel, say), so markers for hidden parts are left out.
   function clipperOf(el, host) {
     if (!scrollers.has(el)) {
@@ -216,7 +225,7 @@ FeedbackTool.register("feedback", function (site) {
   function placeMarkers() {
     frame = 0;
     document.querySelectorAll(".fb-markers").forEach(l => l.remove());
-    if (!active) return;
+    if (!active || !markersOn) return;
     const layers = new Map();   // host -> { layer, ox, oy, placed }
     for (const el of document.querySelectorAll(TARGETS)) {
       if (ignore(el)) continue;
@@ -229,18 +238,18 @@ FeedbackTool.register("feedback", function (site) {
         const layer = document.createElement("div"); layer.className = "fb-markers"; host.appendChild(layer);
         const o = layer.getBoundingClientRect(); L = { layer, ox: o.left, oy: o.top, placed: [] }; layers.set(host, L);
       }
-      // Just right of the part if there's room in the margin, otherwise inside its top right corner; never on top of
-      // the marker above.
-      const room = (dlg ? dlg.getBoundingClientRect().right : document.documentElement.clientWidth) - 4;
-      const x = r.right + 6 + SIZE <= room ? r.right + 6 : r.right - SIZE;
+      // Just right of the part if there's room in the margin (on narrow screens feedback.css makes some), otherwise
+      // inside its top right corner; never where it would overlap the marker above.
+      const room = dlg ? dlg.getBoundingClientRect().right : document.documentElement.clientWidth;
+      const x = r.right + 6 + SIZE + PAD <= room ? r.right + 6 : r.right - SIZE;
       let y = r.top;
-      for (const p of L.placed) if (Math.abs(p.x - x) < SIZE && y > p.y - SIZE && y < p.y + SIZE + 2) y = p.y + SIZE + 2;
+      for (const p of L.placed) if (Math.abs(p.x - x) < HIT && y > p.y - HIT && y < p.y + HIT) y = p.y + HIT;
       L.placed.push({ x, y });
       const key = keyOf(el); if (!labels.has(key)) labels.set(key, labelFor(key));
       const b = document.createElement("button");
-      b.type = "button"; b.className = "fb-marker"; b.textContent = "💬"; b.dataset.key = key;
+      b.type = "button"; b.className = "fb-marker"; b.innerHTML = "<span>💬</span>"; b.dataset.key = key;
       b.title = `Comment on ${labels.get(key)}`; b.setAttribute("aria-label", b.title);
-      b.style.left = `${x - L.ox}px`; b.style.top = `${y - L.oy}px`;
+      b.style.left = `${x - PAD - L.ox}px`; b.style.top = `${y - PAD - L.oy}px`;
       L.layer.appendChild(b);
     }
   }
@@ -274,6 +283,8 @@ FeedbackTool.register("feedback", function (site) {
     };
   }
   const pending = () => { const ch = changes(); return ch.added.length + ch.changed.length + ch.withdrawn.length; };
+  const hint = () => !markersOn ? "Point at any part of the page and click 💬, or select some words."
+    : `${matchMedia("(any-pointer: coarse)").matches ? "Tap" : "Click"} 💬 beside any part of the page, or select some words.`;
   const whoLabel = () => me.via === "anon" ? (me.name ? `${esc(me.name)} (anonymous)` : "anonymous") : `@${esc(me.user)}`;
   function updateBar() {
     if (!bar) return;
@@ -293,12 +304,12 @@ FeedbackTool.register("feedback", function (site) {
     bar.className = "fb-bar";
     bar.innerHTML = `<div class="fb-bar-in"><b>💬 Feedback</b><span class="fb-who">as ${whoLabel()} · <button type="button" class="fb-link" data-fbbar="signout">not you?</button></span>
       <span class="fb-count"></span><span class="fb-thread"></span>
-      <span class="fb-hint">${markersOn ? "Click 💬 beside any part of the page, or select some words." : "Point at any part of the page and click 💬, or select some words."}</span>
+      <span class="fb-hint">${hint()}</span>
       ${othersOn ? `<button type="button" data-fbbar="others" aria-pressed="false">Others' feedback</button><button type="button" data-fbbar="othershide" hidden>Hide</button>` : ""}<button type="button" data-fbbar="stop">Close</button><button type="button" class="primary" data-fbbar="send">Review &amp; send</button></div>`;
     document.body.appendChild(bar);
     bar.addEventListener("click", e => {
       const b = e.target.closest("[data-fbbar]"); if (!b) return;
-      if (b.dataset.fbbar === "others") chooseOpenFeedback().then(updateBar);
+      if (b.dataset.fbbar === "others") chooseOpenFeedback({ edits: false }).then(updateBar);
       if (b.dataset.fbbar === "othershide") hideOpenFeedback();
       if (b.dataset.fbbar === "send") review();
       if (b.dataset.fbbar === "stop") { if (!pending() || confirm("Close feedback? Comments you haven't sent stay saved in this browser.")) location.reload(); }
@@ -416,8 +427,9 @@ FeedbackTool.register("feedback", function (site) {
     me = { via: who.via, ...(who.user ? { user: who.user } : {}), ...(who.via === "anon" ? { name: who.name || "" } : {}) };
     active = true;
     document.body.classList.add("feedback-mode");
-    // Lets a site make room for the markers, e.g. a right margin on narrow screens.
+    // While markers show, the page has the class fb-with-markers (feedback.css gives narrow screens a right margin).
     if (markersOn) document.body.classList.add("fb-with-markers");
+    if (touchQuery) touchQuery.addEventListener("change", e => { markersOn = e.matches; markersChanged(); });
     try {
       if (who.recover) {
         // Private link: continue that anonymous feedback here.
@@ -453,7 +465,7 @@ FeedbackTool.register("feedback", function (site) {
       if (hoverBtn) hoverBtn.hidden = true; if (selBtn) selBtn.hidden = true; hoverTarget = null;
       if (e.target !== document) scheduleMarkers();   // a panel scrolled: its markers have to move
     }, true);
-    if (markersOn) { addEventListener("resize", scheduleMarkers); new ResizeObserver(scheduleMarkers).observe(document.body); }
+    if (T.config.markers) { addEventListener("resize", scheduleMarkers); new ResizeObserver(scheduleMarkers).observe(document.body); }
     showBar();
     refresh();
   }
@@ -485,11 +497,12 @@ FeedbackTool.register("feedback", function (site) {
     if (!states[it.key]) states[it.key] = await (it.kind === "edit" ? site.proposedEdits.cards(it) : feedbackCards(it));
     return states[it.key];
   }
-  // Opens the picker; resolves to the number of threads shown.
-  function chooseOpenFeedback() {
+  // Opens the picker; resolves to the number of threads shown. Proposed edits are included if the site plug-in has
+  // them, except with { edits: false } (the "Others' feedback" button, which is about feedback only).
+  function chooseOpenFeedback({ edits: withEdits = true } = {}) {
     return new Promise(resolve => {
       const dlg = document.createElement("dialog");
-      const edits = !!site.proposedEdits;   // otherwise nothing mentions proposed edits
+      const edits = withEdits && !!site.proposedEdits;   // otherwise nothing mentions proposed edits
       const head = `<h2>${edits ? "Show open feedback and edits" : "Show open feedback"}</h2>`;
       const notice = msg => { dlg.innerHTML = `${head}<p class="fb-explain">${msg}</p><div class="fb-buttons"><button type="button" class="primary" data-p="close">Close</button></div>`; };
       dlg.className = "fb-dialog fb-pick";
@@ -500,7 +513,7 @@ FeedbackTool.register("feedback", function (site) {
       dlg.addEventListener("close", finish);
       dlg.addEventListener("click", e => { if (e.target.closest("[data-p=close]")) finish(); });
       const day = d => new Date(d).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
-      Promise.allSettled([listFeedback(), listEdits()]).then(([f, e]) => {
+      Promise.allSettled([listFeedback(), edits ? listEdits() : Promise.resolve([])]).then(([f, e]) => {
         if (f.status === "rejected" && e.status === "rejected") throw new Error("unreachable");
         const list = [...(f.value || []), ...(e.value || [])].sort((x, y) => y.updated.localeCompare(x.updated));
         const missing = f.status === "rejected" ? "feedback" : e.status === "rejected" ? "proposed edits" : "";
