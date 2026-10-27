@@ -18,8 +18,9 @@ All content is data: everything you read on the site lives in JSON files in `con
 | `assets/site.js` | Renders every page from the JSON: navigation, persona browser and dialog, case studies, citations and reference lists |
 | `assets/site.css`, `assets/case.css` | Shared styles; `case.css` adds article typography for case-study pages |
 | `images/<persona-id>.jpg` | One photo per persona |
-| `assets/editor.js` | The entry dialog and the in-page editor for contributors |
-| `assets/feedback.js` | Feedback mode for everyone else, and the contributors' view of open feedback |
+| `assets/feedback-tool/` | The feedback tool, which knows nothing about this site's content: the 💬 button and entry dialog (`tool.js`), feedback mode and the contributors' view of open feedback (`feedback.js`), and their styles (`feedback.css`). `tool.js` describes how a site connects to it |
+| `assets/site-feedback.js` | This site's plug-in for the feedback tool: which parts of a page can be commented on, what they are called, and how proposed edits map onto the page |
+| `assets/editor.js` | The in-page editor for contributors, started by the feedback tool |
 | `tools/apply-edit.js` | Applies an edit submitted from the website and opens a pull request |
 | `tools/feedback.js` | Labels feedback issues and folds updates into the person's earlier issue |
 | `tools/apps-script/` | The Google Apps Script that creates issues for anonymous feedback, with setup instructions |
@@ -77,7 +78,7 @@ Run `node tools/validate.js` before committing. It lists every problem, such as 
 Every page has a **💬 Feedback and comments** button (bottom right; a link ending in `?feedback` or `?edit` opens it straight away). It asks people to continue **with their GitHub account** or **without an account**:
 
 - **Contributors** (the repository's direct collaborators) go into edit mode, described below.
-- **Everyone else** goes into feedback mode (`assets/feedback.js`). They point at any part of the page (a section, a paragraph, a list, a table, a persona profile field) and click 💬, or select some words and click "Comment on selection". Comments appear under the part they refer to, with the selected words highlighted, and can be edited or deleted at any time.
+- **Everyone else** goes into feedback mode (`assets/feedback-tool/`). They point at any part of the page (a section, a paragraph, a list, a table, a persona profile field) and click 💬, or select some words and click "Comment on selection". Comments appear under the part they refer to, with the selected words highlighted, and can be edited or deleted at any time.
 - **Sending** creates a GitHub issue titled `[feedback] …`, never a pull request. Sending again adds to the same issue: GitHub users go through a pre-filled GitHub page, and the **Handle website feedback** Action (`tools/feedback.js`) copies updates into their earlier issue and closes the update; anonymous feedback goes through a Google Apps Script web app (`tools/apps-script/`, set up following its README, then `feedbackEndpoint` and `feedbackBot` in `content/site.json`), which creates the issue and adds later comments to it.
 - **Coming back:** comments are kept in the browser. GitHub users are offered their earlier open feedback on the page; anonymous people get a **private link** (`…#fb=<issue>-<key>`) to continue from any device.
 - **Contributors** can click **💬 Feedback & edits** in the edit bar to choose what to see on that page: it lists the open feedback threads and the proposed edits waiting for review (open pull requests from the website), most recent first, with a filter. Only the ones they tick are shown: feedback as comments, proposed edits as cards showing the new text (with the current text underneath), next to the parts of the page they change. Proposed edits are read from the pull request itself, so they include later additions and any changes a reviewer made. Nothing is shown by default.

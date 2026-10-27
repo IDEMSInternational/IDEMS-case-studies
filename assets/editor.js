@@ -1,9 +1,10 @@
-// In-page editor. Loaded by assets/site.js when someone clicks "Edit".
+// In-page editor for contributors. Loaded by the feedback tool (assets/feedback-tool/tool.js) when its entry dialog
+// finds that the person is a contributor.
 // Edits are kept as a working copy of the JSON content. On submit they become a list of operations keyed by
 // permanent block ids, each with the original value, sent as a GitHub issue. A GitHub Action
 // (tools/apply-edit.js) applies them and opens a pull request for review.
 (function () {
-  const A = window.SiteAPI;
+  const A = window.SiteAPI, T = window.FeedbackTool;
   const { esc, md } = A;
   const clone = x => JSON.parse(JSON.stringify(x));
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -17,6 +18,7 @@
   const SITE_FIELDS = ["personasNote", "creditsNote"];                       // editable on the home page
   const CAT_FIELDS = ["lede", "personasNote", "sources", "creditsNote"];     // editable on a category page
   let editing = false;
+  let editor = null;                  // the contributor's GitHub username
   let docOrig = null, doc = null;     // case study: original and working copy
   let deleted = new Set();            // ids of blocks marked for deletion
   const personaOrig = {};             // persona id -> original copy, taken the first time it is edited
@@ -95,8 +97,10 @@
   const readField = el => el.dataset.plain ? tidy(el.textContent) : tidy(ser(el));
 
   // ---------- Rendering the case study in edit mode ----------
-  const F = (path, value, tag, cls = "", plain = false) =>
-    `<${tag} class="ed ${cls}" contenteditable="true" spellcheck="true" data-f="${path}"${plain ? ' data-plain="1"' : ""}>${plain ? esc(value) : md(value, true)}</${tag}>`;
+  // Blocks, section headings and the case study's own fields carry the same data-block, data-section and data-doc
+  // attributes as on the normal page, so feedback and proposed edits can be shown next to them (assets/site-feedback.js).
+  const F = (path, value, tag, cls = "", plain = false, attrs = "") =>
+    `<${tag} class="ed ${cls}" contenteditable="true" spellcheck="true" data-f="${path}"${plain ? ' data-plain="1"' : ""}${attrs ? ` ${attrs}` : ""}>${plain ? esc(value) : md(value, true)}</${tag}>`;
   // Small add/remove controls for one item of a list-like field (timeline entries, table rows, panel points, key figures)
   const itools = (arr, i, what) => `<span class="ed-itools" contenteditable="false"><button type="button" data-iact="add" data-arr="${arr}" data-i="${i}" title="Add ${what} below">＋</button><button type="button" data-iact="del" data-arr="${arr}" data-i="${i}" title="Remove this ${what}">×</button></span>`;
   const tools = b => deleted.has(b.id)
@@ -132,19 +136,19 @@
   }
   function blockHTML(b) {
     const cls = ["ed-block", deleted.has(b.id) ? "ed-deleted" : "", findBlock(docOrig, b.id) ? "" : "ed-new"].join(" ");
-    return `<div class="${cls}" data-bid="${b.id}">${tools(b)}${blockInner(b)}</div>`;
+    return `<div class="${cls}" data-bid="${b.id}" data-block="${b.id}">${tools(b)}${blockInner(b)}</div>`;
   }
   function renderCase() {
     const all = A.CATEGORIES[A.CAT].caseStudies, idx = all.indexOf(A.CASE);
     const html = `<header class="hero"><div class="eyebrow">Case study ${idx + 1} of ${all.length} · editing</div>
-        ${F("doc|title", doc.title, "h1")}${F("doc|standfirst", doc.standfirst, "p", "standfirst")}${F("doc|note", doc.note || "", "p", "note")}</header>
-      <div class="stats">${doc.stats.map((s, i) => `<div class="stat">${F(`doc|stats|${i}|value`, s.value, "b", "", true)}${F(`doc|stats|${i}|label`, s.label, "span")}${itools("doc|stats", i, "figure")}</div>`).join("")}</div>
-      ${doc.sections.map(s => `<section class="ed-section" data-sid="${s.id}">${F(`sec|${s.id}|heading`, s.heading, "h2")}
+        ${F("doc|title", doc.title, "h1", "", false, 'data-doc="title"')}${F("doc|standfirst", doc.standfirst, "p", "standfirst", false, 'data-doc="standfirst"')}${F("doc|note", doc.note || "", "p", "note", false, 'data-doc="note"')}</header>
+      <div class="stats" data-doc="stats">${doc.stats.map((s, i) => `<div class="stat">${F(`doc|stats|${i}|value`, s.value, "b", "", true)}${F(`doc|stats|${i}|label`, s.label, "span")}${itools("doc|stats", i, "figure")}</div>`).join("")}</div>
+      ${doc.sections.map(s => `<section class="ed-section" data-sid="${s.id}">${F(`sec|${s.id}|heading`, s.heading, "h2", "", false, `data-section="${s.id}"`)}
         <div class="ed-tools ed-tools-sec"><button type="button" data-act="add-start">＋ Paragraph at the start of this section</button></div>
         ${s.blocks.map(b => blockHTML(b)).join("")}</section>`).join("")}
       <p class="ed-footnote">References and persona cards update automatically once your changes are approved.</p>`;
     A.app.querySelector("main").innerHTML = html;
-    if (window.SiteFeedback) window.SiteFeedback.refresh();
+    T.refresh();
     A.app.querySelectorAll(".ed-deleted [contenteditable], .ed-deleted button:not([data-act=restore]), .ed-deleted select").forEach(el => {
       if (el.hasAttribute("contenteditable")) el.setAttribute("contenteditable", "false"); else el.disabled = true;
     });
@@ -400,7 +404,7 @@
   function updateBar() {
     if (!bar) return;
     const n = count(), fresh = countNew();
-    bar.querySelector(".ed-count").textContent = !n ? "No changes yet"
+    bar.querySelector(".fb-count").textContent = !n ? "No changes yet"
       : link ? (fresh ? `${fresh} new change${fresh === 1 ? "" : "s"} for #${link.issue}` : `All changes sent in #${link.issue}`)
       : `${n} change${n === 1 ? "" : "s"}`;
     bar.querySelector("[data-bar=review]").disabled = !fresh;
@@ -412,32 +416,32 @@
   }
   function showBar() {
     bar = document.createElement("div");
-    bar.className = "ed-bar";
-    bar.innerHTML = `<div class="ed-bar-in"><b>Editing</b><span class="ed-who">as @${esc(editor)} · <button type="button" class="ed-link" data-bar="signout">not you?</button></span><span class="ed-count"></span>
-      <span class="ed-hint">${doc ? "Click any text to change it. Use the buttons beside a block to move, add or delete it, and ＋ / × to add or remove entries." : "Click the highlighted text to change it, or open a persona to edit their profile."}</span>
+    bar.className = "fb-bar";
+    bar.innerHTML = `<div class="fb-bar-in"><b>Editing</b><span class="fb-who">as @${esc(editor)} · <button type="button" class="fb-link" data-bar="signout">not you?</button></span><span class="fb-count"></span>
+      <span class="fb-hint">${doc ? "Click any text to change it. Use the buttons beside a block to move, add or delete it, and ＋ / × to add or remove entries." : "Click the highlighted text to change it, or open a persona to edit their profile."}</span>
       <button type="button" data-bar="feedback" aria-pressed="false">💬 Feedback &amp; edits</button><button type="button" data-bar="fbhide" hidden>Hide</button><button type="button" data-bar="cancel">Stop editing</button><button type="button" class="primary" data-bar="review">Review &amp; submit</button></div>`;
     document.body.appendChild(bar);
     bar.addEventListener("click", e => {
       const b = e.target.closest("[data-bar]"); if (!b) return;
       if (b.dataset.bar === "review") review();
       if (b.dataset.bar === "cancel") stop();
-      if (b.dataset.bar === "signout") signOut();
-      if (b.dataset.bar === "feedback") loadFeedback().then(F => F.chooseOpenFeedback()).then(fbShown);
-      if (b.dataset.bar === "fbhide") loadFeedback().then(F => { F.hideOpenFeedback(); fbShown(0); });
+      if (b.dataset.bar === "signout") T.signOut();
+      if (b.dataset.bar === "feedback") T.feedback().then(F => F.chooseOpenFeedback()).then(fbShown, T.loadError);
+      if (b.dataset.bar === "fbhide") T.feedback().then(F => { F.hideOpenFeedback(); fbShown(0); });
     });
     updateBar();
   }
 
   function review() {
     const edits = allEdits(), dlg = document.createElement("dialog");
-    dlg.className = "ed-review";
+    dlg.className = "fb-dialog";
     const items = edits.flatMap(e => e.ops.map(op => ({ op, sent: isSent(e.file, op) })));
     dlg.innerHTML = `<h2>Review your changes</h2>
-      ${link ? `<p class="ed-explain">These will be added to your earlier suggestion, <a href="https://github.com/${esc(A.site.repository)}/issues/${link.issue}" target="_blank" rel="noopener">#${link.issue}</a>.</p>` : ""}
-      <ul class="ed-changes">${items.map((it, i) => `<li${it.sent ? ' class="ed-sent"' : ""}><span>${esc(describe(it.op))}${it.sent ? ` <em>(already sent)</em>` : ""}</span>${it.sent ? "" : `<button type="button" data-undo="${i}">Undo</button>`}</li>`).join("")}</ul>
-      <label class="ed-note">What did you change, and why? <span>(a short note for the reviewer)</span><textarea rows="3" placeholder="e.g. Corrected Faith's age and tightened the Kenya section"></textarea></label>
-      <p class="ed-explain">Submitting opens GitHub in a new tab with your changes filled in. Click <b>Create</b> there to send them. You need to be logged in to GitHub.</p>
-      <div class="ed-actions"><button type="button" data-r="back">Keep editing</button><button type="button" class="primary" data-r="submit">Submit for review</button></div>`;
+      ${link ? `<p class="fb-explain">These will be added to your earlier suggestion, <a href="${esc(T.issueURL(link.issue))}" target="_blank" rel="noopener">#${link.issue}</a>.</p>` : ""}
+      <ul class="fb-items">${items.map((it, i) => `<li${it.sent ? ' class="ed-sent"' : ""}><span>${esc(describe(it.op))}${it.sent ? ` <em>(already sent)</em>` : ""}</span>${it.sent ? "" : `<button type="button" data-undo="${i}">Undo</button>`}</li>`).join("")}</ul>
+      <label class="fb-field">What did you change, and why? <span>(a short note for the reviewer)</span><textarea rows="3" placeholder="e.g. Corrected Faith's age and tightened the Kenya section"></textarea></label>
+      <p class="fb-explain">Submitting opens GitHub in a new tab with your changes filled in. Click <b>Create</b> there to send them. You need to be logged in to GitHub.</p>
+      <div class="fb-buttons"><button type="button" data-r="back">Keep editing</button><button type="button" class="primary" data-r="submit">Submit for review</button></div>`;
     document.body.appendChild(dlg);
     dlg.showModal();
     dlg.addEventListener("close", () => dlg.remove());
@@ -470,12 +474,8 @@
     return out;
   }
   async function encode(payload) {
-    const json = JSON.stringify(payload);
-    if (typeof CompressionStream === "undefined") return "```json\n" + json + "\n```";
-    const stream = new Blob([json]).stream().pipeThrough(new CompressionStream("deflate-raw"));
-    const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
-    let bin = ""; bytes.forEach(b => { bin += String.fromCharCode(b); });
-    return "```edit-v2\n" + btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") + "\n```";
+    if (typeof CompressionStream === "undefined") return "```json\n" + JSON.stringify(payload) + "\n```";
+    return "```edit-v2\n" + await T.compress(payload) + "\n```";
   }
 
   async function submit(dlg, note) {
@@ -489,22 +489,15 @@
     const full = (link ? `**More changes for #${link.issue}** (${pageTitle})\n\n` : `**Suggested changes to ${pageTitle}**\n\n`) +
       `${fresh.join("\n")}\n\n${sentBefore.length ? `<sub>Also included, sent before: ${sentBefore.length} change(s).</sub>\n\n` : ""}**Note from the editor**\n\n${note || "_No note._"}\n\nPage: ${location.pathname}\n\n` +
       `<details><summary>Technical details for the robot (please do not edit)</summary>\n\n${await encode(payload)}\n</details>\n`;
-    const base = `https://github.com/${A.site.repository}/issues/new`;
-    let url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(full)}`, pasted = false;
-    if (url.length > 6000) {
-      // Too long for a link: copy the text and ask the editor to paste it.
-      pasted = true;
-      try { navigator.clipboard.writeText(full); } catch (_) {}
-      url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent("Paste your changes here (Ctrl+V or ⌘V), replacing this line.")}`;
-    }
+    const { url, pasted } = T.newIssueLink(title, full, "Paste your changes here (Ctrl+V or ⌘V), replacing this line.");
     const submittedAt = Date.now(), sentKeys = edits.flatMap(e => e.ops.map(op => opKey(e.file, op)));
     window.open(url, "_blank", "noopener");
     dlg.innerHTML = `<h2>Almost done</h2>
       <p>GitHub has opened in a new tab.${pasted ? " Your changes were too long to fill in automatically, so they have been <b>copied</b>: paste them into the description box." : ""} Click <b>Create</b> there to send your changes.</p>
-      <p class="ed-explain">If GitHub showed an error while you were signing in, <button type="button" class="ed-link" data-r="again">open GitHub again</button>: you're signed in now, so it will work.</p>
+      <p class="fb-explain">If GitHub showed an error while you were signing in, <button type="button" class="fb-link" data-r="again">open GitHub again</button>: you're signed in now, so it will work.</p>
       ${pasted ? `<details><summary>If pasting doesn't work, copy this text</summary><textarea rows="6" readonly>${esc(full)}</textarea></details>` : ""}
-      <p class="ed-explain">Once you've clicked Create, tell us below. If you keep editing, your next changes will be added to the same suggestion.</p>
-      <div class="ed-actions ed-actions-wrap"><button type="button" data-r="back">Not sent yet</button><button type="button" data-r="sentkeep">I've sent it: keep editing</button><button type="button" class="primary" data-r="done">I've sent it: I'm finished</button></div>`;
+      <p class="fb-explain">Once you've clicked Create, tell us below. If you keep editing, your next changes will be added to the same suggestion.</p>
+      <div class="fb-buttons fb-buttons-wrap"><button type="button" data-r="back">Not sent yet</button><button type="button" data-r="sentkeep">I've sent it: keep editing</button><button type="button" class="primary" data-r="done">I've sent it: I'm finished</button></div>`;
     dlg.addEventListener("click", async e => {
       const r = e.target.closest("[data-r]"); if (!r) return;
       if (r.dataset.r === "again") { window.open(url, "_blank", "noopener"); return; }
@@ -512,10 +505,10 @@
       if (r.dataset.r === "done") { clearDraft(); clearLink(); (dlg.close(), dlg.remove()); return stop(true); }
       if (r.dataset.r === "sentkeep") {
         if (!link) {
-          dlg.innerHTML = `<h2>Finding your suggestion on GitHub…</h2><p class="ed-explain">This takes a few seconds.</p>`;
-          const n = await findIssue(submittedAt);
+          dlg.innerHTML = `<h2>Finding your suggestion on GitHub…</h2><p class="fb-explain">This takes a few seconds.</p>`;
+          const n = await T.findIssue({ user: editor, prefix: "[edit]", since: submittedAt });
           if (!n) {
-            dlg.innerHTML = `<h2>Couldn't find it yet</h2><p>We couldn't find your suggestion on GitHub. If you did click Create, your next changes will be sent as a separate suggestion, which works too.</p><div class="ed-actions"><button type="button" class="primary" data-r="back">Keep editing</button></div>`;
+            dlg.innerHTML = `<h2>Couldn't find it yet</h2><p>We couldn't find your suggestion on GitHub. If you did click Create, your next changes will be sent as a separate suggestion, which works too.</p><div class="fb-buttons"><button type="button" class="primary" data-r="back">Keep editing</button></div>`;
             return;
           }
           link = { issue: n, sent: [] };
@@ -526,117 +519,13 @@
       }
     });
   }
-  // The issue just created by this editor for this page (GitHub's public API; it may take a moment to appear).
-  async function findIssue(since) {
-    const api = `https://api.github.com/repos/${A.site.repository}/issues?creator=${encodeURIComponent(editor)}&state=open&sort=created&direction=desc&per_page=10`;
-    for (let i = 0; i < 8; i++) {
-      try {
-        const list = await (await fetch(api, { cache: "no-store" })).json();
-        const hit = Array.isArray(list) && list.find(x => !x.pull_request && /^\[edit\]/.test(x.title) && !/update to #\d+/.test(x.title)
-          && (x.body || "").includes(`Page: ${location.pathname}`) && Date.parse(x.created_at) > since - 120000);
-        if (hit) return hit.number;
-      } catch (_) {}
-      await new Promise(r => setTimeout(r, 4000));
-    }
-    return null;
-  }
-
-  // ---------- Who is editing? ----------
-  // Asks for the editor's GitHub username and checks that the account has access to the repository, using
-  // access/editors.json: hashes of the collaborators' usernames, refreshed by a GitHub Action every 30 minutes.
-  // This is a convenience check: the real check happens when the change is submitted, against the account that
-  // creates the GitHub issue.
-  const USER_KEY = "editor-github";
-  let editor = null, starting = false;
-  async function loadEditors() {
-    try { const r = await fetch(A.ROOT + "access/editors.json?t=" + Date.now()); return new Set((await r.json()).hashes || []); }
-    catch (_) { return null; }
-  }
-  async function hashName(name) {
-    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(name).toLowerCase()));
-    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
-  }
-  const isEditor = async (set, name) => set.has(await hashName(name));
-  // The entry dialog. Contributors (direct collaborators) go into edit mode; everyone else, with a GitHub account or
-  // anonymously, goes into feedback mode (assets/feedback.js).
-  const ID_KEY = "fb-identity";
-  function gate() {
-    return new Promise(async resolve => {
-      const list = await loadEditors();
-      if (!list) { alert("This could not be loaded. Please check your connection and try again."); return resolve(null); }
-      // Private link to continue anonymous feedback: #fb=<issue>-<key>
-      const pl = location.hash.match(/^#fb=(\d+)-([0-9a-f]+)$/);
-      if (pl) return resolve({ mode: "feedback", via: "anon", recover: { issue: +pl[1], key: pl[2] } });
-      let remembered = null, rememberedId = null;
-      try { remembered = localStorage.getItem(USER_KEY); rememberedId = JSON.parse(localStorage.getItem(ID_KEY) || "null"); } catch (_) {}
-      if (remembered && await isEditor(list, remembered)) return resolve({ mode: "edit", user: remembered });
-      if (rememberedId && (rememberedId.via === "github" || A.site.feedbackEndpoint)) return resolve({ mode: "feedback", ...rememberedId });
-      const endpoint = A.site.feedbackEndpoint;
-      const dlg = document.createElement("dialog");
-      dlg.className = "ed-review ed-gate";
-      const ask = (msg = "") => {
-        dlg.innerHTML = `<h2>Feedback and comments</h2>
-          <p>Comment on any part of this page: a section, a single item or a few selected words. People on the team can also edit the page directly.</p>
-          <form method="dialog" class="fb-choice"><h3>With your GitHub account</h3>
-            <label class="ed-note">GitHub username<input type="text" name="u" autocomplete="username" spellcheck="false" placeholder="e.g. jane-doe" value="${esc(remembered || (rememberedId && rememberedId.user) || "")}"></label>
-            ${msg ? `<p class="ed-gate-msg">${msg}</p>` : ""}
-            <p class="ed-explain">Tip: <a href="https://github.com/login" target="_blank" rel="noopener">log in to GitHub</a> in this browser first, so sending is one click. No account? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one for free</a>.</p>
-            <div class="ed-actions"><button type="submit" class="primary">Continue with GitHub</button></div></form>
-          <div class="fb-choice"><h3>Without an account</h3>
-            ${endpoint ? `<label class="ed-note">Your name <span>(optional)</span><input type="text" name="n" autocomplete="name" placeholder="Leave empty to stay anonymous"></label>
-              <div class="ed-actions"><button type="button" data-g="anon">Continue anonymously</button></div>`
-              : `<p class="ed-explain">Anonymous feedback is coming soon. For now, please use a GitHub account.</p>`}</div>
-          <p class="ed-explain">Feedback is published on this site's public GitHub repository.</p>
-          <div class="ed-actions"><button type="button" data-g="cancel">Cancel</button></div>`;
-        const input = dlg.querySelector("input[name=u]"); input.focus(); input.select();
-      };
-      const remember = id => { try { localStorage.setItem(ID_KEY, JSON.stringify(id)); } catch (_) {} };
-      dlg.addEventListener("click", e => {
-        const b = e.target.closest("[data-g]"); if (!b) return;
-        if (b.dataset.g === "cancel") { (dlg.close(), dlg.remove()); resolve(null); }
-        if (b.dataset.g === "anon") {
-          const id = { via: "anon", name: (dlg.querySelector("input[name=n]").value || "").trim().slice(0, 80) };
-          remember(id); (dlg.close(), dlg.remove()); resolve({ mode: "feedback", ...id });
-        }
-      });
-      dlg.addEventListener("submit", async e => {
-        e.preventDefault();
-        const name = dlg.querySelector("input[name=u]").value.trim().replace(/^@/, "");
-        if (!name) return ask("Please enter your GitHub username.");
-        if (await isEditor(list, name)) { try { localStorage.setItem(USER_KEY, name); } catch (_) {} (dlg.close(), dlg.remove()); return resolve({ mode: "edit", user: name }); }
-        // Catch typos: check that the account exists (GitHub's public API; if it can't be reached, skip this check).
-        try {
-          const r = await fetch("https://api.github.com/users/" + encodeURIComponent(name));
-          if (r.status === 404) return ask(`There's no GitHub account called “${esc(name)}”. Please check the spelling.`);
-        } catch (_) {}
-        const id = { via: "github", user: name };
-        remember(id); (dlg.close(), dlg.remove()); resolve({ mode: "feedback", ...id });
-      });
-      dlg.addEventListener("cancel", () => resolve(null));
-      dlg.addEventListener("close", () => dlg.remove());
-      document.body.appendChild(dlg);
-      dlg.showModal();
-      ask();
-    });
-  }
-  function signOut() { try { localStorage.removeItem(USER_KEY); localStorage.removeItem(ID_KEY); } catch (_) {} stop(true); }
-  function loadFeedback() {
-    if (window.SiteFeedback) return Promise.resolve(window.SiteFeedback);
-    return new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = A.ROOT + "assets/feedback.js"; sc.onload = () => ok(window.SiteFeedback); sc.onerror = no; document.body.appendChild(sc); });
-  }
-
   // ---------- Start and stop ----------
-  async function start() {
-    if (editing || starting) return;
-    starting = true;
-    const who = await gate();
-    starting = false;
-    if (!who) return;
-    if (who.mode === "feedback") { (await loadFeedback()).start(who); return; }
-    editor = who.user;
+  // Started by the feedback tool with the contributor's GitHub username.
+  async function start(user) {
+    if (editing) return;
+    editor = user;
     editing = true;
     document.body.classList.add("editing");
-    document.querySelector(".edit-fab").hidden = true;
     let draft = loadDraft();
     const hasDraft = draft && ((draft.doc && caseFile) || (draft.personas && Object.keys(draft.personas).length) || draft.site || draft.cat);
     if (hasDraft && !confirm("You have unsent changes from an earlier visit. Restore them?")) { clearDraft(); draft = null; }
@@ -656,7 +545,7 @@
     link = loadLink();
     if (link) {
       try {
-        const st = await (await fetch(`https://api.github.com/repos/${A.site.repository}/issues/${link.issue}`, { cache: "no-store" })).json();
+        const st = await T.ghJSON(`${T.api}/issues/${link.issue}`);
         if (st.state === "closed") { clearLink(); link = null; if (!countNew()) { clearDraft(); location.reload(); return; } }
       } catch (_) {}
     }
@@ -675,5 +564,5 @@
     location.reload();
   }
 
-  window.SiteEditor = { start, ops: allEdits };
+  T.register("editor", { start, ops: allEdits });
 })();
