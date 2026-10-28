@@ -17,6 +17,11 @@ FeedbackTool.register("feedback", function (site) {
   const typeName = t => (site.typeName && site.typeName(t)) || "block";
   const fieldName = site.fieldName || (f => f);
   const isOnPage = site.isOnPage || (key => !!elFor(key));
+  // markers: true, or "touch" for any device with a touch screen (also a touch-screen laptop), following changes
+  // such as a tablet being docked.
+  const touchQuery = T.config.markers === "touch" ? matchMedia("(any-pointer: coarse)") : null;
+  let markersOn = T.config.markers === true || !!(touchQuery && touchQuery.matches);
+  const othersOn = !!T.config.showOpenFeedback;
 
   let me = null;            // { via: "github", user } or { via: "anon", name }
   let active = false;       // feedback mode on
@@ -122,6 +127,7 @@ FeedbackTool.register("feedback", function (site) {
     for (const { c, own } of list) { const el = elFor(c.target); if (el) stackFor(el).insertAdjacentHTML("beforeend", card(c, own)); }
     highlight(list);
     updateBar();
+    scheduleMarkers();
   }
   function openComposer(key, quote, id) {
     const el = elFor(key); if (!el) return;
@@ -159,10 +165,11 @@ FeedbackTool.register("feedback", function (site) {
   }
   function hideButtons() { if (hoverBtn) hoverBtn.hidden = true; if (selBtn) selBtn.hidden = true; }
   // The tool's own controls, and the site's.
-  const OWN = ".fb-stack, .fb-float, .fb-bar, .fb-fab, dialog.fb-dialog" + (site.ignore ? `, ${site.ignore}` : "");
+  const OWN = ".fb-stack, .fb-float, .fb-markers, .fb-chooser, .fb-bar, .fb-fab, dialog.fb-dialog" + (site.ignore ? `, ${site.ignore}` : "");
   const ignore = n => !n || n.closest(OWN);
+  // With markers on, they take the place of the button that follows the pointer.
   function onOver(e) {
-    if (!active || ignore(e.target)) return;
+    if (!active || markersOn || ignore(e.target)) return;
     const t = e.target.closest(TARGETS); if (!t || t === hoverTarget) return;
     hoverTarget = t;
     const r = t.getBoundingClientRect();
@@ -186,9 +193,143 @@ FeedbackTool.register("feedback", function (site) {
     const r = selInfo.rect;
     place(selBtn, selInfo.el, r, r.left, r.bottom + 6);
   }
+  // On touch screens a selection ends without a mouseup, so wait for it to settle instead.
+  let lastPointer = "mouse", selTimer = 0;
+  const onPointer = e => { lastPointer = e.pointerType; };
+  const onSelectionChange = () => { if (lastPointer !== "touch") return; clearTimeout(selTimer); selTimer = setTimeout(onSelect, 400); };
+
+  // ---------- Markers (the markers option) ----------
+  // A 💬 beside every part that can be commented on, for touch screens, where pointing and selecting work poorly.
+  // They sit in a layer of their own (on the page, or in the dialog the part is in), placed from each part's box, so
+  // the page's content is untouched. They are placed again whenever the layout may have changed.
+  // Each marker is a 28px circle in a 40px button, so it is easy to tap.
+  const SIZE = 28, PAD = 6, HIT = SIZE + 2 * PAD, labels = new Map(), scrollers = new WeakMap();
+  let frame = 0;
+  function scheduleMarkers() { if (T.config.markers && !frame) frame = requestAnimationFrame(placeMarkers); }
+  function markersChanged() {
+    document.body.classList.toggle("fb-with-markers", active && markersOn);
+    if (!markersOn) document.querySelectorAll(".fb-markers-room").forEach(h => h.classList.remove("fb-markers-room"));
+    const h = bar && bar.querySelector(".fb-hint"); if (h) h.textContent = hint();
+    scheduleMarkers();
+  }
+  // The nearest ancestor that clips its content (a scrolling panel, say), so markers for hidden parts are left out.
+  function clipperOf(el, host) {
+    if (!scrollers.has(el)) {
+      let c = null;
+      for (let p = el.parentElement; p && p !== host && p !== document.body; p = p.parentElement) {
+        const s = getComputedStyle(p); if (/auto|scroll|hidden|clip/.test(s.overflowX + s.overflowY)) { c = p; break; }
+      }
+      scrollers.set(el, c);
+    }
+    return scrollers.get(el);
+  }
+  // An inline part (a name within a line, say) is marked at the right edge of the block it sits in, not where its
+  // text ends, so the marker doesn't land on the rest of the line.
+  const blocks = new WeakMap();
+  function blockOf(el) {
+    if (!blocks.has(el)) {
+      let b = el;
+      while (b.parentElement && getComputedStyle(b).display.startsWith("inline")) b = b.parentElement;
+      blocks.set(el, b);
+    }
+    return blocks.get(el);
+  }
+  const overlaps = (a, c) => a.left < c.right && c.left < a.right && a.top < c.bottom && c.top < a.bottom;
+  // One marker per row: parts that start within a marker's height of each other share a marker, level with the first
+  // of them, so markers never drift away from their parts or overlap, however densely parts are nested (an exercise,
+  // its paragraph and a list item, say). A marker for several parts asks which one the comment is about.
+  // Each marker goes just right of its row's parts if that spot is free: inside the page or dialog, and clear of other
+  // parts and of the site's own controls (its ignore list, such as a dialog's close button). Otherwise it goes in a
+  // margin that the tool gives the page or dialog (class fb-markers-room, kept while markers show).
+  // A page or dialog whose markers haven't moved keeps them as they are (and any list that is open), so pages that
+  // keep changing (maths still rendering, say) don't rebuild them all the time.
+  function placeMarkers() {
+    frame = 0;
+    if (!active || !markersOn) return document.querySelectorAll(".fb-markers").forEach(l => l.remove());
+    const hosts = new Map();   // the page or dialog -> its parts, with their boxes
+    for (const el of document.querySelectorAll(TARGETS)) {
+      if (ignore(el)) continue;
+      const dlg = el.closest("dialog"); if (dlg && !dlg.open) continue;
+      const r = el.getBoundingClientRect(); if (!r.width || !r.height) continue;
+      const host = dlg || document.body, clip = clipperOf(el, host);
+      if (clip) { const v = clip.getBoundingClientRect(); if (r.bottom <= v.top || r.top >= v.bottom) continue; }
+      const block = blockOf(el);
+      if (!hosts.has(host)) hosts.set(host, []);
+      hosts.get(host).push({ el, r, right: block === el ? r.right : block.getBoundingClientRect().right });
+    }
+    let again = false;
+    for (const [host, parts] of hosts) {
+      const dlg = host === document.body ? null : host, hr = host.getBoundingClientRect();
+      const room = dlg ? hr.right : document.documentElement.clientWidth, roomy = host.classList.contains("fb-markers-room");
+      const controls = site.ignore ? [...host.querySelectorAll(site.ignore)].filter(c => c.closest("dialog") === dlg)
+        .map(c => c.getBoundingClientRect()).filter(c => c.width && c.height) : [];
+      const boxAt = (x, y) => ({ left: x - PAD, top: y - PAD, right: x - PAD + HIT, bottom: y - PAD + HIT });
+      const rows = [];
+      for (const p of [...parts].sort((a, b) => a.r.top - b.r.top)) {
+        const row = rows[rows.length - 1];
+        if (row && p.r.top < row.top + HIT) row.parts.push(p); else rows.push({ top: p.r.top, parts: [p] });
+      }
+      const related = (q, row) => row.parts.some(p => p === q || q.el.contains(p.el) || p.el.contains(q.el));
+      const margin = Math.min(hr.right, room) - HIT + PAD;   // x of a marker in the margin
+      let layer = [...host.children].find(c => c.classList.contains("fb-markers"));
+      if (!layer) { layer = document.createElement("div"); layer.className = "fb-markers"; host.appendChild(layer); }
+      const o = layer.getBoundingClientRect(), specs = [];
+      for (const row of rows) {
+        let x = Math.max(...row.parts.map(p => p.right)) + 6, y = row.top;
+        const box = boxAt(x, y);
+        const free = x + SIZE + PAD <= room && !controls.some(c => overlaps(box, c)) && !parts.some(q => !related(q, row) && overlaps(box, q.r));
+        if (!free) {
+          if (!roomy) { host.classList.add("fb-markers-room"); again = true; break; }
+          x = margin;
+          // Off any of the site's controls that reach into the margin.
+          for (let i = 0; i < controls.length; i++) if (overlaps(boxAt(x, y), controls[i])) { y = controls[i].bottom + PAD; i = -1; }
+        }
+        specs.push({ keys: row.parts.map(p => keyOf(p.el)), left: Math.round(x - PAD - o.left), top: Math.round(y - PAD - o.top) });
+      }
+      if (again) break;
+      const sig = JSON.stringify(specs);
+      if (layer._sig === sig) continue;
+      layer._sig = sig; layer.textContent = "";
+      for (const { keys, left, top } of specs) {
+        keys.forEach(k => { if (!labels.has(k)) labels.set(k, labelFor(k)); });
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "fb-marker"; b.innerHTML = "<span>💬</span>"; b.dataset.keys = JSON.stringify(keys);
+        b.title = keys.length === 1 ? `Comment on ${labels.get(keys[0])}` : `Comment on one of the ${keys.length} parts here`;
+        b.setAttribute("aria-label", b.title); if (keys.length > 1) b.setAttribute("aria-haspopup", "menu");
+        b.style.left = `${left}px`; b.style.top = `${top}px`;
+        layer.appendChild(b);
+      }
+    }
+    // Markers in pages or dialogs with nothing to mark now (a dialog that has closed) go.
+    document.querySelectorAll(".fb-markers").forEach(l => { if (!hosts.has(l.parentElement)) l.remove(); });
+    // A page or dialog has just been given a margin: place everything again once the layout has followed.
+    if (again) { document.querySelectorAll(".fb-markers").forEach(l => l.remove()); scheduleMarkers(); }
+  }
+  // The list a marker for several parts opens: one button per part, in the order they appear. It sits beside the
+  // markers rather than among them, so it stays open while they are placed again (a page still settling, say).
+  function showChooser(marker) {
+    closeChooser();
+    const keys = JSON.parse(marker.dataset.keys), menu = document.createElement("div"), layer = marker.parentElement;
+    menu.className = "fb-chooser"; menu.setAttribute("role", "menu");
+    menu.innerHTML = `<div class="fb-chooser-head">Comment on…</div>` + keys.map(k =>
+      `<button type="button" role="menuitem" data-key="${esc(k)}">${esc(cut(labels.get(k) || labelFor(k), 80))}</button>`).join("");
+    layer.parentElement.appendChild(menu);
+    // To the left of the marker, inside the window and above the feedback bar (scrolling itself if it has to).
+    const floor = (bar ? bar.getBoundingClientRect().top : innerHeight) - 8;
+    menu.style.maxHeight = `${Math.max(120, floor - 8)}px`;
+    const m = marker.getBoundingClientRect(), w = menu.getBoundingClientRect(), o = layer.getBoundingClientRect();
+    const left = Math.max(8, Math.min(m.left - w.width - 4, innerWidth - w.width - 8)), top = Math.max(8, Math.min(m.top, floor - w.height));
+    menu.style.left = `${left - o.left}px`; menu.style.top = `${top - o.top}px`;
+    menu.querySelector("button").focus({ preventScroll: true });
+  }
+  function closeChooser() { document.querySelectorAll(".fb-chooser").forEach(m => m.remove()); }
 
   // ---------- Card actions ----------
   function onClick(e) {
+    const m = e.target.closest(".fb-marker");
+    if (m) { const keys = JSON.parse(m.dataset.keys); return keys.length > 1 ? showChooser(m) : (closeChooser(), openComposer(keys[0], null)); }
+    const pick = e.target.closest(".fb-chooser [data-key]"); if (pick) { closeChooser(); return openComposer(pick.dataset.key, null); }
+    if (!e.target.closest(".fb-chooser")) closeChooser();
     const b = e.target.closest("[data-fb]"); if (!b) return;
     const box = b.closest(".fb-card"), id = box && box.dataset.cid;
     if (b.dataset.fb === "cancel") { box.remove(); refresh(); }
@@ -215,6 +356,8 @@ FeedbackTool.register("feedback", function (site) {
     };
   }
   const pending = () => { const ch = changes(); return ch.added.length + ch.changed.length + ch.withdrawn.length; };
+  const hint = () => !markersOn ? "Point at any part of the page and click 💬, or select some words."
+    : `${matchMedia("(any-pointer: coarse)").matches ? "Tap" : "Click"} 💬 beside any part of the page, or select some words.`;
   const whoLabel = () => me.via === "anon" ? (me.name ? `${esc(me.name)} (anonymous)` : "anonymous") : `@${esc(me.user)}`;
   function updateBar() {
     if (!bar) return;
@@ -223,17 +366,24 @@ FeedbackTool.register("feedback", function (site) {
     bar.querySelector("[data-fbbar=send]").disabled = !n;
     const t = bar.querySelector(".fb-thread");
     t.innerHTML = thread ? `In <a href="${esc(T.issueURL(thread.issue))}" target="_blank" rel="noopener">#${thread.issue}</a>${thread.key ? ` · <button type="button" class="fb-link" data-fbbar="link">copy private link</button>` : ""}` : "";
+    if (othersOn) {
+      const n = reviewOn ? shown.size : 0, o = bar.querySelector("[data-fbbar=others]");
+      o.textContent = n ? `Others' feedback (${n})` : "Others' feedback"; o.setAttribute("aria-pressed", n > 0);
+      bar.querySelector("[data-fbbar=othershide]").hidden = !n;
+    }
   }
   function showBar() {
     bar = document.createElement("div");
     bar.className = "fb-bar";
     bar.innerHTML = `<div class="fb-bar-in"><b>💬 Feedback</b><span class="fb-who">as ${whoLabel()} · <button type="button" class="fb-link" data-fbbar="signout">not you?</button></span>
       <span class="fb-count"></span><span class="fb-thread"></span>
-      <span class="fb-hint">Point at any part of the page and click 💬, or select some words.</span>
-      <button type="button" data-fbbar="stop">Close</button><button type="button" class="primary" data-fbbar="send">Review &amp; send</button></div>`;
+      <span class="fb-hint">${hint()}</span>
+      ${othersOn ? `<button type="button" data-fbbar="others" aria-pressed="false">Others' feedback</button><button type="button" data-fbbar="othershide" hidden>Hide</button>` : ""}<button type="button" data-fbbar="stop">Close</button><button type="button" class="primary" data-fbbar="send">Review &amp; send</button></div>`;
     document.body.appendChild(bar);
     bar.addEventListener("click", e => {
       const b = e.target.closest("[data-fbbar]"); if (!b) return;
+      if (b.dataset.fbbar === "others") chooseOpenFeedback({ edits: false }).then(updateBar);
+      if (b.dataset.fbbar === "othershide") hideOpenFeedback();
       if (b.dataset.fbbar === "send") review();
       if (b.dataset.fbbar === "stop") { if (!pending() || confirm("Close feedback? Comments you haven't sent stay saved in this browser.")) location.reload(); }
       if (b.dataset.fbbar === "signout") T.signOut();
@@ -350,6 +500,9 @@ FeedbackTool.register("feedback", function (site) {
     me = { via: who.via, ...(who.user ? { user: who.user } : {}), ...(who.via === "anon" ? { name: who.name || "" } : {}) };
     active = true;
     document.body.classList.add("feedback-mode");
+    // While markers show, the page has the class fb-with-markers.
+    if (markersOn) document.body.classList.add("fb-with-markers");
+    if (touchQuery) touchQuery.addEventListener("change", e => { markersOn = e.matches; markersChanged(); });
     try {
       if (who.recover) {
         // Private link: continue that anonymous feedback here.
@@ -378,21 +531,45 @@ FeedbackTool.register("feedback", function (site) {
     document.addEventListener("mouseover", onOver);
     document.addEventListener("mouseup", () => setTimeout(onSelect, 0));
     document.addEventListener("keyup", () => setTimeout(onSelect, 0));
+    document.addEventListener("pointerdown", onPointer, true);
+    document.addEventListener("selectionchange", onSelectionChange);
     document.addEventListener("click", onClick);
-    addEventListener("scroll", () => { if (hoverBtn) hoverBtn.hidden = true; if (selBtn) selBtn.hidden = true; hoverTarget = null; }, true);
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeChooser(); });
+    addEventListener("scroll", e => {
+      if (hoverBtn) hoverBtn.hidden = true; if (selBtn) selBtn.hidden = true; hoverTarget = null;
+      if (e.target !== document) scheduleMarkers();   // a panel scrolled: its markers have to move
+    }, true);
+    if (T.config.markers) {
+      addEventListener("resize", scheduleMarkers);
+      new ResizeObserver(scheduleMarkers).observe(document.body);
+      // Changes that leave the page's size alone: a dialog opening or getting new contents (a persona's Next, say), a
+      // section or knowl expanding, a picture loading. The tool's own elements are left out, or placing the markers
+      // would set this off again; and a page that keeps changing (an animation) is followed at most every 150ms.
+      const mine = n => { const e = n.nodeType === 1 ? n : n.parentElement; return !!(e && e.closest(OWN)); };
+      let soon = 0;
+      const later = () => { if (!soon) soon = setTimeout(() => { soon = 0; scheduleMarkers(); }, 150); };
+      new MutationObserver(list => {
+        if (list.some(m => !mine(m.target) && (m.type === "attributes" || [...m.addedNodes, ...m.removedNodes].some(n => !mine(n))))) later();
+      }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["open", "hidden"] });
+      document.addEventListener("toggle", later, true);
+      document.addEventListener("load", later, true);
+    }
     showBar();
     refresh();
   }
 
-  // ---------- Contributors: show open feedback and proposed edits ----------
-  // The lists come from two requests; a thread's details are only fetched once it is picked, because GitHub allows
-  // visitors who aren't signed in only a few requests an hour. Proposed edits come from the site plug-in.
+  // ---------- Open feedback and proposed edits ----------
+  // For contributors (from the editor), and for everyone with the showOpenFeedback option. The lists come from two
+  // requests; a thread's details are only fetched once it is picked, because GitHub allows visitors who aren't signed
+  // in only a few requests an hour. Proposed edits come from the site plug-in, if it has them.
   let shown = new Set();    // picked: "fb-<issue>", or the key of a proposed edit
   const states = {};        // picked key -> its cards, once fetched
   async function listFeedback() {
     const q = encodeURIComponent(`repo:${REPO} is:issue is:open in:title "[feedback]"`);
     const res = await ghJSON(`https://api.github.com/search/issues?q=${q}&per_page=100&sort=updated&order=desc`);
-    return (res.items || []).filter(it => !/update to #\d+/.test(it.title) && T.onThisPage(it.body)).map(it => ({
+    // In feedback mode, the person's own thread is left out: their comments are already on the page.
+    const own = active && thread ? thread.issue : null;
+    return (res.items || []).filter(it => !/update to #\d+/.test(it.title) && it.number !== own && T.onThisPage(it.body)).map(it => ({
       key: `fb-${it.number}`, kind: "feedback", number: it.number, url: it.html_url, updated: it.updated_at,
       title: it.title.replace(/^\[feedback\]\s*/, "").replace(/^[^:]*:\s*/, ""),
       author: ((it.body || "").match(/^From: (.+)$/m) || [])[1] || `@${it.user.login}`,
@@ -408,31 +585,34 @@ FeedbackTool.register("feedback", function (site) {
     if (!states[it.key]) states[it.key] = await (it.kind === "edit" ? site.proposedEdits.cards(it) : feedbackCards(it));
     return states[it.key];
   }
-  // Opens the picker; resolves to the number of threads shown.
-  function chooseOpenFeedback() {
+  // Opens the picker; resolves to the number of threads shown. Proposed edits are included if the site plug-in has
+  // them, except with { edits: false } (the "Others' feedback" button, which is about feedback only).
+  function chooseOpenFeedback({ edits: withEdits = true } = {}) {
     return new Promise(resolve => {
       const dlg = document.createElement("dialog");
-      const head = `<h2>Show open feedback and edits</h2>`;
+      const edits = withEdits && !!site.proposedEdits;   // otherwise nothing mentions proposed edits
+      const head = `<h2>${edits ? "Show open feedback and edits" : "Show open feedback"}</h2>`;
       const notice = msg => { dlg.innerHTML = `${head}<p class="fb-explain">${msg}</p><div class="fb-buttons"><button type="button" class="primary" data-p="close">Close</button></div>`; };
       dlg.className = "fb-dialog fb-pick";
-      dlg.innerHTML = `${head}<p class="fb-explain">Looking for open feedback and proposed edits on this page…</p>`;
+      dlg.innerHTML = `${head}<p class="fb-explain">Looking for open feedback${edits ? " and proposed edits" : ""} on this page…</p>`;
       document.body.appendChild(dlg); dlg.showModal();
       let done = false;
       const finish = () => { if (done) return; done = true; if (dlg.open) dlg.close(); dlg.remove(); resolve(shown.size); };
       dlg.addEventListener("close", finish);
       dlg.addEventListener("click", e => { if (e.target.closest("[data-p=close]")) finish(); });
       const day = d => new Date(d).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
-      Promise.allSettled([listFeedback(), listEdits()]).then(([f, e]) => {
+      Promise.allSettled([listFeedback(), edits ? listEdits() : Promise.resolve([])]).then(([f, e]) => {
         if (f.status === "rejected" && e.status === "rejected") throw new Error("unreachable");
         const list = [...(f.value || []), ...(e.value || [])].sort((x, y) => y.updated.localeCompare(x.updated));
         const missing = f.status === "rejected" ? "feedback" : e.status === "rejected" ? "proposed edits" : "";
         const partly = missing ? ` <b>Couldn't load the ${missing} just now; please try again in a few minutes.</b>` : "";
-        if (!list.length) return notice(`There's no open feedback and there are no proposed edits waiting for review on this page.${partly}`);
+        if (!list.length) return notice(edits ? `There's no open feedback and there are no proposed edits waiting for review on this page.${partly}`
+          : `There's no open feedback${active ? " from anyone else" : ""} on this page yet.${partly}`);
         const nf = list.filter(x => x.kind === "feedback").length, ne = list.length - nf;
         const counts = [nf && `${nf} open feedback thread${nf === 1 ? "" : "s"}`, ne && `${ne} proposed edit${ne === 1 ? "" : "s"} waiting for review`].filter(Boolean).join(" and ");
         dlg.innerHTML = `${head}
           <p class="fb-explain">${counts} on this page, most recent first. Pick the ones to show: they appear beside the parts of the page they're about.${partly}</p>
-          <div class="fb-pick-tools"><input type="search" placeholder="Filter by name, words, “feedback” or “edit”" aria-label="Filter"><button type="button" data-p="all">Select all listed</button><button type="button" data-p="none">Clear</button></div>
+          <div class="fb-pick-tools"><input type="search" placeholder="${edits ? "Filter by name, words, “feedback” or “edit”" : "Filter by name or words"}" aria-label="Filter"><button type="button" data-p="all">Select all listed</button><button type="button" data-p="none">Clear</button></div>
           <ul class="fb-items fb-pick-list">${list.map(it => { const tag = it.kind === "edit" ? "✏️ Proposed edit" : "💬 Feedback"; return `<li data-q="${esc((tag + " " + it.author + " " + it.title).toLowerCase())}"><label>
             <input type="checkbox" value="${it.key}"${shown.has(it.key) ? " checked" : ""}>
             <span><span class="fb-tag fb-tag-${it.kind}">${tag}</span> <b>${esc(it.author)}</b> · ${esc(cut(it.title, 90))}<br><small>${day(it.updated)} · <a href="${esc(it.url)}" target="_blank" rel="noopener">#${it.number}</a></small></span></label></li>`; }).join("")}</ul>
