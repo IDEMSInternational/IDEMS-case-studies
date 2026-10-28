@@ -19,6 +19,7 @@ All content is data: everything you read on the site lives in JSON files in `con
 | `assets/site.css`, `assets/case.css` | Shared styles; `case.css` adds article typography for case-study pages |
 | `images/<persona-id>.jpg` | One photo per persona |
 | `assets/feedback-tool/` | The feedback tool, which knows nothing about this site's content: the 💬 button and entry dialog (`tool.js`), feedback mode and the contributors' view of open feedback (`feedback.js`), and their styles (`feedback.css`). `tool.js` describes how a site connects to it |
+| `assets/feedback-tool/plugins/` | Plug-ins for other sites that use the tool: `pretext-site.js` for PreTeXt textbooks |
 | `assets/site-feedback.js` | This site's plug-in for the feedback tool: which parts of a page can be commented on, what they are called, and how proposed edits map onto the page |
 | `assets/editor.js` | The in-page editor for contributors, started by the feedback tool |
 | `tools/apply-edit.js` | Applies an edit submitted from the website and opens a pull request |
