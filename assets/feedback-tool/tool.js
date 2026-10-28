@@ -267,6 +267,29 @@
   }
   function signOut() { try { localStorage.removeItem(USER_KEY); localStorage.removeItem(ID_KEY); } catch (_) {} location.reload(); }
 
+  // ---------- A toolbar along the bottom of the screen ----------
+  // Some sites pin a toolbar to the bottom of the screen, as PreTeXt books do on phones. The 💬 button and the feedback
+  // bar go above it: the page's --fb-bottom property holds its height, measured again when the window changes size.
+  const OURS = ".fb-bar, .fb-fab, .fb-float, .fb-stack, .fb-markers, .fb-chooser, dialog";
+  let bottom = 0, measuring = false; // the toolbar's height; pages without one are left untouched
+  function measureBottom() {
+    measuring = false;
+    // While a modal dialog is open, the rest of the page can't be found by position: measure once it closes.
+    const modal = [...document.querySelectorAll("dialog[open]")].find(d => { try { return d.matches(":modal"); } catch (_) { return true; } });
+    if (modal) return void modal.addEventListener("close", remeasure, { once: true });
+    const h = innerHeight, w = document.documentElement.clientWidth;
+    let top = h;
+    for (const x of [w * 0.1, w * 0.5, w * 0.9]) for (const e of document.elementsFromPoint(x, h - 1)) {
+      if (e.closest(OURS) || getComputedStyle(e).position !== "fixed") continue;
+      // A toolbar: along the bottom edge, across at least half the screen, and in its lower half.
+      const r = e.getBoundingClientRect();
+      if (r.bottom >= h - 1 && r.width >= w / 2 && r.top > h / 2) top = Math.min(top, r.top);
+    }
+    const px = Math.round(h - top);
+    if (px !== bottom) document.documentElement.style.setProperty("--fb-bottom", `${bottom = px}px`);
+  }
+  const remeasure = () => { if (!measuring) { measuring = true; requestAnimationFrame(measureBottom); } };
+
   // ---------- The button ----------
   let fab = null, starting = false, started = false;
   // If the chosen mode can't be loaded, the button stays, so the person can try again.
@@ -296,6 +319,9 @@
       : "Comment on this page, or suggest changes if you are on the team";
     fab.addEventListener("click", open);
     document.body.appendChild(fab);
+    measureBottom();
+    addEventListener("resize", remeasure);
+    addEventListener("load", remeasure);
     // Links ending in ?edit (or ?feedback) open it straight away; #fb=<issue>-<key> is a private link to continue
     // anonymous feedback.
     const q = new URLSearchParams(location.search);
