@@ -381,6 +381,8 @@ FeedbackTool.register("feedback", function (site) {
       <span class="fb-hint">${hint()}</span>
       ${othersOn ? `<button type="button" data-fbbar="others" aria-pressed="false">Others' feedback</button><button type="button" data-fbbar="othershide" hidden>Hide</button>` : ""}<button type="button" data-fbbar="stop">Close</button><button type="button" class="primary" data-fbbar="send">Review &amp; send</button></div>`;
     document.body.appendChild(bar);
+    // The page keeps room at its end for the bar, however many lines it takes on a narrow screen (feedback.css).
+    new ResizeObserver(() => document.documentElement.style.setProperty("--fb-bar", `${bar.offsetHeight}px`)).observe(bar);
     bar.addEventListener("click", e => {
       const b = e.target.closest("[data-fbbar]"); if (!b) return;
       if (b.dataset.fbbar === "others") chooseOpenFeedback({ edits: false }).then(updateBar);

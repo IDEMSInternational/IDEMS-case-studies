@@ -11,9 +11,9 @@
 }
 
 /* ---------- Button, bar and dialogs (also used by a site's editor) ---------- */
-.fb-fab { position: fixed; right: 18px; bottom: 18px; z-index: 50; background: var(--fb-surface); color: var(--fb-text); border: 1px solid var(--fb-line); border-radius: 999px; padding: 9px 16px; font: 600 14px var(--fb-font); box-shadow: var(--fb-shadow); cursor: pointer; }
+.fb-fab { position: fixed; right: 18px; bottom: calc(18px + var(--fb-bottom, 0px)); z-index: 50; background: var(--fb-surface); color: var(--fb-text); border: 1px solid var(--fb-line); border-radius: 999px; padding: 9px 16px; font: 600 14px var(--fb-font); box-shadow: var(--fb-shadow); cursor: pointer; }
 .fb-fab:hover { border-color: var(--fb-accent); color: var(--fb-accent); }
-.fb-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--fb-surface); border-top: 2px solid var(--fb-accent); box-shadow: 0 -4px 20px rgba(0,0,0,.08); }
+.fb-bar { position: fixed; left: 0; right: 0; bottom: var(--fb-bottom, 0px); z-index: 60; background: var(--fb-surface); border-top: 2px solid var(--fb-accent); box-shadow: 0 -4px 20px rgba(0,0,0,.08); }
 .fb-bar-in { max-width: 1100px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; font: 14px var(--fb-font); }
 .fb-bar .fb-count { color: var(--fb-accent); font-weight: 600; }
 .fb-bar .fb-hint { color: var(--fb-muted); flex: 1 1 200px; font-size: 13px; }
@@ -40,7 +40,7 @@ dialog.fb-dialog::backdrop { background: rgba(20, 18, 15, .45); }
 .fb-buttons-wrap { flex-wrap: wrap; }
 
 /* ---------- Feedback mode ---------- */
-body.feedback-mode { padding-bottom: 90px; }
+body.feedback-mode { padding-bottom: calc(max(90px, var(--fb-bar, 0px) + 30px) + var(--fb-bottom, 0px)); }
 .fb-float { position: fixed; z-index: 70; font: 600 12.5px var(--fb-font); border: 1px solid var(--fb-accent); background: var(--fb-surface); color: var(--fb-accent); border-radius: 999px; padding: 5px 11px; box-shadow: var(--fb-shadow); cursor: pointer; }
 .fb-float:hover { background: var(--fb-accent); color: var(--fb-bg); }
 .fb-float-sel { background: var(--fb-accent); color: var(--fb-bg); }
