@@ -1,14 +1,14 @@
 // Feedback mode, and the contributors' view of open feedback. Loaded on demand by tool.js together with the site
 // plug-in, which says what can be commented on (see tool.js).
 // A comment points at a "target" (a key from the site plug-in, such as a block's permanent id) and may quote some
-// selected words. The whole set of a person's comments on a page is sent each time, as a GitHub issue
-// ("[feedback] …"); later sends are added to the same issue. GitHub users send through a pre-filled GitHub page;
+// selected words. The whole set of a person's comments on a page is sent each time, as an issue on the forge (GitHub,
+// or the forge plug-in) ("[feedback] …"); later sends are added to the same issue. People with an account send
+// through a pre-filled page on the forge;
 // anonymous people send through a web app (the feedbackEndpoint option, tools/apps-script/).
 FeedbackTool.register("feedback", function (site) {
   const T = FeedbackTool;
-  const { esc, clone, ghJSON } = T;
-  const REPO = T.config.repository;
-  const API = T.api;
+  const { esc, clone } = T;
+  const forge = T.forge;
   const plain = site.plain || T.plain;
   const cut = (s, n) => (s = plain(s)).length > n ? s.slice(0, n - 1) + "…" : s;
   const newId = () => Math.random().toString(16).slice(2, 8);
@@ -23,7 +23,7 @@ FeedbackTool.register("feedback", function (site) {
   let markersOn = T.config.markers === true || !!(touchQuery && touchQuery.matches);
   const othersOn = !!T.config.showOpenFeedback;
 
-  let me = null;            // { via: "github", user } or { via: "anon", name }
+  let me = null;            // { via: forge.id, user } or { via: "anon", name }
   let active = false;       // feedback mode on
   let comments = [];        // this person's comments on this page
   let thread = null;        // { issue, key?, sent: { id: comment as last sent } }
@@ -34,9 +34,10 @@ FeedbackTool.register("feedback", function (site) {
 
   // The latest set of comments in a feedback issue: the last feedback-v1 block written by its author or by the robots.
   async function latestState(n) {
-    const [iss, coms] = await Promise.all([ghJSON(`${API}/issues/${n}`), ghJSON(`${API}/issues/${n}/comments?per_page=100`)]);
-    const ok = new Set([iss.user.login, "github-actions[bot]", T.config.feedbackBot].filter(Boolean).map(x => x.toLowerCase()));
-    const texts = [iss.body, ...coms.filter(c => ok.has(c.user.login.toLowerCase())).map(c => c.body)];
+    const [iss, coms] = await Promise.all([forge.issue(n), forge.comments(n)]);
+    if (!iss) throw new Error(`#${n} not found`);
+    const ok = new Set([iss.user, ...(forge.bots || [])].map(x => x.toLowerCase()));
+    const texts = [iss.body, ...coms.filter(c => ok.has(c.user.toLowerCase())).map(c => c.body)];
     for (let i = texts.length - 1; i >= 0; i--) {
       const m = (texts[i] || "").match(/```feedback-v1\s*\n([\s\S]*?)\n```/);
       if (m) { try { return { state: await T.decompress(m[1]), issue: iss }; } catch (_) {} }
@@ -419,7 +420,7 @@ FeedbackTool.register("feedback", function (site) {
       ${thread ? `<p class="fb-explain">This will be added to your earlier feedback, <a href="${esc(T.issueURL(thread.issue))}" target="_blank" rel="noopener">#${thread.issue}</a>.</p>` : ""}
       <ul class="fb-items">${[...ch.added.map(c => li(c, "New")), ...ch.changed.map(c => li(c, "Changed")), ...ch.withdrawn.map(c => li(c, "Withdrawn"))].join("")}</ul>
       <label class="fb-field">Anything else? <span>(optional)</span><textarea rows="2"></textarea></label>
-      <p class="fb-explain">${me.via === "anon" ? "Your feedback is sent straight away, and you get a private link to come back to it." : "Sending opens GitHub in a new tab with your feedback filled in. Click <b>Create</b> there."} Feedback is public on GitHub.</p>
+      <p class="fb-explain">${me.via === "anon" ? "Your feedback is sent straight away, and you get a private link to come back to it." : `Sending opens ${esc(forge.name)} in a new tab with your feedback filled in. Click <b>Create</b> there.`} Feedback is public on ${esc(forge.name)}.</p>
       <div class="fb-buttons"><button type="button" data-r="back">Keep going</button><button type="button" class="primary" data-r="send">Send</button></div>`;
     document.body.appendChild(dlg); dlg.showModal();
     dlg.addEventListener("close", () => dlg.remove());
@@ -429,7 +430,7 @@ FeedbackTool.register("feedback", function (site) {
       if (r.dataset.r === "send") (me.via === "anon" ? sendAnon : sendGitHub)(dlg, dlg.querySelector("textarea").value.trim());
     });
   }
-  const payloadNow = () => ({ version: 1, kind: "feedback", page: T.pagePath(), from: me.via === "anon" ? { via: "anon", name: me.name || "" } : { via: "github", user: me.user },
+  const payloadNow = () => ({ version: 1, kind: "feedback", page: T.pagePath(), from: me.via === "anon" ? { via: "anon", name: me.name || "" } : { via: forge.id, user: me.user },
     ...(thread ? { follows: thread.issue } : {}), comments: comments.map(clone) });
   const markSent = () => { thread.sent = Object.fromEntries(comments.map(c => [c.id, clone(c)])); save(); refresh(); };
 
@@ -466,16 +467,23 @@ FeedbackTool.register("feedback", function (site) {
     const sentAt = Date.now();
     window.open(url, "_blank", "noopener");
     dlg.innerHTML = `<h2>Almost done</h2>
-      <p>GitHub has opened in a new tab.${pasted ? " Your feedback was too long to fill in automatically, so it has been <b>copied</b>: paste it into the description box." : ""} Click <b>Create</b> there to send it.</p>
-      <p class="fb-explain">If GitHub showed an error while you were signing in, <button type="button" class="fb-link" data-r="again">open GitHub again</button>.</p>
+      <p>${esc(forge.name)} has opened in a new tab.${pasted ? " Your feedback was too long to fill in automatically, so it has been <b>copied</b>: paste it into the description box." : ""} Click <b>Create</b> there to send it.</p>
+      <p class="fb-explain">If ${esc(forge.name)} showed an error while you were signing in, <button type="button" class="fb-link" data-r="again">open it again</button>.</p>
       ${pasted ? `<details><summary>If pasting doesn't work, copy this text</summary><textarea rows="6" readonly>${esc(body)}</textarea></details>` : ""}
       <div class="fb-buttons fb-buttons-wrap"><button type="button" data-r="back">Not sent yet</button><button type="button" data-r="sentkeep">I've sent it: keep going</button><button type="button" class="primary" data-r="sentdone">I've sent it: I'm finished</button></div>`;
     dlg.addEventListener("click", async e => {
       const r = e.target.closest("[data-r]"); if (!r) return;
       if (r.dataset.r === "again") return void window.open(url, "_blank", "noopener");
       if (r.dataset.r !== "sentkeep" && r.dataset.r !== "sentdone") return;
+      // A forge that can't look up the new issue: what was sent is on the forge now, and comments added from here on
+      // are sent as new feedback.
+      if (!thread && !forge.issuesBy) {
+        comments = []; save(); refresh();
+        if (r.dataset.r === "sentdone") location.reload(); else (dlg.close(), dlg.remove());
+        return;
+      }
       if (!thread) {
-        dlg.innerHTML = `<h2>Finding your feedback on GitHub…</h2><p class="fb-explain">This takes a few seconds.</p>`;
+        dlg.innerHTML = `<h2>Finding your feedback on ${esc(forge.name)}…</h2><p class="fb-explain">This takes a few seconds.</p>`;
         const n = await T.findIssue({ user: me.user, prefix: "[feedback]", since: sentAt });
         if (!n) { dlg.innerHTML = `<h2>Couldn't find it yet</h2><p>If you did click Create, your next comments will be sent as separate feedback, which works too.</p><div class="fb-buttons"><button type="button" class="primary" data-r="back">OK</button></div>`; return; }
         thread = { issue: n, sent: {} };
@@ -513,12 +521,12 @@ FeedbackTool.register("feedback", function (site) {
         if (d) { comments = d.comments || []; thread = d.thread || null; }
         if (thread) {
           // Drop the link once the team has closed that feedback; keep anything not yet sent.
-          const st = await ghJSON(`${API}/issues/${thread.issue}`).catch(() => null);
+          const st = await forge.issue(thread.issue).catch(() => null);
           if (st && st.state === "closed") { comments = comments.filter(c => !thread.sent[c.id]); thread = null; save(); }
-        } else if (me.via === "github") {
+        } else if (me.via !== "anon" && forge.issuesBy) {
           // Offer to continue earlier open feedback on this page.
-          const list = await ghJSON(`${API}/issues?creator=${encodeURIComponent(me.user)}&state=open&per_page=30`).catch(() => []);
-          const prev = list.find(x => !x.pull_request && /^\[feedback\]/.test(x.title) && !/update to #\d+/.test(x.title) && T.onThisPage(x.body));
+          const list = await forge.issuesBy(me.user).catch(() => []);
+          const prev = list.find(x => /^\[feedback\]/.test(x.title) && !/update to #\d+/.test(x.title) && T.onThisPage(x.body));
           if (prev && confirm(`You left feedback on this page before (#${prev.number}). Continue with it?`)) {
             const mine = comments.filter(c => !(thread && thread.sent[c.id]));
             await adopt(prev.number);
@@ -565,14 +573,13 @@ FeedbackTool.register("feedback", function (site) {
   let shown = new Set();    // picked: "fb-<issue>", or the key of a proposed edit
   const states = {};        // picked key -> its cards, once fetched
   async function listFeedback() {
-    const q = encodeURIComponent(`repo:${REPO} is:issue is:open in:title "[feedback]"`);
-    const res = await ghJSON(`https://api.github.com/search/issues?q=${q}&per_page=100&sort=updated&order=desc`);
+    const items = await forge.openIssues("[feedback]");
     // In feedback mode, the person's own thread is left out: their comments are already on the page.
     const own = active && thread ? thread.issue : null;
-    return (res.items || []).filter(it => !/update to #\d+/.test(it.title) && it.number !== own && T.onThisPage(it.body)).map(it => ({
-      key: `fb-${it.number}`, kind: "feedback", number: it.number, url: it.html_url, updated: it.updated_at,
+    return items.filter(it => !/update to #\d+/.test(it.title) && it.number !== own && T.onThisPage(it.body)).map(it => ({
+      key: `fb-${it.number}`, kind: "feedback", number: it.number, url: it.url, updated: it.updated,
       title: it.title.replace(/^\[feedback\]\s*/, "").replace(/^[^:]*:\s*/, ""),
-      author: ((it.body || "").match(/^From: (.+)$/m) || [])[1] || `@${it.user.login}`,
+      author: ((it.body || "").match(/^From: (.+)$/m) || [])[1] || `@${it.user}`,
     }));
   }
   const listEdits = () => site.proposedEdits ? site.proposedEdits.list() : Promise.resolve([]);
@@ -638,11 +645,11 @@ FeedbackTool.register("feedback", function (site) {
           reviewItems = got.flatMap(([, cs]) => cs || []);
           refresh();
           const empty = got.filter(([it, cs]) => cs && it.kind === "edit" && !cs.some(c => isOnPage(c.target))).map(([it]) => `#${it.number}`);
-          if (empty.length) alert(`${empty.join(", ")} ${empty.length === 1 ? "changes" : "change"} nothing visible on this page as it is now (it may change things on another page, or have been changed by a reviewer). Open it on GitHub to see it.`);
-          if (failed.length) alert(`Couldn't load ${failed.join(", ")} from GitHub just now (it limits how often it can be asked). Try again in a few minutes.`);
+          if (empty.length) alert(`${empty.join(", ")} ${empty.length === 1 ? "changes" : "change"} nothing visible on this page as it is now (it may change things on another page, or have been changed by a reviewer). Open it on ${forge.name} to see it.`);
+          if (failed.length) alert(`Couldn't load ${failed.join(", ")} from ${forge.name} just now${forge.id === "github" ? " (it limits how often it can be asked)" : ""}. Try again in a few minutes.`);
           finish();
         });
-      }).catch(() => notice("Couldn't reach GitHub just now. It limits how often it can be asked when you aren't signed in, so please try again in a few minutes."));
+      }).catch(() => notice(`Couldn't reach ${esc(forge.name)} just now${forge.id === "github" ? ". It limits how often it can be asked when you aren't signed in, so" : ";"} please try again in a few minutes.`));
     });
   }
   function hideOpenFeedback() { shown = new Set(); reviewOn = false; reviewItems = null; refresh(); }

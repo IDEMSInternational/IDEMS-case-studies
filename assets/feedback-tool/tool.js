@@ -4,7 +4,9 @@
 // the page:
 //
 //   FeedbackTool.init({
-//     repository:       "owner/name" of the public GitHub repository that receives feedback as issues
+//     repository:       "owner/name" of the public repository that receives feedback as issues (on GitHub, unless
+//                       forge is set)
+//     forge:            optional: URL of a forge plug-in (below), for a repository that isn't on GitHub
 //     root:             optional: URL of the site's home page folder, so pages are recognised whatever their address
 //                       (default: the domain's root)
 //     feedbackEndpoint: optional: web app that creates issues for anonymous feedback (tools/apps-script/)
@@ -13,6 +15,8 @@
 //     editors, editor:  optional, together: URL of the hashed usernames of contributors (tools/sync-editors.js), and
 //                       URL of the site's editor, started for contributors instead of feedback mode. Without them,
 //                       everyone gets feedback mode and nothing mentions editing.
+//     openEditing:      optional, with editor in place of editors: everyone who continues with an account gets the
+//                       editor. Whether their edits are applied is decided when they are submitted.
 //     showOpenFeedback: optional: true adds a button to the feedback bar that shows everyone else's open feedback on
 //                       the page (feedback only: contributors see proposed edits from the editor)
 //     markers:          optional: true shows a 💬 beside every part that can be commented on, for touch screens;
@@ -37,11 +41,24 @@
 //   proposedEdits     optional: { list(), cards(item) }: open pull requests, shown next to the parts they change
 // The site calls FeedbackTool.refresh() after it redraws part of the page, so comments are put back in place.
 // The editor plug-in ("editor") has start(username).
+// A forge plug-in ("forge") says where the repository lives and how to read it, in place of GitHub (see github below):
+//   id, name          e.g. "forgejo", "git.idems.international": stored with who someone is, and used in wording
+//   web               URL of the repository's web pages; login, signup: URLs of the forge's pages for those
+//   issue(n)          the issue, as { number, state, title, body, user, url, created, updated }, or null if unknown
+//   comments(n)       its comments, as [{ user, body }]
+//   openIssues(prefix)  open issues whose title starts with prefix, most recently updated first
+//   issuesBy(user)    optional: the open issues a person opened, newest first; without it, a new issue isn't looked for
+//   userExists(name)  optional: whether an account exists (true, false, or null for "can't tell")
+//   bots              optional: accounts whose comments count as the issue author's (e.g. the Action's)
 (function () {
   const BASE = new URL(".", document.currentScript.src).href;
+  // A page may load this file with a version, such as ?v=<build>, so a new build is never served a stale copy. The
+  // files this one loads carry the same version.
+  const VERSION = new URL(document.currentScript.src).search;
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const clone = x => JSON.parse(JSON.stringify(x));
   let config = null, apiBase = null; // apiBase: GitHub API URL of the repository
+  let forge = null;                    // where the repository lives: GitHub, or the forge plug-in
 
   // ---------- Plug-ins ----------
   const plugins = {}, loading = {};
@@ -52,7 +69,7 @@
     if (plugins[name]) return Promise.resolve(plugins[name]);
     if (!loading[name]) loading[name] = new Promise((ok, no) => {
       const sc = document.createElement("script");
-      sc.src = name === "feedback" ? BASE + "feedback.js" : config[name];
+      sc.src = name === "feedback" ? BASE + "feedback.js" + VERSION : config[name];
       const fail = why => { sc.remove(); no(new Error(`${sc.src} ${why}`)); };
       sc.onload = () => plugins[name] ? ok(plugins[name]) : fail(`loaded but did not register "${name}"`);
       sc.onerror = () => fail("could not be loaded");
@@ -64,7 +81,7 @@
   // Feedback mode is made for the site plug-in once both are loaded.
   let feedbackMode = null;
   const feedback = () => feedbackMode ? Promise.resolve(feedbackMode) :
-    Promise.all([load("site"), load("feedback")]).then(([site, make]) => feedbackMode || (feedbackMode = make(site)));
+    Promise.all([load("site"), load("feedback"), loadForge()]).then(([site, make]) => feedbackMode || (feedbackMode = make(site)));
   const refresh = () => { if (feedbackMode) feedbackMode.refresh(); };
 
   // ---------- Shared helpers ----------
@@ -82,11 +99,11 @@
   }
   const plain = s => String(s ?? "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/[*`]/g, "").replace(/\s+/g, " ").trim();
   const ghJSON = async url => { const r = await fetch(url, { cache: "no-store" }); if (!r.ok) throw new Error(r.status); return r.json(); };
-  const issueURL = n => `https://github.com/${config.repository}/issues/${n}`;
-  // A link to GitHub's "new issue" page, filled in. Text too long for a link is copied instead, and the link carries
-  // `placeholder`, asking the person to paste it.
+  const issueURL = n => `${forge.web}/issues/${n}`;
+  // A link to the forge's "new issue" page, filled in. Text too long for a link is copied instead, and the link
+  // carries `placeholder`, asking the person to paste it.
   function newIssueLink(title, body, placeholder) {
-    const base = `https://github.com/${config.repository}/issues/new`;
+    const base = `${forge.web}/issues/new`;
     let url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`, pasted = false;
     if (url.length > 6000) { pasted = true; try { navigator.clipboard.writeText(body); } catch (_) {} url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(placeholder)}`; }
     return { url, pasted };
@@ -133,14 +150,36 @@
     return key;
   }
 
-  // The issue `user` has just created for this page, with a title starting with `prefix` (GitHub's public API; it
-  // may take a moment to appear).
+  // GitHub, read through its public API.
+  const fromGitHub = x => ({ number: x.number, state: x.state, title: x.title, body: x.body, user: x.user.login, url: x.html_url, created: x.created_at, updated: x.updated_at });
+  const github = () => ({
+    id: "github", name: "GitHub", web: `https://github.com/${config.repository}`,
+    login: "https://github.com/login", signup: "https://github.com/signup",
+    issue: async n => fromGitHub(await ghJSON(`${apiBase}/issues/${n}`)),
+    comments: async n => (await ghJSON(`${apiBase}/issues/${n}/comments?per_page=100`)).map(c => ({ user: c.user.login, body: c.body })),
+    openIssues: async prefix => {
+      const q = encodeURIComponent(`repo:${config.repository} is:issue is:open in:title "${prefix}"`);
+      return ((await ghJSON(`https://api.github.com/search/issues?q=${q}&per_page=100&sort=updated&order=desc`)).items || []).map(fromGitHub);
+    },
+    issuesBy: async user => (await ghJSON(`${apiBase}/issues?creator=${encodeURIComponent(user)}&state=open&sort=created&direction=desc&per_page=30`))
+      .filter(x => !x.pull_request).map(fromGitHub),
+    userExists: async name => {
+      try { const r = await fetch("https://api.github.com/users/" + encodeURIComponent(name)); return r.status === 404 ? false : r.ok || null; }
+      catch (_) { return null; }
+    },
+    bots: ["github-actions[bot]", config.feedbackBot].filter(Boolean),
+  });
+  const loadForge = async () => { if (!forge) forge = config.forge ? await load("forge") : github(); return forge; };
+
+  // The issue `user` has just created for this page, with a title starting with `prefix` (it may take a moment to
+  // appear). Null if it isn't found, or the forge can't look.
   async function findIssue({ user, prefix, since }) {
+    if (!forge.issuesBy) return null;
     for (let i = 0; i < 8; i++) {
       try {
-        const list = await ghJSON(`${apiBase}/issues?creator=${encodeURIComponent(user)}&state=open&sort=created&direction=desc&per_page=10`);
-        const hit = list.find(x => !x.pull_request && x.title.startsWith(prefix) && !/update to #\d+/.test(x.title)
-          && onThisPage(x.body) && Date.parse(x.created_at) > since - 120000);
+        const list = await forge.issuesBy(user);
+        const hit = list.find(x => x.title.startsWith(prefix) && !/update to #\d+/.test(x.title)
+          && onThisPage(x.body) && Date.parse(x.created) > since - 120000);
         if (hit) return hit.number;
       } catch (_) {}
       await new Promise(r => setTimeout(r, 4000));
@@ -149,10 +188,10 @@
   }
 
   // ---------- Who is it? ----------
-  // Asks for the person's GitHub username and checks whether it is a contributor's, using a list of hashes of the
+  // Asks for the person's username on the forge and checks whether it is a contributor's, using a list of hashes of the
   // contributors' usernames (so the list can't be read from the site). This is a convenience check: the real check
-  // happens when changes are submitted, against the account that creates the GitHub issue. Everyone else, with a
-  // GitHub account or anonymously, goes into feedback mode.
+  // happens when changes are submitted, against the account that creates the issue. Everyone else, with an account
+  // or anonymously, goes into feedback mode.
   const USER_KEY = "editor-github", ID_KEY = "fb-identity";
   async function loadEditors() {
     try { const r = await fetch(config.editors + "?t=" + Date.now()); return r.ok ? new Set((await r.json()).hashes || []) : null; }
@@ -162,37 +201,41 @@
     const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(name).toLowerCase()));
     return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
   }
-  const isEditor = async (set, name) => set.has(await hashName(name));
-  const canEdit = () => !!(config.editors && config.editor);
+  // openEditing: anyone who continues with an account gets the editor, and the list isn't loaded. Whether
+  // their changes are applied is decided when they are submitted, so this only changes who sees the button.
+  const isEditor = async (set, name) => !!config.openEditing || set.has(await hashName(name));
+  const canEdit = () => !!((config.editors || config.openEditing) && config.editor);
   function gate() {
     return new Promise(async resolve => {
       // Private link to continue anonymous feedback: #fb=<issue>-<key>
       const pl = location.hash.match(/^#fb=(\d+)-([0-9a-f]+)$/);
       if (pl) return resolve({ mode: "feedback", via: "anon", recover: { issue: +pl[1], key: pl[2] } });
       // If the list of contributors can't be loaded, nobody can edit just now, but everyone can still leave feedback.
-      const list = canEdit() ? await loadEditors() : new Set(), unchecked = !list, editors = list || new Set();
+      const list = canEdit() && !config.openEditing ? await loadEditors() : new Set(), unchecked = !list, editors = list || new Set();
       let remembered = null, rememberedId = null;
       try { remembered = localStorage.getItem(USER_KEY); rememberedId = JSON.parse(localStorage.getItem(ID_KEY) || "null"); } catch (_) {}
       if (remembered && await isEditor(editors, remembered)) return resolve({ mode: "edit", user: remembered });
       // A contributor who couldn't be checked sees the dialog, which says why editing isn't available.
-      if (rememberedId && !(remembered && unchecked) && (rememberedId.via === "github" || config.feedbackEndpoint)) return resolve({ mode: "feedback", ...rememberedId });
+      if (rememberedId && !(remembered && unchecked) && (rememberedId.via === forge.id || config.feedbackEndpoint)) return resolve({ mode: "feedback", ...rememberedId });
       const endpoint = config.feedbackEndpoint;
       const dlg = document.createElement("dialog");
       dlg.className = "fb-dialog fb-gate";
       const ask = (msg = "") => {
         dlg.innerHTML = `<h2>Feedback and comments</h2>
-          <p>Comment on any part of this page: a section, a single item or a few selected words.${canEdit() ? " People on the team can also edit the page directly." : ""}</p>${unchecked ? `
+          <p>Comment on any part of this page: a section, a single item or a few selected words.${canEdit() ? (config.openEditing
+            ? " With an account you can also suggest edits to the page: the team's edits become pull requests, and anyone else's are kept as suggestions for the team."
+            : " People on the team can also edit the page directly.") : ""}</p>${unchecked ? `
           <p class="fb-gate-msg">Editing isn't available just now, because the list of people who can edit couldn't be loaded. You can still leave feedback.</p>` : ""}
-          <form method="dialog" class="fb-choice"><h3>With your GitHub account</h3>
-            <label class="fb-field">GitHub username<input type="text" name="u" autocomplete="username" spellcheck="false" placeholder="e.g. jane-doe" value="${esc(remembered || (rememberedId && rememberedId.user) || "")}"></label>
+          <form method="dialog" class="fb-choice"><h3>With your ${esc(forge.name)} account</h3>
+            <label class="fb-field">${esc(forge.name)} username<input type="text" name="u" autocomplete="username" spellcheck="false" placeholder="e.g. jane-doe" value="${esc(remembered || (rememberedId && rememberedId.user) || "")}"></label>
             ${msg ? `<p class="fb-gate-msg">${msg}</p>` : ""}
-            <p class="fb-explain">Tip: <a href="https://github.com/login" target="_blank" rel="noopener">log in to GitHub</a> in this browser first, so sending is one click. No account? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one for free</a>.</p>
-            <div class="fb-buttons"><button type="submit" class="primary">Continue with GitHub</button></div></form>
+            <p class="fb-explain">Tip: <a href="${esc(forge.login)}" target="_blank" rel="noopener">log in to ${esc(forge.name)}</a> in this browser first, so sending is one click.${forge.signup ? ` No account? <a href="${esc(forge.signup)}" target="_blank" rel="noopener">Create one</a>.` : ""}</p>
+            <div class="fb-buttons"><button type="submit" class="primary">Continue with ${esc(forge.name)}</button></div></form>
           <div class="fb-choice"><h3>Without an account</h3>
             ${endpoint ? `<label class="fb-field">Your name <span>(optional)</span><input type="text" name="n" autocomplete="name" placeholder="Leave empty to stay anonymous"></label>
               <div class="fb-buttons"><button type="button" data-g="anon">Continue anonymously</button></div>`
-              : `<p class="fb-explain">Anonymous feedback is coming soon. For now, please use a GitHub account.</p>`}</div>
-          <p class="fb-explain">Feedback is published on this site's public GitHub repository.</p>
+              : `<p class="fb-explain">Anonymous feedback is coming soon. For now, please use a ${esc(forge.name)} account.</p>`}</div>
+          <p class="fb-explain">Feedback is published on this site's repository on ${esc(forge.name)}.</p>
           <div class="fb-buttons"><button type="button" data-g="cancel">Cancel</button></div>`;
         const input = dlg.querySelector("input[name=u]"); input.focus(); input.select();
       };
@@ -208,14 +251,11 @@
       dlg.addEventListener("submit", async e => {
         e.preventDefault();
         const name = dlg.querySelector("input[name=u]").value.trim().replace(/^@/, "");
-        if (!name) return ask("Please enter your GitHub username.");
+        if (!name) return ask(`Please enter your ${esc(forge.name)} username.`);
         if (await isEditor(editors, name)) { try { localStorage.setItem(USER_KEY, name); } catch (_) {} (dlg.close(), dlg.remove()); return resolve({ mode: "edit", user: name }); }
-        // Catch typos: check that the account exists (GitHub's public API; if it can't be reached, skip this check).
-        try {
-          const r = await fetch("https://api.github.com/users/" + encodeURIComponent(name));
-          if (r.status === 404) return ask(`There's no GitHub account called “${esc(name)}”. Please check the spelling.`);
-        } catch (_) {}
-        const id = { via: "github", user: name };
+        // Catch typos: check that the account exists, where the forge can tell.
+        if (forge.userExists && await forge.userExists(name) === false) return ask(`There's no ${esc(forge.name)} account called “${esc(name)}”. Please check the spelling.`);
+        const id = { via: forge.id, user: name };
         remember(id); (dlg.close(), dlg.remove()); resolve({ mode: "feedback", ...id });
       });
       dlg.addEventListener("cancel", () => resolve(null));
@@ -234,6 +274,7 @@
     if (starting || started) return;
     starting = true;
     try {
+      await loadForge();
       const who = await gate();
       if (!who) return;
       const mode = who.mode === "edit" ? await load("editor") : await feedback();
@@ -251,7 +292,8 @@
     fab.className = "fb-fab";
     fab.type = "button";
     fab.textContent = "💬 Feedback and comments";
-    fab.title = canEdit() ? "Comment on this page, or suggest changes if you are on the team" : "Comment on this page";
+    fab.title = !canEdit() ? "Comment on this page" : config.openEditing ? "Comment on this page, or suggest changes to it"
+      : "Comment on this page, or suggest changes if you are on the team";
     fab.addEventListener("click", open);
     document.body.appendChild(fab);
     // Links ending in ?edit (or ?feedback) open it straight away; #fb=<issue>-<key> is a private link to continue
@@ -262,7 +304,7 @@
 
   window.FeedbackTool = {
     init, register, feedback, refresh, signOut, loadError,
-    get config() { return config; }, get api() { return apiBase; },
+    get config() { return config; }, get api() { return apiBase; }, get forge() { return forge; },
     esc, clone, plain, compress, decompress, ghJSON, issueURL, newIssueLink, findIssue, pagePath, pageLine, pageOf, onThisPage, pageStorageKey,
   };
 })();
