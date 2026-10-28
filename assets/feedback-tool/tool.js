@@ -17,9 +17,10 @@
 //                       the page (feedback only: contributors see proposed edits from the editor)
 //     markers:          optional: true shows a 💬 beside every part that can be commented on, for touch screens;
 //                       "touch" shows them on any device with a touch screen, and follows changes (a tablet being
-//                       docked, say). Markers go just right of each part; on narrow screens the page gets a right
-//                       margin for them (class fb-with-markers), and where there's still no room they go inside the
-//                       part's top right corner
+//                       docked, say). Parts that start within 40px of each other share a marker, which asks which one
+//                       is meant. Markers go just right of their parts where that spot is free; otherwise the page
+//                       or dialog gets a right margin for them (class fb-markers-room). They follow changes to the
+//                       page by themselves. While markers show, the page has the class fb-with-markers
 //   })
 //
 // Plug-ins are loaded when first needed and register themselves with FeedbackTool.register(name, plugin).

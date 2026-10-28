@@ -61,13 +61,21 @@ body.feedback-mode { padding-bottom: 90px; }
 .fb-choice { border: 1px solid var(--fb-line); border-radius: 12px; padding: 12px 16px; margin: 0 0 12px; }
 .fb-choice h3 { margin: 0 0 6px; font-size: 16px; }
 .fb-markers { position: absolute; top: 0; left: 0; width: 0; height: 0; z-index: 45; }
-/* A 40px button (easy to tap) around a 28px circle. On narrow screens the page gets a right margin to hold them. */
-.fb-marker { position: absolute; box-sizing: border-box; width: 40px; height: 40px; padding: 6px; border: 0; background: none; cursor: pointer; }
+/* One marker per row of parts: a 40px button (easy to tap) around a 28px circle; a marker for several parts opens a
+   short list of them (fb-chooser). Where there's no free space beside a part, the tool gives the
+   page or dialog a right margin to hold the markers (fb-markers-room); border-box, so a page set to width: 100% doesn't
+   grow sideways. */
+.fb-marker { position: absolute; box-sizing: border-box; width: 40px; height: 40px; padding: 6px; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .fb-marker span { display: block; box-sizing: border-box; width: 28px; height: 28px; border: 1px solid var(--fb-line); border-radius: 999px; background: var(--fb-surface); box-shadow: var(--fb-shadow); font-size: 14px; line-height: 26px; text-align: center; }
 .fb-marker:hover span { border-color: var(--fb-accent); }
 .fb-marker:focus-visible { outline: none; }
 .fb-marker:focus-visible span { border-color: var(--fb-accent); outline: 2px solid var(--fb-accent); outline-offset: 1px; }
-@media (max-width: 760px) { body.fb-with-markers { padding-right: 40px; } }
+.fb-chooser { position: absolute; z-index: 46; display: grid; overflow: auto; min-width: 180px; max-width: min(320px, calc(100vw - 16px)); padding: 6px; border: 1px solid var(--fb-line); border-radius: 12px; background: var(--fb-surface); box-shadow: var(--fb-shadow); font: 14px/1.35 var(--fb-font); }
+.fb-chooser-head { padding: 4px 8px 6px; font-size: 12.5px; font-weight: 600; color: var(--fb-muted); }
+.fb-chooser button { display: block; width: 100%; min-height: 40px; padding: 8px; border: 0; border-radius: 8px; background: none; color: var(--fb-text); font: inherit; text-align: left; cursor: pointer; }
+.fb-chooser button:hover, .fb-chooser button:focus-visible { background: var(--fb-bg); outline: none; }
+body.fb-markers-room { box-sizing: border-box; padding-right: 40px !important; }
+dialog.fb-markers-room { box-sizing: border-box; padding-right: 40px !important; }
 .fb-linkbox { display: flex; gap: 8px; }
 .fb-linkbox input { flex: 1; font: 13px ui-monospace, monospace; padding: 7px 9px; border: 1px solid var(--fb-line); border-radius: 8px; background: var(--fb-bg); color: var(--fb-text); }
 

@@ -165,7 +165,7 @@ FeedbackTool.register("feedback", function (site) {
   }
   function hideButtons() { if (hoverBtn) hoverBtn.hidden = true; if (selBtn) selBtn.hidden = true; }
   // The tool's own controls, and the site's.
-  const OWN = ".fb-stack, .fb-float, .fb-markers, .fb-bar, .fb-fab, dialog.fb-dialog" + (site.ignore ? `, ${site.ignore}` : "");
+  const OWN = ".fb-stack, .fb-float, .fb-markers, .fb-chooser, .fb-bar, .fb-fab, dialog.fb-dialog" + (site.ignore ? `, ${site.ignore}` : "");
   const ignore = n => !n || n.closest(OWN);
   // With markers on, they take the place of the button that follows the pointer.
   function onOver(e) {
@@ -208,6 +208,7 @@ FeedbackTool.register("feedback", function (site) {
   function scheduleMarkers() { if (T.config.markers && !frame) frame = requestAnimationFrame(placeMarkers); }
   function markersChanged() {
     document.body.classList.toggle("fb-with-markers", active && markersOn);
+    if (!markersOn) document.querySelectorAll(".fb-markers-room").forEach(h => h.classList.remove("fb-markers-room"));
     const h = bar && bar.querySelector(".fb-hint"); if (h) h.textContent = hint();
     scheduleMarkers();
   }
@@ -222,41 +223,113 @@ FeedbackTool.register("feedback", function (site) {
     }
     return scrollers.get(el);
   }
+  // An inline part (a name within a line, say) is marked at the right edge of the block it sits in, not where its
+  // text ends, so the marker doesn't land on the rest of the line.
+  const blocks = new WeakMap();
+  function blockOf(el) {
+    if (!blocks.has(el)) {
+      let b = el;
+      while (b.parentElement && getComputedStyle(b).display.startsWith("inline")) b = b.parentElement;
+      blocks.set(el, b);
+    }
+    return blocks.get(el);
+  }
+  const overlaps = (a, c) => a.left < c.right && c.left < a.right && a.top < c.bottom && c.top < a.bottom;
+  // One marker per row: parts that start within a marker's height of each other share a marker, level with the first
+  // of them, so markers never drift away from their parts or overlap, however densely parts are nested (an exercise,
+  // its paragraph and a list item, say). A marker for several parts asks which one the comment is about.
+  // Each marker goes just right of its row's parts if that spot is free: inside the page or dialog, and clear of other
+  // parts and of the site's own controls (its ignore list, such as a dialog's close button). Otherwise it goes in a
+  // margin that the tool gives the page or dialog (class fb-markers-room, kept while markers show).
+  // A page or dialog whose markers haven't moved keeps them as they are (and any list that is open), so pages that
+  // keep changing (maths still rendering, say) don't rebuild them all the time.
   function placeMarkers() {
     frame = 0;
-    document.querySelectorAll(".fb-markers").forEach(l => l.remove());
-    if (!active || !markersOn) return;
-    const layers = new Map();   // host -> { layer, ox, oy, placed }
+    if (!active || !markersOn) return document.querySelectorAll(".fb-markers").forEach(l => l.remove());
+    const hosts = new Map();   // the page or dialog -> its parts, with their boxes
     for (const el of document.querySelectorAll(TARGETS)) {
       if (ignore(el)) continue;
       const dlg = el.closest("dialog"); if (dlg && !dlg.open) continue;
       const r = el.getBoundingClientRect(); if (!r.width || !r.height) continue;
       const host = dlg || document.body, clip = clipperOf(el, host);
       if (clip) { const v = clip.getBoundingClientRect(); if (r.bottom <= v.top || r.top >= v.bottom) continue; }
-      let L = layers.get(host);
-      if (!L) {
-        const layer = document.createElement("div"); layer.className = "fb-markers"; host.appendChild(layer);
-        const o = layer.getBoundingClientRect(); L = { layer, ox: o.left, oy: o.top, placed: [] }; layers.set(host, L);
-      }
-      // Just right of the part if there's room in the margin (on narrow screens feedback.css makes some), otherwise
-      // inside its top right corner; never where it would overlap the marker above.
-      const room = dlg ? dlg.getBoundingClientRect().right : document.documentElement.clientWidth;
-      const x = r.right + 6 + SIZE + PAD <= room ? r.right + 6 : r.right - SIZE;
-      let y = r.top;
-      for (const p of L.placed) if (Math.abs(p.x - x) < HIT && y > p.y - HIT && y < p.y + HIT) y = p.y + HIT;
-      L.placed.push({ x, y });
-      const key = keyOf(el); if (!labels.has(key)) labels.set(key, labelFor(key));
-      const b = document.createElement("button");
-      b.type = "button"; b.className = "fb-marker"; b.innerHTML = "<span>💬</span>"; b.dataset.key = key;
-      b.title = `Comment on ${labels.get(key)}`; b.setAttribute("aria-label", b.title);
-      b.style.left = `${x - PAD - L.ox}px`; b.style.top = `${y - PAD - L.oy}px`;
-      L.layer.appendChild(b);
+      const block = blockOf(el);
+      if (!hosts.has(host)) hosts.set(host, []);
+      hosts.get(host).push({ el, r, right: block === el ? r.right : block.getBoundingClientRect().right });
     }
+    let again = false;
+    for (const [host, parts] of hosts) {
+      const dlg = host === document.body ? null : host, hr = host.getBoundingClientRect();
+      const room = dlg ? hr.right : document.documentElement.clientWidth, roomy = host.classList.contains("fb-markers-room");
+      const controls = site.ignore ? [...host.querySelectorAll(site.ignore)].filter(c => c.closest("dialog") === dlg)
+        .map(c => c.getBoundingClientRect()).filter(c => c.width && c.height) : [];
+      const boxAt = (x, y) => ({ left: x - PAD, top: y - PAD, right: x - PAD + HIT, bottom: y - PAD + HIT });
+      const rows = [];
+      for (const p of [...parts].sort((a, b) => a.r.top - b.r.top)) {
+        const row = rows[rows.length - 1];
+        if (row && p.r.top < row.top + HIT) row.parts.push(p); else rows.push({ top: p.r.top, parts: [p] });
+      }
+      const related = (q, row) => row.parts.some(p => p === q || q.el.contains(p.el) || p.el.contains(q.el));
+      const margin = Math.min(hr.right, room) - HIT + PAD;   // x of a marker in the margin
+      let layer = [...host.children].find(c => c.classList.contains("fb-markers"));
+      if (!layer) { layer = document.createElement("div"); layer.className = "fb-markers"; host.appendChild(layer); }
+      const o = layer.getBoundingClientRect(), specs = [];
+      for (const row of rows) {
+        let x = Math.max(...row.parts.map(p => p.right)) + 6, y = row.top;
+        const box = boxAt(x, y);
+        const free = x + SIZE + PAD <= room && !controls.some(c => overlaps(box, c)) && !parts.some(q => !related(q, row) && overlaps(box, q.r));
+        if (!free) {
+          if (!roomy) { host.classList.add("fb-markers-room"); again = true; break; }
+          x = margin;
+          // Off any of the site's controls that reach into the margin.
+          for (let i = 0; i < controls.length; i++) if (overlaps(boxAt(x, y), controls[i])) { y = controls[i].bottom + PAD; i = -1; }
+        }
+        specs.push({ keys: row.parts.map(p => keyOf(p.el)), left: Math.round(x - PAD - o.left), top: Math.round(y - PAD - o.top) });
+      }
+      if (again) break;
+      const sig = JSON.stringify(specs);
+      if (layer._sig === sig) continue;
+      layer._sig = sig; layer.textContent = "";
+      for (const { keys, left, top } of specs) {
+        keys.forEach(k => { if (!labels.has(k)) labels.set(k, labelFor(k)); });
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "fb-marker"; b.innerHTML = "<span>💬</span>"; b.dataset.keys = JSON.stringify(keys);
+        b.title = keys.length === 1 ? `Comment on ${labels.get(keys[0])}` : `Comment on one of the ${keys.length} parts here`;
+        b.setAttribute("aria-label", b.title); if (keys.length > 1) b.setAttribute("aria-haspopup", "menu");
+        b.style.left = `${left}px`; b.style.top = `${top}px`;
+        layer.appendChild(b);
+      }
+    }
+    // Markers in pages or dialogs with nothing to mark now (a dialog that has closed) go.
+    document.querySelectorAll(".fb-markers").forEach(l => { if (!hosts.has(l.parentElement)) l.remove(); });
+    // A page or dialog has just been given a margin: place everything again once the layout has followed.
+    if (again) { document.querySelectorAll(".fb-markers").forEach(l => l.remove()); scheduleMarkers(); }
   }
+  // The list a marker for several parts opens: one button per part, in the order they appear. It sits beside the
+  // markers rather than among them, so it stays open while they are placed again (a page still settling, say).
+  function showChooser(marker) {
+    closeChooser();
+    const keys = JSON.parse(marker.dataset.keys), menu = document.createElement("div"), layer = marker.parentElement;
+    menu.className = "fb-chooser"; menu.setAttribute("role", "menu");
+    menu.innerHTML = `<div class="fb-chooser-head">Comment on…</div>` + keys.map(k =>
+      `<button type="button" role="menuitem" data-key="${esc(k)}">${esc(cut(labels.get(k) || labelFor(k), 80))}</button>`).join("");
+    layer.parentElement.appendChild(menu);
+    // To the left of the marker, inside the window and above the feedback bar (scrolling itself if it has to).
+    const floor = (bar ? bar.getBoundingClientRect().top : innerHeight) - 8;
+    menu.style.maxHeight = `${Math.max(120, floor - 8)}px`;
+    const m = marker.getBoundingClientRect(), w = menu.getBoundingClientRect(), o = layer.getBoundingClientRect();
+    const left = Math.max(8, Math.min(m.left - w.width - 4, innerWidth - w.width - 8)), top = Math.max(8, Math.min(m.top, floor - w.height));
+    menu.style.left = `${left - o.left}px`; menu.style.top = `${top - o.top}px`;
+    menu.querySelector("button").focus({ preventScroll: true });
+  }
+  function closeChooser() { document.querySelectorAll(".fb-chooser").forEach(m => m.remove()); }
 
   // ---------- Card actions ----------
   function onClick(e) {
-    const m = e.target.closest(".fb-marker"); if (m) return openComposer(m.dataset.key, null);
+    const m = e.target.closest(".fb-marker");
+    if (m) { const keys = JSON.parse(m.dataset.keys); return keys.length > 1 ? showChooser(m) : (closeChooser(), openComposer(keys[0], null)); }
+    const pick = e.target.closest(".fb-chooser [data-key]"); if (pick) { closeChooser(); return openComposer(pick.dataset.key, null); }
+    if (!e.target.closest(".fb-chooser")) closeChooser();
     const b = e.target.closest("[data-fb]"); if (!b) return;
     const box = b.closest(".fb-card"), id = box && box.dataset.cid;
     if (b.dataset.fb === "cancel") { box.remove(); refresh(); }
@@ -427,7 +500,7 @@ FeedbackTool.register("feedback", function (site) {
     me = { via: who.via, ...(who.user ? { user: who.user } : {}), ...(who.via === "anon" ? { name: who.name || "" } : {}) };
     active = true;
     document.body.classList.add("feedback-mode");
-    // While markers show, the page has the class fb-with-markers (feedback.css gives narrow screens a right margin).
+    // While markers show, the page has the class fb-with-markers.
     if (markersOn) document.body.classList.add("fb-with-markers");
     if (touchQuery) touchQuery.addEventListener("change", e => { markersOn = e.matches; markersChanged(); });
     try {
@@ -461,11 +534,26 @@ FeedbackTool.register("feedback", function (site) {
     document.addEventListener("pointerdown", onPointer, true);
     document.addEventListener("selectionchange", onSelectionChange);
     document.addEventListener("click", onClick);
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeChooser(); });
     addEventListener("scroll", e => {
       if (hoverBtn) hoverBtn.hidden = true; if (selBtn) selBtn.hidden = true; hoverTarget = null;
       if (e.target !== document) scheduleMarkers();   // a panel scrolled: its markers have to move
     }, true);
-    if (T.config.markers) { addEventListener("resize", scheduleMarkers); new ResizeObserver(scheduleMarkers).observe(document.body); }
+    if (T.config.markers) {
+      addEventListener("resize", scheduleMarkers);
+      new ResizeObserver(scheduleMarkers).observe(document.body);
+      // Changes that leave the page's size alone: a dialog opening or getting new contents (a persona's Next, say), a
+      // section or knowl expanding, a picture loading. The tool's own elements are left out, or placing the markers
+      // would set this off again; and a page that keeps changing (an animation) is followed at most every 150ms.
+      const mine = n => { const e = n.nodeType === 1 ? n : n.parentElement; return !!(e && e.closest(OWN)); };
+      let soon = 0;
+      const later = () => { if (!soon) soon = setTimeout(() => { soon = 0; scheduleMarkers(); }, 150); };
+      new MutationObserver(list => {
+        if (list.some(m => !mine(m.target) && (m.type === "attributes" || [...m.addedNodes, ...m.removedNodes].some(n => !mine(n))))) later();
+      }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["open", "hidden"] });
+      document.addEventListener("toggle", later, true);
+      document.addEventListener("load", later, true);
+    }
     showBar();
     refresh();
   }
