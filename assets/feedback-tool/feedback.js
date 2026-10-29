@@ -5,6 +5,9 @@
 // or the forge plug-in) ("[feedback] …"); later sends are added to the same issue. People with an account send
 // through a pre-filled page on the forge;
 // anonymous people send through a web app (the feedbackEndpoint option, tools/apps-script/).
+// With the topics option (a translated book: its content and its translation), each comment says which topic it is
+// about, chosen on its card, and each topic's comments are a thread of their own in that topic's repository: sending
+// makes one issue per topic that has something new.
 FeedbackTool.register("feedback", function (site) {
   const T = FeedbackTool;
   const { esc, clone } = T;
@@ -25,16 +28,27 @@ FeedbackTool.register("feedback", function (site) {
 
   let me = null;            // { via: forge.id, user } or { via: "anon", name }
   let active = false;       // feedback mode on
-  let comments = [];        // this person's comments on this page
-  let thread = null;        // { issue, key?, sent: { id: comment as last sent } }
+  let comments = [];        // this person's comments on this page; with topics, each has about: a topic's id
+  let threads = {};         // topic id ("" without topics) -> { issue, key?, sent: { id: comment as last sent } }
   let reviewOn = false, reviewItems = null; // contributors: the open feedback they picked to see
   const draftKey = () => T.pageStorageKey("fb:", `:${me.via === "anon" ? "anon" : me.user.toLowerCase()}`);
-  const save = () => { try { localStorage.setItem(draftKey(), JSON.stringify({ comments, thread })); } catch (_) {} };
+  const save = () => { try { localStorage.setItem(draftKey(), JSON.stringify({ comments, threads })); } catch (_) {} };
   const load = () => { try { return JSON.parse(localStorage.getItem(draftKey()) || "null"); } catch (_) { return null; } };
 
+  // ---------- Topics: which thread, and which repository, a comment belongs to ----------
+  const TOPICS = T.config.topics || null;
+  const topicOf = g => TOPICS && TOPICS.find(t => t.id === g);
+  const groups = () => TOPICS ? TOPICS.map(t => t.id) : [""];
+  const groupOf = c => TOPICS ? (topicOf(c.about) ? c.about : TOPICS[0].id) : "";
+  const inGroup = g => comments.filter(c => groupOf(c) === g);
+  const repoOf = g => g ? topicOf(g).repository : T.config.repository;
+  const ABOUT_KEY = "fb-about";   // the topic the last comment was about: the next one's to start with
+  const lastAbout = () => { let a = null; try { a = localStorage.getItem(ABOUT_KEY); } catch (_) {} return topicOf(a) ? a : TOPICS[0].id; };
+
   // The latest set of comments in a feedback issue: the last feedback-v1 block written by its author or by the robots.
-  async function latestState(n) {
-    const [iss, coms] = await Promise.all([forge.issue(n), forge.comments(n)]);
+  // repo: the repository it is in, when it isn't the repository option's (the topics option).
+  async function latestState(n, repo) {
+    const [iss, coms] = await Promise.all([repo ? forge.issue(n, repo) : forge.issue(n), repo ? forge.comments(n, repo) : forge.comments(n)]);
     if (!iss) throw new Error(`#${n} not found`);
     const ok = new Set([iss.user, ...(forge.bots || [])].map(x => x.toLowerCase()));
     const texts = [iss.body, ...coms.filter(c => ok.has(c.user.toLowerCase())).map(c => c.body)];
@@ -91,7 +105,11 @@ FeedbackTool.register("feedback", function (site) {
 
   // ---------- Cards ----------
   const snap = c => JSON.stringify([c.target, c.quote || null, c.text]);
-  function stateOf(c) { if (!thread || !thread.sent[c.id]) return "not sent yet"; return snap(thread.sent[c.id]) === snap(c) ? "sent" : "changed, not sent yet"; }
+  function stateOf(c) {
+    const t = threads[groupOf(c)];
+    if (!t || !t.sent[c.id]) return "not sent yet";
+    return snap(t.sent[c.id]) === snap(c) ? "sent" : "changed, not sent yet";
+  }
   // A proposed edit, as described by the site plug-in: deleted, inserted (new text), reordered (number of blocks), or a
   // field with its old and new value.
   function editCard(c) {
@@ -115,7 +133,8 @@ FeedbackTool.register("feedback", function (site) {
   }
   function card(c, own) {
     if (c.change) return editCard(c);
-    const head = own ? `💬 Your comment <span class="fb-state">· ${stateOf(c)}</span>` : `💬 ${esc(c.author)} · <a href="${esc(c.url)}" target="_blank" rel="noopener">#${c.issue}</a>`;
+    const head = own ? `💬 Your comment${TOPICS ? ` <span class="fb-tag fb-tag-about">${esc(topicOf(groupOf(c)).short || topicOf(groupOf(c)).label)}</span>` : ""} <span class="fb-state">· ${stateOf(c)}</span>`
+      : `💬 ${esc(c.author)} · <a href="${esc(c.url)}" target="_blank" rel="noopener">#${c.issue}</a>`;
     return `<div class="fb-card${own ? "" : " fb-other"}" data-cid="${c.id}"><div class="fb-head">${head}</div>
       ${c.quote ? `<blockquote class="fb-quote">“${esc(c.quote.exact)}”</blockquote>` : ""}<p class="fb-text">${esc(c.text)}</p>
       ${own ? `<div class="fb-actions"><button type="button" data-fb="edit">Edit</button><button type="button" data-fb="del">Delete</button></div>` : ""}</div>`;
@@ -130,6 +149,9 @@ FeedbackTool.register("feedback", function (site) {
     updateBar();
     scheduleMarkers();
   }
+  // With topics: what the comment is about, on its card, so each comment can be about a different one.
+  const aboutChoice = g => `<span class="fb-about" role="radiogroup" aria-label="What is this comment about?">${TOPICS.map(t =>
+    `<button type="button" role="radio" data-fb="about" data-about="${esc(t.id)}" aria-checked="${t.id === g}" title="${esc(t.label)}: goes to ${esc(t.repository)}">${esc(t.short || t.label)}</button>`).join("")}</span>`;
   function openComposer(key, quote, id) {
     const el = elFor(key); if (!el) return;
     document.querySelectorAll(".fb-composer").forEach(x => x.remove());
@@ -138,7 +160,7 @@ FeedbackTool.register("feedback", function (site) {
       <div class="fb-head">💬 ${quote || (existing && existing.quote) ? "Comment on the selected words" : `Comment on ${esc(labelFor(key))}`}</div>
       ${(quote || (existing && existing.quote)) ? `<blockquote class="fb-quote">“${esc((quote || existing.quote).exact)}”</blockquote>` : ""}
       <textarea rows="3" placeholder="Your comment…">${existing ? esc(existing.text) : ""}</textarea>
-      <div class="fb-actions"><button type="button" data-fb="cancel">Cancel</button><button type="button" class="primary" data-fb="save">Save comment</button></div></div>`;
+      <div class="fb-actions">${TOPICS ? aboutChoice(existing ? groupOf(existing) : lastAbout()) : ""}<button type="button" data-fb="cancel">Cancel</button><button type="button" class="primary" data-fb="save">Save comment</button></div></div>`;
     const cardEl = id && document.querySelector(`.fb-card[data-cid="${id}"]:not(.fb-other)`);
     if (cardEl) cardEl.outerHTML = html; else stackFor(el).insertAdjacentHTML("beforeend", html);
     const comp = document.querySelector(".fb-composer");
@@ -333,30 +355,37 @@ FeedbackTool.register("feedback", function (site) {
     if (!e.target.closest(".fb-chooser")) closeChooser();
     const b = e.target.closest("[data-fb]"); if (!b) return;
     const box = b.closest(".fb-card"), id = box && box.dataset.cid;
+    if (b.dataset.fb === "about") { box.querySelectorAll("[data-fb=about]").forEach(x => x.setAttribute("aria-checked", String(x === b))); return; }
     if (b.dataset.fb === "cancel") { box.remove(); refresh(); }
     if (b.dataset.fb === "edit") { const c = comments.find(x => x.id === id); if (c) openComposer(c.target, null, id); }
     if (b.dataset.fb === "del") { if (confirm("Delete this comment?")) { comments = comments.filter(x => x.id !== id); save(); refresh(); } }
     if (b.dataset.fb === "save") {
       const text = box.querySelector("textarea").value.trim();
       if (!text) return box.querySelector("textarea").focus();
+      const picked = box.querySelector('[data-fb=about][aria-checked="true"]'), about = picked ? { about: picked.dataset.about } : {};
+      if (picked) try { localStorage.setItem(ABOUT_KEY, picked.dataset.about); } catch (_) {}
       const existing = id && comments.find(x => x.id === id);
-      if (existing) existing.text = text;
-      else { const key = box.dataset.key; comments.push({ id: newId(), target: key, where: labelFor(key), ...(box._quote ? { quote: box._quote } : {}), text }); }
+      if (existing) Object.assign(existing, { text }, about);
+      else { const key = box.dataset.key; comments.push({ id: newId(), target: key, where: labelFor(key), ...(box._quote ? { quote: box._quote } : {}), text, ...about }); }
       save(); refresh();
     }
   }
 
   // ---------- Bar ----------
   let bar;
-  function changes() {
-    const sent = thread ? thread.sent : {}, now = new Set(comments.map(c => c.id));
+  // What has changed in topic g's thread since it was last sent. A comment moved to another topic counts as
+  // withdrawn from this one and added to that one.
+  function changes(g) {
+    const t = threads[g], sent = t ? t.sent : {}, mine = inGroup(g), now = new Set(mine.map(c => c.id));
     return {
-      added: comments.filter(c => !sent[c.id]),
-      changed: comments.filter(c => sent[c.id] && snap(sent[c.id]) !== snap(c)),
+      added: mine.filter(c => !sent[c.id]),
+      changed: mine.filter(c => sent[c.id] && snap(sent[c.id]) !== snap(c)),
       withdrawn: Object.values(sent).filter(c => !now.has(c.id)),
     };
   }
-  const pending = () => { const ch = changes(); return ch.added.length + ch.changed.length + ch.withdrawn.length; };
+  const pendingIn = g => { const ch = changes(g); return ch.added.length + ch.changed.length + ch.withdrawn.length; };
+  const pending = () => groups().reduce((n, g) => n + pendingIn(g), 0);
+  const toSend = () => groups().filter(g => pendingIn(g));
   const hint = () => !markersOn ? "Point at any part of the page and click 💬, or select some words."
     : `${matchMedia("(any-pointer: coarse)").matches ? "Tap" : "Click"} 💬 beside any part of the page, or select some words.`;
   const whoLabel = () => me.via === "anon" ? (me.name ? `${esc(me.name)} (anonymous)` : "anonymous") : `@${esc(me.user)}`;
@@ -365,8 +394,8 @@ FeedbackTool.register("feedback", function (site) {
     const n = pending(), total = comments.length;
     bar.querySelector(".fb-count").textContent = !total && !n ? "No comments yet" : `${total} comment${total === 1 ? "" : "s"}${n ? ` · ${n} not sent` : " · all sent"}`;
     bar.querySelector("[data-fbbar=send]").disabled = !n;
-    const t = bar.querySelector(".fb-thread");
-    t.innerHTML = thread ? `In <a href="${esc(T.issueURL(thread.issue))}" target="_blank" rel="noopener">#${thread.issue}</a>${thread.key ? ` · <button type="button" class="fb-link" data-fbbar="link">copy private link</button>` : ""}` : "";
+    bar.querySelector(".fb-thread").innerHTML = groups().filter(g => threads[g]).map(g => { const t = threads[g];
+      return `${TOPICS ? `${esc(topicOf(g).short || topicOf(g).label)}: ` : "In "}<a href="${esc(T.issueURL(t.issue, repoOf(g)))}" target="_blank" rel="noopener">#${t.issue}</a>${t.key ? ` · <button type="button" class="fb-link" data-fbbar="link" data-g="${esc(g)}">copy private link</button>` : ""}`; }).join(" · ");
     if (othersOn) {
       const n = reviewOn ? shown.size : 0, o = bar.querySelector("[data-fbbar=others]");
       o.textContent = n ? `Others' feedback (${n})` : "Others' feedback"; o.setAttribute("aria-pressed", n > 0);
@@ -390,39 +419,48 @@ FeedbackTool.register("feedback", function (site) {
       if (b.dataset.fbbar === "send") review();
       if (b.dataset.fbbar === "stop") { if (!pending() || confirm("Close feedback? Comments you haven't sent stay saved in this browser.")) location.reload(); }
       if (b.dataset.fbbar === "signout") T.signOut();
-      if (b.dataset.fbbar === "link") copyLink(b);
+      if (b.dataset.fbbar === "link") copyLink(b, b.dataset.g || "");
     });
     updateBar();
   }
-  const privateLink = () => `${location.origin}${location.pathname}#fb=${thread.issue}-${thread.key}`;
-  function copyLink(btn) {
-    try { navigator.clipboard.writeText(privateLink()); btn.textContent = "link copied"; setTimeout(() => { btn.textContent = "copy private link"; }, 2000); }
-    catch (_) { prompt("Your private link:", privateLink()); }
+  // A private link continues one thread: #fb=<issue>-<key>, or #fb=<topic>.<issue>-<key> with topics.
+  const privateLink = g => `${location.origin}${location.pathname}#fb=${g ? `${g}.` : ""}${threads[g].issue}-${threads[g].key}`;
+  function copyLink(btn, g) {
+    try { navigator.clipboard.writeText(privateLink(g)); btn.textContent = "link copied"; setTimeout(() => { btn.textContent = "copy private link"; }, 2000); }
+    catch (_) { prompt("Your private link:", privateLink(g)); }
   }
 
   // ---------- Review and send ----------
-  function bodyFor(note, payload64) {
-    const pageTitle = site.pageTitle();
-    const ch = changes();
+  function bodyFor(g, note, payload64) {
+    const pageTitle = site.pageTitle(), thread = threads[g], topic = topicOf(g);
+    const ch = changes(g);
     const item = (c, i) => `${i + 1}. **On ${c.where}**\n${c.quote ? `   > ${c.quote.exact}\n\n` : ""}   ${c.text.replace(/\n/g, "\n   ")}`;
-    const parts = [thread ? `**More feedback for #${thread.issue}** (${pageTitle})` : `**Feedback on ${pageTitle}**`,
+    const parts = [thread ? `**More feedback for #${thread.issue}** (${pageTitle})` : `**Feedback on ${pageTitle}**${topic ? ` · ${topic.short || topic.label}` : ""}`,
       `From: ${me.via === "anon" ? (me.name ? `${me.name} (anonymous)` : "anonymous") : `@${me.user}`}`];
     if (ch.added.length) parts.push(`**New**\n\n${ch.added.map(item).join("\n\n")}`);
     if (ch.changed.length) parts.push(`**Changed**\n\n${ch.changed.map(item).join("\n\n")}`);
     if (ch.withdrawn.length) parts.push(`**Withdrawn**\n\n${ch.withdrawn.map((c, i) => `${i + 1}. ~~On ${c.where}: ${cut(c.text, 80)}~~`).join("\n")}`);
     if (note) parts.push(`**Note**\n\n${note}`);
+    if (topic && topic.notes) { const more = topic.notes(inGroup(g)); if (more) parts.push(more); }
     parts.push(T.pageLine(), `<details><summary>Technical details for the robot (please do not edit)</summary>\n\n\`\`\`feedback-v1\n${payload64}\n\`\`\`\n</details>`);
     return { pageTitle, body: parts.join("\n\n") + "\n" };
   }
   function review() {
-    const ch = changes(), dlg = document.createElement("dialog");
+    const dlg = document.createElement("dialog"), gs = toSend();
     dlg.className = "fb-dialog";
     const li = (c, tag) => `<li><span><b>${tag}</b> on ${esc(c.where)}: “${esc(cut(c.text, 80))}”</span></li>`;
+    // With topics, each thread is listed under where it goes.
+    const section = g => { const ch = changes(g), t = threads[g], topic = topicOf(g);
+      return `${topic ? `<h3 class="fb-group">${esc(topic.short || topic.label)} <small>→ ${esc(topic.repository)}</small></h3>` : ""}
+      ${t ? `<p class="fb-explain">This will be added to your earlier feedback, <a href="${esc(T.issueURL(t.issue, repoOf(g)))}" target="_blank" rel="noopener">#${t.issue}</a>.</p>` : ""}
+      <ul class="fb-items">${[...ch.added.map(c => li(c, "New")), ...ch.changed.map(c => li(c, "Changed")), ...ch.withdrawn.map(c => li(c, "Withdrawn"))].join("")}</ul>`; };
+    const two = gs.length > 1;
     dlg.innerHTML = `<h2>Send your feedback</h2>
-      ${thread ? `<p class="fb-explain">This will be added to your earlier feedback, <a href="${esc(T.issueURL(thread.issue))}" target="_blank" rel="noopener">#${thread.issue}</a>.</p>` : ""}
-      <ul class="fb-items">${[...ch.added.map(c => li(c, "New")), ...ch.changed.map(c => li(c, "Changed")), ...ch.withdrawn.map(c => li(c, "Withdrawn"))].join("")}</ul>
-      <label class="fb-field">Anything else? <span>(optional)</span><textarea rows="2"></textarea></label>
-      <p class="fb-explain">${me.via === "anon" ? "Your feedback is sent straight away, and you get a private link to come back to it." : `Sending opens ${esc(forge.name)} in a new tab with your feedback filled in. Click <b>Create</b> there.`} Feedback is public on ${esc(forge.name)}.</p>
+      ${gs.map(section).join("")}
+      <label class="fb-field">Anything else? <span>(optional${two ? ", added to both" : ""})</span><textarea rows="2"></textarea></label>
+      <p class="fb-explain">${me.via === "anon" ? `Your feedback is sent straight away${two ? " to both repositories, and you get a private link to each" : ", and you get a private link"} to come back to it.`
+        : two ? `Sending opens ${esc(forge.name)} in a new tab for the first repository, then asks you to open the second. Click <b>Create</b> in each.`
+        : `Sending opens ${esc(forge.name)} in a new tab with your feedback filled in. Click <b>Create</b> there.`} Feedback is public on ${esc(forge.name)}.</p>
       <div class="fb-buttons"><button type="button" data-r="back">Keep going</button><button type="button" class="primary" data-r="send">Send</button></div>`;
     document.body.appendChild(dlg); dlg.showModal();
     dlg.addEventListener("close", () => dlg.remove());
@@ -432,75 +470,103 @@ FeedbackTool.register("feedback", function (site) {
       if (r.dataset.r === "send") (me.via === "anon" ? sendAnon : sendGitHub)(dlg, dlg.querySelector("textarea").value.trim());
     });
   }
-  const payloadNow = () => ({ version: 1, kind: "feedback", page: T.pagePath(), from: me.via === "anon" ? { via: "anon", name: me.name || "" } : { via: forge.id, user: me.user },
-    ...(thread ? { follows: thread.issue } : {}), comments: comments.map(clone) });
-  const markSent = () => { thread.sent = Object.fromEntries(comments.map(c => [c.id, clone(c)])); save(); refresh(); };
+  // The thread's comments, without about: the whole thread is about its topic, which payload says.
+  const strip = ({ about, ...c }) => clone(c);
+  const payloadNow = g => ({ version: 1, kind: "feedback", page: T.pagePath(), from: me.via === "anon" ? { via: "anon", name: me.name || "" } : { via: forge.id, user: me.user },
+    ...(threads[g] ? { follows: threads[g].issue } : {}), ...(topicOf(g) && topicOf(g).payload), comments: inGroup(g).map(strip) });
+  const markSent = g => { threads[g].sent = Object.fromEntries(inGroup(g).map(c => [c.id, clone(c)])); save(); refresh(); };
+  async function issueFor(g, note) {
+    const { pageTitle, body } = bodyFor(g, note, await T.compress(payloadNow(g)));
+    const mine = inGroup(g), first = mine[0] ? cut(mine[0].text, 60) : "comments", t = threads[g];
+    return { title: t ? `[feedback] ${pageTitle}: update to #${t.issue}` : `[feedback] ${pageTitle}: ${first}`, body };
+  }
+  const where = g => topicOf(g) ? ` (${esc(topicOf(g).short || topicOf(g).label).toLowerCase()})` : "";
 
+  // Anonymous: one request to the web app per thread with something new, each naming its repository.
   async function sendAnon(dlg, note) {
     dlg.innerHTML = `<h2>Sending…</h2>`;
-    const { pageTitle, body } = bodyFor(note, await T.compress(payloadNow()));
-    const first = comments[0] ? cut(comments[0].text, 60) : "comments";
-    const title = thread ? `[feedback] ${pageTitle}: update to #${thread.issue}` : `[feedback] ${pageTitle}: ${first}`;
-    let res = null;
-    try { res = await (await fetch(T.config.feedbackEndpoint, { method: "POST", body: JSON.stringify({ title, body, ...(thread ? { follows: thread.issue, key: thread.key } : {}), website: "" }) })).json(); } catch (_) {}
-    if (!res || !res.issue) {
-      dlg.innerHTML = `<h2>That didn't work</h2><p>Your feedback couldn't be sent${res && res.error ? ` (${esc(res.error)})` : ""}. It's still saved in this browser; please try again later.</p><div class="fb-buttons"><button type="button" class="primary" data-r="back">OK</button></div>`;
+    const sent = [], failed = [];
+    for (const g of toSend()) {
+      const { title, body } = await issueFor(g, note), t = threads[g];
+      let res = null;
+      try { res = await (await fetch(T.config.feedbackEndpoint, { method: "POST", body: JSON.stringify({ repository: repoOf(g), title, body, ...(t ? { follows: t.issue, key: t.key } : {}), website: "" }) })).json(); } catch (_) {}
+      if (!res || !res.issue) { failed.push([g, res && res.error]); continue; }
+      if (!threads[g]) threads[g] = { issue: res.issue, key: res.key, sent: {} };
+      markSent(g); sent.push(g);
+    }
+    if (!sent.length) {
+      const why = failed.map(([, e]) => e).filter(Boolean)[0];
+      dlg.innerHTML = `<h2>That didn't work</h2><p>Your feedback couldn't be sent${why ? ` (${esc(why)})` : ""}. It's still saved in this browser; please try again later.</p><div class="fb-buttons"><button type="button" class="primary" data-r="back">OK</button></div>`;
       return;
     }
-    if (!thread) thread = { issue: res.issue, key: res.key, sent: {} };
-    markSent();
+    const issue = g => `<a href="${esc(T.issueURL(threads[g].issue, repoOf(g)))}" target="_blank" rel="noopener">#${threads[g].issue}</a>${where(g)}`;
+    const links = sent.filter(g => threads[g].key);
     dlg.innerHTML = `<h2>Thank you!</h2>
-      <p>Your feedback is <a href="${esc(T.issueURL(thread.issue))}" target="_blank" rel="noopener">#${thread.issue}</a>. If you add more comments, they'll be added to it.</p>
-      <p><b>Your private link</b>: use it to come back to your feedback from any device. Keep it to yourself; anyone with it can add to your feedback.</p>
-      <p class="fb-linkbox"><input type="text" readonly value="${esc(privateLink())}"><button type="button" data-r="copy">Copy</button></p>
+      <p>Your feedback is ${sent.map(issue).join(" and ")}. If you add more comments, they'll be added to ${sent.length > 1 ? "them" : "it"}.</p>
+      ${failed.length ? `<p class="fb-gate-msg">The rest${failed.map(([g]) => where(g)).join("")} couldn't be sent just now. It's still saved in this browser; please send again later.</p>` : ""}
+      ${links.length ? `<p><b>Your private link${links.length > 1 ? "s" : ""}</b>: use ${links.length > 1 ? "them" : "it"} to come back to your feedback from any device. Keep ${links.length > 1 ? "them to yourself; anyone with one can add to that feedback" : "it to yourself; anyone with it can add to your feedback"}.</p>
+      ${links.map(g => `<p class="fb-linkbox">${TOPICS ? `<span>${esc(topicOf(g).short || topicOf(g).label)}</span>` : ""}<input type="text" readonly value="${esc(privateLink(g))}"><button type="button" data-r="copy" data-g="${esc(g)}">Copy</button></p>`).join("")}` : ""}
       <div class="fb-buttons"><button type="button" data-r="back">Keep going</button><button type="button" class="primary" data-r="done">I'm finished</button></div>`;
     dlg.addEventListener("click", e => {
       const r = e.target.closest("[data-r]"); if (!r) return;
-      if (r.dataset.r === "copy") copyLink(r);
+      if (r.dataset.r === "copy") copyLink(r, r.dataset.g || "");
       if (r.dataset.r === "done") location.reload();
     });
   }
 
+  // With an account: a pre-filled new-issue page per thread with something new. A browser lets a click open one new
+  // tab, so the first opens straight away and each next one waits for a click of its own.
   async function sendGitHub(dlg, note) {
-    const { pageTitle, body } = bodyFor(note, await T.compress(payloadNow()));
-    const first = comments[0] ? cut(comments[0].text, 60) : "comments";
-    const title = thread ? `[feedback] ${pageTitle}: update to #${thread.issue}` : `[feedback] ${pageTitle}: ${first}`;
-    const { url, pasted } = T.newIssueLink(title, body, "Paste your feedback here (Ctrl+V or ⌘V), replacing this line.");
+    const gs = toSend();
+    const pages = await Promise.all(gs.map(async g => ({ g, ...(await issueFor(g, note)) })));
     const sentAt = Date.now();
-    window.open(url, "_blank", "noopener");
-    dlg.innerHTML = `<h2>Almost done</h2>
-      <p>${esc(forge.name)} has opened in a new tab.${pasted ? " Your feedback was too long to fill in automatically, so it has been <b>copied</b>: paste it into the description box." : ""} Click <b>Create</b> there to send it.</p>
-      <p class="fb-explain">If ${esc(forge.name)} showed an error while you were signing in, <button type="button" class="fb-link" data-r="again">open it again</button>.</p>
-      ${pasted ? `<details><summary>If pasting doesn't work, copy this text</summary><textarea rows="6" readonly>${esc(body)}</textarea></details>` : ""}
-      <div class="fb-buttons fb-buttons-wrap"><button type="button" data-r="back">Not sent yet</button><button type="button" data-r="sentkeep">I've sent it: keep going</button><button type="button" class="primary" data-r="sentdone">I've sent it: I'm finished</button></div>`;
+    let opened = 0;
+    // Each page's link is made as it opens: feedback too long for a link is copied then, so the clipboard holds the
+    // feedback of the page just opened.
+    const openNext = () => {
+      const p = pages[opened++];
+      Object.assign(p, T.newIssueLink(p.title, p.body, "Paste your feedback here (Ctrl+V or ⌘V), replacing this line.", TOPICS ? repoOf(p.g) : undefined));
+      window.open(p.url, "_blank", "noopener"); show();
+    };
+    const show = () => {
+      const p = pages[opened - 1], next = pages[opened], many = pages.length > 1;
+      dlg.innerHTML = `<h2>${next ? `Opened ${opened} of ${pages.length}` : "Almost done"}</h2>
+        <p>${esc(forge.name)} has opened in a new tab${many ? ` for your feedback${where(p.g)}, on ${esc(repoOf(p.g))}` : ""}.${p.pasted ? ` ${many ? "It" : "Your feedback"} was too long to fill in automatically, so it has been <b>copied</b>: paste it into the description box.` : ""} Click <b>Create</b> there to send it.</p>
+        ${next ? `<div class="fb-buttons"><button type="button" class="primary" data-r="next">Now open the ${["second", "third"][opened - 1] || "next"}${where(next.g)}, on ${esc(repoOf(next.g))}</button></div>` : ""}
+        <p class="fb-explain">If ${esc(forge.name)} showed an error while you were signing in, <button type="button" class="fb-link" data-r="again">open it again</button>.</p>
+        ${p.pasted ? `<details><summary>If pasting doesn't work, copy this text</summary><textarea rows="6" readonly>${esc(p.body)}</textarea></details>` : ""}
+        ${next ? "" : `<div class="fb-buttons fb-buttons-wrap"><button type="button" data-r="back">Not sent yet</button><button type="button" data-r="sentkeep">I've sent ${many ? "them" : "it"}: keep going</button><button type="button" class="primary" data-r="sentdone">I've sent ${many ? "them" : "it"}: I'm finished</button></div>`}`;
+    };
+    openNext();
     dlg.addEventListener("click", async e => {
       const r = e.target.closest("[data-r]"); if (!r) return;
-      if (r.dataset.r === "again") return void window.open(url, "_blank", "noopener");
+      if (r.dataset.r === "again") return void window.open(pages[opened - 1].url, "_blank", "noopener");
+      if (r.dataset.r === "next") return openNext();
       if (r.dataset.r !== "sentkeep" && r.dataset.r !== "sentdone") return;
-      // A forge that can't look up the new issue: what was sent is on the forge now, and comments added from here on
-      // are sent as new feedback.
-      if (!thread && !forge.issuesBy) {
-        comments = []; save(); refresh();
-        if (r.dataset.r === "sentdone") location.reload(); else (dlg.close(), dlg.remove());
-        return;
+      for (const { g } of pages) {
+        // A forge that can't look up the new issue (or several threads at once): what was sent is on the forge now,
+        // and comments added from here on are sent as new feedback.
+        if (!threads[g] && (!forge.issuesBy || TOPICS)) { comments = comments.filter(c => groupOf(c) !== g); save(); refresh(); continue; }
+        if (!threads[g]) {
+          dlg.innerHTML = `<h2>Finding your feedback on ${esc(forge.name)}…</h2><p class="fb-explain">This takes a few seconds.</p>`;
+          const n = await T.findIssue({ user: me.user, prefix: "[feedback]", since: sentAt });
+          if (!n) { dlg.innerHTML = `<h2>Couldn't find it yet</h2><p>If you did click Create, your next comments will be sent as separate feedback, which works too.</p><div class="fb-buttons"><button type="button" class="primary" data-r="back">OK</button></div>`; return; }
+          threads[g] = { issue: n, sent: {} };
+        }
+        markSent(g);
       }
-      if (!thread) {
-        dlg.innerHTML = `<h2>Finding your feedback on ${esc(forge.name)}…</h2><p class="fb-explain">This takes a few seconds.</p>`;
-        const n = await T.findIssue({ user: me.user, prefix: "[feedback]", since: sentAt });
-        if (!n) { dlg.innerHTML = `<h2>Couldn't find it yet</h2><p>If you did click Create, your next comments will be sent as separate feedback, which works too.</p><div class="fb-buttons"><button type="button" class="primary" data-r="back">OK</button></div>`; return; }
-        thread = { issue: n, sent: {} };
-      }
-      markSent();
       if (r.dataset.r === "sentdone") location.reload(); else (dlg.close(), dlg.remove());
     });
   }
 
   // ---------- Start ----------
-  async function adopt(n, key) {
-    const { state, issue } = await latestState(n);
+  // Continue thread n of topic g: its comments as last sent replace that topic's comments here.
+  async function adopt(n, key, g = "") {
+    const { state, issue } = await latestState(n, TOPICS ? repoOf(g) : undefined);
     if (issue.state === "closed") return false;
-    comments = state ? state.comments : [];
-    thread = { issue: n, ...(key ? { key } : {}), sent: Object.fromEntries(comments.map(c => [c.id, clone(c)])) };
+    const theirs = (state ? state.comments : []).map(c => TOPICS ? { ...c, about: g } : c);
+    comments = [...comments.filter(c => groupOf(c) !== g), ...theirs];
+    threads[g] = { issue: n, ...(key ? { key } : {}), sent: Object.fromEntries(theirs.map(c => [c.id, clone(c)])) };
     if (state && state.from && state.from.via === "anon" && state.from.name && !me.name) me.name = state.from.name;
     save();
     return true;
@@ -513,24 +579,27 @@ FeedbackTool.register("feedback", function (site) {
     // While markers show, the page has the class fb-with-markers.
     if (markersOn) document.body.classList.add("fb-with-markers");
     if (touchQuery) touchQuery.addEventListener("change", e => { markersOn = e.matches; markersChanged(); });
+    if (TOPICS) await Promise.all(TOPICS.map(t => t.prepare ? t.prepare() : null));
     try {
+      const d = load();
+      if (d) { comments = d.comments || []; threads = d.threads || (d.thread ? { "": d.thread } : {}); }
       if (who.recover) {
         // Private link: continue that anonymous feedback here.
-        if (!(await adopt(who.recover.issue, who.recover.key))) alert(`Feedback #${who.recover.issue} has been closed by the team. You can start new feedback.`);
+        const g = TOPICS ? (topicOf(who.recover.topic) ? who.recover.topic : TOPICS[0].id) : "";
+        if (!(await adopt(who.recover.issue, who.recover.key, g))) alert(`Feedback #${who.recover.issue} has been closed by the team. You can start new feedback.`);
         history.replaceState(null, "", location.pathname + location.search);
       } else {
-        const d = load();
-        if (d) { comments = d.comments || []; thread = d.thread || null; }
-        if (thread) {
-          // Drop the link once the team has closed that feedback; keep anything not yet sent.
-          const st = await forge.issue(thread.issue).catch(() => null);
-          if (st && st.state === "closed") { comments = comments.filter(c => !thread.sent[c.id]); thread = null; save(); }
-        } else if (me.via !== "anon" && forge.issuesBy) {
+        // Drop a thread once the team has closed it; keep anything not yet sent.
+        for (const g of Object.keys(threads)) {
+          const t = threads[g], st = await forge.issue(t.issue, TOPICS ? repoOf(g) : undefined).catch(() => null);
+          if (st && st.state === "closed") { comments = comments.filter(c => !(groupOf(c) === g && t.sent[c.id])); delete threads[g]; save(); }
+        }
+        if (!TOPICS && !threads[""] && me.via !== "anon" && forge.issuesBy) {
           // Offer to continue earlier open feedback on this page.
           const list = await forge.issuesBy(me.user).catch(() => []);
           const prev = list.find(x => /^\[feedback\]/.test(x.title) && !/update to #\d+/.test(x.title) && T.onThisPage(x.body));
           if (prev && confirm(`You left feedback on this page before (#${prev.number}). Continue with it?`)) {
-            const mine = comments.filter(c => !(thread && thread.sent[c.id]));
+            const mine = comments.slice();
             await adopt(prev.number);
             comments.push(...mine.filter(c => !comments.some(x => x.id === c.id))); save();
           }
@@ -576,19 +645,21 @@ FeedbackTool.register("feedback", function (site) {
   const states = {};        // picked key -> its cards, once fetched
   async function listFeedback() {
     const items = await forge.openIssues("[feedback]");
-    // In feedback mode, the person's own thread is left out: their comments are already on the page.
-    const own = active && thread ? thread.issue : null;
-    return items.filter(it => !/update to #\d+/.test(it.title) && it.number !== own && T.onThisPage(it.body)).map(it => ({
-      key: `fb-${it.number}`, kind: "feedback", number: it.number, url: it.url, updated: it.updated,
+    // In feedback mode, the person's own threads are left out: their comments are already on the page.
+    // With the topics option, issues come from several repositories, so an issue is its repo and number.
+    const id = (repo, n) => `${String(repo).toLowerCase()}#${n}`;
+    const own = new Set(active ? Object.entries(threads).map(([g, t]) => id(TOPICS ? repoOf(g) : T.config.repository, t.issue)) : []);
+    return items.filter(it => !/update to #\d+/.test(it.title) && !own.has(id(it.repo || T.config.repository, it.number)) && T.onThisPage(it.body)).map(it => ({
+      key: `fb-${it.repo ? `${it.repo}#` : ""}${it.number}`, kind: "feedback", number: it.number, repo: it.repo, url: it.url, updated: it.updated,
       title: it.title.replace(/^\[feedback\]\s*/, "").replace(/^[^:]*:\s*/, ""),
       author: ((it.body || "").match(/^From: (.+)$/m) || [])[1] || `@${it.user}`,
     }));
   }
   const listEdits = () => site.proposedEdits ? site.proposedEdits.list() : Promise.resolve([]);
   async function feedbackCards(it) {
-    const { state } = await latestState(it.number);
+    const { state } = await latestState(it.number, it.repo);
     const author = !state ? it.author : state.from.via === "anon" ? (state.from.name ? `${state.from.name} (anonymous)` : "anonymous") : `@${state.from.user}`;
-    return state ? state.comments.map(c => ({ ...c, id: `${it.number}-${c.id}`, issue: it.number, url: it.url, author })) : [];
+    return state ? state.comments.map(c => ({ ...c, id: `${it.repo ? `${it.repo}#` : ""}${it.number}-${c.id}`, issue: it.number, url: it.url, author })) : [];
   }
   async function cardsFor(it) {
     if (!states[it.key]) states[it.key] = await (it.kind === "edit" ? site.proposedEdits.cards(it) : feedbackCards(it));
@@ -624,7 +695,7 @@ FeedbackTool.register("feedback", function (site) {
           <div class="fb-pick-tools"><input type="search" placeholder="${edits ? "Filter by name, words, “feedback” or “edit”" : "Filter by name or words"}" aria-label="Filter"><button type="button" data-p="all">Select all listed</button><button type="button" data-p="none">Clear</button></div>
           <ul class="fb-items fb-pick-list">${list.map(it => { const tag = it.kind === "edit" ? "✏️ Proposed edit" : "💬 Feedback"; return `<li data-q="${esc((tag + " " + it.author + " " + it.title).toLowerCase())}"><label>
             <input type="checkbox" value="${it.key}"${shown.has(it.key) ? " checked" : ""}>
-            <span><span class="fb-tag fb-tag-${it.kind}">${tag}</span> <b>${esc(it.author)}</b> · ${esc(cut(it.title, 90))}<br><small>${day(it.updated)} · <a href="${esc(it.url)}" target="_blank" rel="noopener">#${it.number}</a></small></span></label></li>`; }).join("")}</ul>
+            <span><span class="fb-tag fb-tag-${it.kind}">${tag}</span> <b>${esc(it.author)}</b> · ${esc(cut(it.title, 90))}<br><small>${day(it.updated)} · <a href="${esc(it.url)}" target="_blank" rel="noopener">${T.config.topics && it.repo ? esc(it.repo) : ""}#${it.number}</a></small></span></label></li>`; }).join("")}</ul>
           <div class="fb-buttons"><button type="button" data-p="close">Cancel</button><button type="button" class="primary" data-p="show"></button></div>`;
         const boxes = () => [...dlg.querySelectorAll(".fb-pick-list input")];
         const count = () => { const n = boxes().filter(b => b.checked).length; dlg.querySelector("[data-p=show]").textContent = n ? `Show ${n}` : "Show none"; };

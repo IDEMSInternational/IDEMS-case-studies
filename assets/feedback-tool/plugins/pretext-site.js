@@ -61,10 +61,12 @@
   async function listEdits() {
     if (!T.forge.pulls) return [];
     const onPage = pr => (pr.edits || []).some(e => elFor(e.svc_id)) || T.onThisPage(pr.body);
+    // A pull request may name its repository (repo), when the forge lists them from several: then it is that and its
+    // number.
     return (await T.forge.pulls()).filter(onPage).map(pr => ({
-      key: `pr-${pr.number}`, kind: "edit", number: pr.number, url: pr.url, updated: pr.updated,
-      title: pr.title.replace(/^\[edit\]\s*/, "").replace(/^[^:]*:\s*/, ""), author: `@${pr.user}`,
-      cards: (pr.edits || []).map((e, i) => ({ id: `pr${pr.number}-${i}`, target: e.svc_id, issue: pr.number, url: pr.url, author: `@${pr.user}`,
+      key: `pr-${pr.repo ? `${pr.repo}#` : ""}${pr.number}`, kind: "edit", number: pr.number, repo: pr.repo, url: pr.url, updated: pr.updated,
+      title: pr.title.replace(/^\[(?:translation-)?edit\]\s*/, "").replace(/^[^:]*:\s*/, ""), author: `@${pr.user}`,
+      cards: (pr.edits || []).map((e, i) => ({ id: `pr${pr.repo ? `${pr.repo}#` : ""}${pr.number}-${i}`, target: e.svc_id, issue: pr.number, url: pr.url, author: `@${pr.user}`,
         change: { field: "source", old: e.old_xml, new: e.new_xml } })),
     }));
   }

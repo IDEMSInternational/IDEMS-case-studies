@@ -93,4 +93,12 @@ dialog.fb-markers-room { box-sizing: border-box; padding-right: 40px !important;
 .fb-new { background: #3b82f614; border-radius: 6px; padding: 4px 8px; }
 .fb-was { margin-top: 6px; font-size: 13.5px; color: var(--fb-muted); }
 .fb-was summary { cursor: pointer; }
+
+/* ---------- Topics (the topics option): what each comment is about, and review grouped by where each goes ---------- */
+.fb-about { display: inline-flex; gap: 2px; border: 1px solid var(--fb-line); border-radius: 8px; padding: 2px; margin-right: auto; }
+.fb-actions .fb-about button { font-size: 12.5px; padding: 3px 10px; border: none; border-radius: 6px; background: none; color: var(--fb-muted); cursor: pointer; }
+.fb-actions .fb-about button[aria-checked="true"] { background: var(--fb-bg); color: var(--fb-text); font-weight: 600; box-shadow: 0 0 0 1px var(--fb-line); }
+.fb-tag-about { background: #ede9fe; color: #5b21b6; font-weight: 500; }
+.fb-dialog h3.fb-group { font-size: 15px; margin: 14px 0 6px; }
+.fb-dialog h3.fb-group small { font-weight: 400; color: var(--fb-muted); }
 @media print { .fb-float, .fb-stack, .fb-markers { display: none; } }

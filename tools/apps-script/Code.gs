@@ -1,9 +1,14 @@
 // Google Apps Script web app that turns anonymous feedback from the website into GitHub issues.
 // Setup: see tools/apps-script/README.md. Script property GITHUB_TOKEN must hold a GitHub token that can create
-// issues and comments on the repository: script property GITHUB_REPOSITORY ("owner/name"), or DEFAULT_REPO below.
-// Use one deployment per repository.
+// issues and comments on the repositories it serves, which are:
+//   - GITHUB_REPOSITORIES: "owner/name" of each, comma-separated, for a site whose feedback goes to several (the
+//     tool's topics option, e.g. a translated book's content and its translation);
+//   - otherwise GITHUB_REPOSITORY ("owner/name"), or DEFAULT_REPO below.
+// Use one deployment per site.
 //
-// Request (POST, JSON text): { title, body, follows?, key?, website }
+// Request (POST, JSON text): { repository?, title, body, follows?, key?, website }
+//   - repository: "owner/name", one of those above. Without it, the request is for the only one, and refused if there
+//     are several.
 //   - new feedback: creates an issue labelled "feedback" and returns { issue, key }. The key lets the same person add
 //     to that issue later (it is the secret part of their private link); only its hash is stored here.
 //   - follows + key: adds the body as a comment on that issue and returns { issue }.
@@ -23,7 +28,8 @@ function doPost(e) {
     if (req.body.length > MAX_BODY) return reply({ error: "feedback too long" });
     if (!withinRateLimit()) return reply({ error: "too many submissions just now, please try again in a few minutes" });
     const props = PropertiesService.getScriptProperties();
-    const repo = props.getProperty("GITHUB_REPOSITORY") || DEFAULT_REPO;
+    const repo = chooseRepository(req.repository, repositories(props));
+    if (!repo) return reply({ error: "this site can't send feedback to that repository" });
     const keyName = n => `key:${repo}:${n}`;
 
     if (req.follows) {
@@ -41,6 +47,20 @@ function doPost(e) {
   } catch (err) {
     return reply({ error: "something went wrong" });
   }
+}
+
+// The repositories this web app may open issues on, as they were written.
+function repositories(props) {
+  const list = props.getProperty("GITHUB_REPOSITORIES") || props.getProperty("GITHUB_REPOSITORY") || DEFAULT_REPO;
+  return list.split(",").map(s => s.trim()).filter(Boolean);
+}
+
+// The allowed repository a request names (compared without regard to case), or the only one when it names none;
+// otherwise null.
+function chooseRepository(asked, allowed) {
+  if (asked === undefined || asked === null || asked === "") return allowed.length === 1 ? allowed[0] : null;
+  if (typeof asked !== "string") return null;
+  return allowed.find(r => r.toLowerCase() === asked.trim().toLowerCase()) || null;
 }
 
 function github(method, path, payload) {
