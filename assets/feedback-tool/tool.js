@@ -19,6 +19,12 @@
 //                       editor. Whether their edits are applied is decided when they are submitted.
 //     showOpenFeedback: optional: true adds a button to the feedback bar that shows everyone else's open feedback on
 //                       the page (feedback only: contributors see proposed edits from the editor)
+//     topics:           optional: what feedback can be about, when it goes to different repositories, e.g. a
+//                       translated book's content and its translation. A list of { id, label, short, repository,
+//                       payload?, notes?(comments), prepare?() }. Each comment picks one on its card (short is the
+//                       card's wording for it), and comments are sent to each topic's repository as a thread of their
+//                       own. payload adds fields to that thread's feedback-v1 block; notes gives extra markdown for
+//                       its issue; prepare runs when feedback starts. Needs a forge plug-in with webOf.
 //     markers:          optional: true shows a 💬 beside every part that can be commented on, for touch screens;
 //                       "touch" shows them on any device with a touch screen, and follows changes (a tablet being
 //                       docked, say). Parts that start within 40px of each other share a marker, which asks which one
@@ -44,9 +50,12 @@
 // A forge plug-in ("forge") says where the repository lives and how to read it, in place of GitHub (see github below):
 //   id, name          e.g. "forgejo", "git.idems.international": stored with who someone is, and used in wording
 //   web               URL of the repository's web pages; login, signup: URLs of the forge's pages for those
-//   issue(n)          the issue, as { number, state, title, body, user, url, created, updated }, or null if unknown
-//   comments(n)       its comments, as [{ user, body }]
-//   openIssues(prefix)  open issues whose title starts with prefix, most recently updated first
+//   webOf(repo)       optional: URL of another repository's web pages, for the topics option
+//   issue(n, repo?)   the issue, as { number, state, title, body, user, url, created, updated }, or null if unknown;
+//                     repo, when given, is the "owner/name" it belongs to (default: the repository option)
+//   comments(n, repo?)  its comments, as [{ user, body }]
+//   openIssues(prefix)  open issues whose title starts with prefix, most recently updated first; with topics, those
+//                     of every topic's repository, each with its repo
 //   issuesBy(user)    optional: the open issues a person opened, newest first; without it, a new issue isn't looked for
 //   userExists(name)  optional: whether an account exists (true, false, or null for "can't tell")
 //   bots              optional: accounts whose comments count as the issue author's (e.g. the Action's)
@@ -99,11 +108,13 @@
   }
   const plain = s => String(s ?? "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/[*`]/g, "").replace(/\s+/g, " ").trim();
   const ghJSON = async url => { const r = await fetch(url, { cache: "no-store" }); if (!r.ok) throw new Error(r.status); return r.json(); };
-  const issueURL = n => `${forge.web}/issues/${n}`;
+  // repo, where given: another repository than the repository option's (the topics option).
+  const webOf = repo => repo && forge.webOf ? forge.webOf(repo) : forge.web;
+  const issueURL = (n, repo) => `${webOf(repo)}/issues/${n}`;
   // A link to the forge's "new issue" page, filled in. Text too long for a link is copied instead, and the link
   // carries `placeholder`, asking the person to paste it.
-  function newIssueLink(title, body, placeholder) {
-    const base = `${forge.web}/issues/new`;
+  function newIssueLink(title, body, placeholder, repo) {
+    const base = `${webOf(repo)}/issues/new`;
     let url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`, pasted = false;
     if (url.length > 6000) { pasted = true; try { navigator.clipboard.writeText(body); } catch (_) {} url = `${base}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(placeholder)}`; }
     return { url, pasted };
@@ -153,7 +164,7 @@
   // GitHub, read through its public API.
   const fromGitHub = x => ({ number: x.number, state: x.state, title: x.title, body: x.body, user: x.user.login, url: x.html_url, created: x.created_at, updated: x.updated_at });
   const github = () => ({
-    id: "github", name: "GitHub", web: `https://github.com/${config.repository}`,
+    id: "github", name: "GitHub", web: `https://github.com/${config.repository}`, webOf: repo => `https://github.com/${repo}`,
     login: "https://github.com/login", signup: "https://github.com/signup",
     issue: async n => fromGitHub(await ghJSON(`${apiBase}/issues/${n}`)),
     comments: async n => (await ghJSON(`${apiBase}/issues/${n}/comments?per_page=100`)).map(c => ({ user: c.user.login, body: c.body })),
@@ -207,9 +218,9 @@
   const canEdit = () => !!((config.editors || config.openEditing) && config.editor);
   function gate() {
     return new Promise(async resolve => {
-      // Private link to continue anonymous feedback: #fb=<issue>-<key>
-      const pl = location.hash.match(/^#fb=(\d+)-([0-9a-f]+)$/);
-      if (pl) return resolve({ mode: "feedback", via: "anon", recover: { issue: +pl[1], key: pl[2] } });
+      // Private link to continue anonymous feedback: #fb=<issue>-<key>, or #fb=<topic>.<issue>-<key> with topics
+      const pl = location.hash.match(/^#fb=(?:([\w-]+)\.)?(\d+)-([0-9a-f]+)$/);
+      if (pl) return resolve({ mode: "feedback", via: "anon", recover: { issue: +pl[2], key: pl[3], ...(pl[1] ? { topic: pl[1] } : {}) } });
       // If the list of contributors can't be loaded, nobody can edit just now, but everyone can still leave feedback.
       const list = canEdit() && !config.openEditing ? await loadEditors() : new Set(), unchecked = !list, editors = list || new Set();
       let remembered = null, rememberedId = null;
