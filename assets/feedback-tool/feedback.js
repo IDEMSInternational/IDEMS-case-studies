@@ -435,7 +435,7 @@ FeedbackTool.register("feedback", function (site) {
     const pageTitle = site.pageTitle(), thread = threads[g], topic = topicOf(g);
     const ch = changes(g);
     const item = (c, i) => `${i + 1}. **On ${c.where}**\n${c.quote ? `   > ${c.quote.exact}\n\n` : ""}   ${c.text.replace(/\n/g, "\n   ")}`;
-    const parts = [thread ? `**More feedback for #${thread.issue}** (${pageTitle})` : `**Feedback on ${pageTitle}**${topic ? `: ${topic.label.replace(/^Something about/, "about")}` : ""}`,
+    const parts = [thread ? `**More feedback for #${thread.issue}** (${pageTitle})` : `**Feedback on ${pageTitle}**${topic ? ` · ${topic.short || topic.label}` : ""}`,
       `From: ${me.via === "anon" ? (me.name ? `${me.name} (anonymous)` : "anonymous") : `@${me.user}`}`];
     if (ch.added.length) parts.push(`**New**\n\n${ch.added.map(item).join("\n\n")}`);
     if (ch.changed.length) parts.push(`**Changed**\n\n${ch.changed.map(item).join("\n\n")}`);
@@ -518,18 +518,21 @@ FeedbackTool.register("feedback", function (site) {
   // tab, so the first opens straight away and each next one waits for a click of its own.
   async function sendGitHub(dlg, note) {
     const gs = toSend();
-    const pages = await Promise.all(gs.map(async g => {
-      const { title, body } = await issueFor(g, note);
-      return { g, body, ...T.newIssueLink(title, body, "Paste your feedback here (Ctrl+V or ⌘V), replacing this line.", TOPICS ? repoOf(g) : undefined) };
-    }));
+    const pages = await Promise.all(gs.map(async g => ({ g, ...(await issueFor(g, note)) })));
     const sentAt = Date.now();
     let opened = 0;
-    const openNext = () => { const p = pages[opened++]; if (p.pasted) try { navigator.clipboard.writeText(p.body); } catch (_) {} window.open(p.url, "_blank", "noopener"); show(); };
+    // Each page's link is made as it opens: feedback too long for a link is copied then, so the clipboard holds the
+    // feedback of the page just opened.
+    const openNext = () => {
+      const p = pages[opened++];
+      Object.assign(p, T.newIssueLink(p.title, p.body, "Paste your feedback here (Ctrl+V or ⌘V), replacing this line.", TOPICS ? repoOf(p.g) : undefined));
+      window.open(p.url, "_blank", "noopener"); show();
+    };
     const show = () => {
       const p = pages[opened - 1], next = pages[opened], many = pages.length > 1;
       dlg.innerHTML = `<h2>${next ? `Opened ${opened} of ${pages.length}` : "Almost done"}</h2>
-        <p>${esc(forge.name)} has opened in a new tab${many ? ` for your feedback${where(p.g)}, on ${esc(repoOf(p.g))}` : ""}.${p.pasted ? " It was too long to fill in automatically, so it has been <b>copied</b>: paste it into the description box." : ""} Click <b>Create</b> there to send it.</p>
-        ${next ? `<div class="fb-buttons"><button type="button" class="primary" data-r="next">Now open the second${where(next.g)}, on ${esc(repoOf(next.g))}</button></div>` : ""}
+        <p>${esc(forge.name)} has opened in a new tab${many ? ` for your feedback${where(p.g)}, on ${esc(repoOf(p.g))}` : ""}.${p.pasted ? ` ${many ? "It" : "Your feedback"} was too long to fill in automatically, so it has been <b>copied</b>: paste it into the description box.` : ""} Click <b>Create</b> there to send it.</p>
+        ${next ? `<div class="fb-buttons"><button type="button" class="primary" data-r="next">Now open the ${["second", "third"][opened - 1] || "next"}${where(next.g)}, on ${esc(repoOf(next.g))}</button></div>` : ""}
         <p class="fb-explain">If ${esc(forge.name)} showed an error while you were signing in, <button type="button" class="fb-link" data-r="again">open it again</button>.</p>
         ${p.pasted ? `<details><summary>If pasting doesn't work, copy this text</summary><textarea rows="6" readonly>${esc(p.body)}</textarea></details>` : ""}
         ${next ? "" : `<div class="fb-buttons fb-buttons-wrap"><button type="button" data-r="back">Not sent yet</button><button type="button" data-r="sentkeep">I've sent ${many ? "them" : "it"}: keep going</button><button type="button" class="primary" data-r="sentdone">I've sent ${many ? "them" : "it"}: I'm finished</button></div>`}`;

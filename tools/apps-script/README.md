@@ -31,7 +31,9 @@ In the script editor: **Project Settings** (gear icon) → **Script properties**
 - Property: `GITHUB_TOKEN`
 - Value: the token from step 2
 
-For a repository other than this one, also add `GITHUB_REPOSITORY` with its `owner/name`, and check that the token from step 2 can write issues there. Each repository needs its own deployment: private links only work on the repository they were made for, so pointing an existing deployment at another repository breaks the links people already have.
+For a repository other than this one, also add `GITHUB_REPOSITORY` with its `owner/name`, and check that the token from step 2 can write issues there. Each site needs its own deployment: private links only work on the repository they were made for, so pointing an existing deployment at another repository breaks the links people already have.
+
+A site whose feedback goes to several repositories (the tool's `topics` option, for example a translated book's content and its translation) lists them all in `GITHUB_REPOSITORIES` instead, comma-separated, and its token needs to write issues on each.
 
 ## 5. Deploy it as a web app
 
@@ -56,4 +58,4 @@ After changing `Code.gs`, use **Deploy → Manage deployments → Edit (pencil) 
 
 - Each anonymous thread has a secret key, which is part of the visitor's private link. Only the hash of the key is stored in the script, under the repository and issue number, and adding to a thread requires the key.
 - A hidden "honeypot" field catches simple bots, and the script accepts at most 30 submissions every 10 minutes.
-- The token can only touch issues on the one repository it is set up for.
+- The script only opens issues on the repositories it is set up for, and the token can only touch issues there.
